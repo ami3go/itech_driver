@@ -1,0 +1,168 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "itech-itm3900d-driver"
+version = "0.1.0"
+description = "Python SCPI driver for ITECH IT-M3900D series power supplies and other SCPI-compliant instruments"
+readme = "README.md"
+authors = [
+    { name = "Your Name", email = "your.email@example.com" }
+]
+license = { file = "LICENSE" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+    "Intended Audience :: Manufacturing",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Hardware :: Hardware Drivers",
+    "Operating System :: OS Independent",
+]
+keywords = ["itech", "power-supply", "scpi", "visa", "instrumentation", "test-automation"]
+dependencies = [
+    "pyvisa>=1.11.0",
+    "typing-extensions>=4.0.0; python_version < '3.8'",
+]
+requires-python = ">=3.7"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/itech-itm3900d-driver"
+Documentation = "https://github.com/yourusername/itech-itm3900d-driver#readme"
+Repository = "https://github.com/yourusername/itech-itm3900d-driver"
+Issues = "https://github.com/yourusername/itech-itm3900d-driver/issues"
+Changelog = "https://github.com/yourusername/itech-itm3900d-driver/releases"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0.0",
+    "pytest-cov>=3.0.0",
+    "black>=22.0.0",
+    "isort>=5.10.0",
+    "flake8>=4.0.0",
+    "mypy>=0.900",
+    "sphinx>=4.0.0",
+    "sphinx-rtd-theme>=1.0.0",
+    "twine>=4.0.0",
+]
+test = [
+    "pytest>=6.0.0",
+    "pytest-cov>=3.0.0",
+    "pytest-mock>=3.0.0",
+]
+docs = [
+    "sphinx>=4.0.0",
+    "sphinx-rtd-theme>=1.0.0",
+    "sphinx-autodoc-typehints>=1.0.0",
+]
+
+[project.scripts]
+itech-discover = "itech_driver.cli:discover_instruments"
+itech-control = "itech_driver.cli:control_instrument"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+packages = { find = { where = ["src"] } }
+include-package-data = true
+
+[tool.setuptools.package-data]
+"itech_driver" = ["py.typed"]
+
+[tool.setuptools.dynamic]
+readme = { file = ["README.md"] }
+
+[tool.black]
+line-length = 88
+target-version = ['py37', 'py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 88
+known_first_party = ["itech_driver"]
+
+[tool.mypy]
+python_version = "3.7"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "itech_driver.*",
+]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--verbose --cov=itech_driver --cov-report=term-missing"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.coverage.run]
+source = ["src/itech_driver"]
+omit = [
+    "src/itech_driver/__init__.py",
+    "src/itech_driver/**/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@overload",
+    "raise NotImplementedError",
+    "pass",
+]
+
+[tool.ruff]
+line-length = 88
+select = [
+    "E", "F", "W",  # Pyflakes
+    "C",  # McCabe complexity
+    "B",  # flake8-bugbear
+    "I",  # isort
+]
+ignore = ["E501"]  # line-too-long handled by black
+target-version = "py37"
+
+[tool.ruff.mccabe]
+max-complexity = 10
