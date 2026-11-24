@@ -78,3 +78,37 @@ def test_auto_detection_does_not_discard_strict_policy():
     with pytest.raises(IdentityError):
         auto_detect_instrument("sim", transport=t, require_qualified_capabilities=True)
     assert not t.is_open
+
+
+def test_direct_subsystem_construction_cannot_bypass_strict_guard():
+    from itech_driver import SourceSubsystem, ArbSubsystem, OutputSubsystem
+    t = ScriptedScpiTransport()
+    with ITM3900D("sim", transport=t, require_qualified_capabilities=True) as d:
+        for call in (lambda: SourceSubsystem(d).voltage_set(1),
+                     lambda: ArbSubsystem(d).count_set(1),
+                     OutputSubsystem(d).state_query):
+            with pytest.raises(UnsupportedOperationError):
+                call()
+    assert t.history == []
+
+
+def test_direct_supported_method_preserves_signature_and_wire():
+    import inspect
+    from itech_driver.subsystems.MeasurementSubsystem import MeasurementSubsystem
+    t = ScriptedScpiTransport().on("*IDN?", f"ITECH,{MODEL},S,1").on("MEAS:VOLT?", "2.5")
+    with ITM3900D("sim", transport=t) as d:
+        d.bind_method_qualification(profile(t))
+        direct = MeasurementSubsystem(d)
+        assert inspect.signature(direct.voltage_query) == inspect.signature(d.measurement.voltage_query)
+        assert direct.voltage_query() == 2.5
+    assert t.history == ["*IDN?", "MEAS:VOLT?"]
+
+
+@pytest.mark.parametrize("key", [
+    "BatterySubsystem.state_set", "SenseSubsystem.acquisition_points_query",
+    "LoggingSubsystem.DLOG.raw_data_query", "TriggerSubsystem.delay_set",
+])
+def test_additional_unimplemented_methods_cannot_be_promoted(key):
+    t = ScriptedScpiTransport()
+    with pytest.raises(ConfigurationError):
+        profile(t, methods={key: MethodEvidence(CapabilityState.SUPPORTED, "synthetic")})

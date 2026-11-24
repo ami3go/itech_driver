@@ -21,3 +21,6 @@ validation still apply. This is not a hardware safety boundary or complete
 
 ## Compound operations
 Acquisition and ARB arm preflight all nested required capabilities before the first configuration write. Supervised ON checks the full observation/protection/setpoint/enable capability list before any query or write. OFF is allowed with qualified state-set capability even if observation is not qualified; the result is UNKNOWN, never a safe-state assertion. Registry scalar execution cannot bypass the typed guard. Other compound operations and direct raw/client access still need separate review. No HIL authorization is implied.
+
+## Class-level enforcement
+Guard installation now occurs on subsystem classes rather than attached instances. Directly constructed subsystem objects with an ITM3900D parent therefore use the same qualification lock and method evidence. Explicitly unsupported battery execution, acquisition readback, generic trigger functions and DLOG raw-data methods cannot be promoted by a caller profile. The legacy compatibility default remains unchanged. Raw SCPI and direct core access remain explicit low-level interfaces; no firmware support is inferred.

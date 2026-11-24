@@ -2,7 +2,7 @@
 
 from contextlib import contextmanager
 from scpi_driver_core import ScpiDriverError, SafetyGuardError, ConfigurationError, UnsupportedOperationError
-from ..method_qualification import MethodQualification, bind_subsystem_guards
+from ..method_qualification import MethodQualification, install_subsystem_guards
 from ..arb_integer_qualification import ArbIntegerQualification
 from ..base import BaseInstrument
 from ..capabilities import ApplicationLimits, discover_capabilities, descriptor_for
@@ -21,6 +21,16 @@ from ..subsystems.SourceSubsystem import SourceSubsystem
 from ..subsystems.StatusSubsystem import StatusSubsystem
 from ..subsystems.SystemSubsystem import SystemSubsystem
 from ..subsystems.TriggerSubsystem import TriggerSubsystem
+
+
+# Install exactly once when the driver module is imported. Exported subsystem
+# classes use the same guard even if callers instantiate them directly.
+install_subsystem_guards((
+    SystemSubsystem, SourceSubsystem, OutputSubsystem, StatusSubsystem,
+    TriggerSubsystem, ArbSubsystem, BatterySubsystem, InitiateSubsystem,
+    AbortSubsystem, IOConfigSubsystem, IEEE488, MeasurementSubsystem,
+    SenseSubsystem, FetchSubsystem, LoggingSubsystem,
+))
 
 
 class ITM3900D(BaseInstrument):
@@ -93,9 +103,6 @@ class ITM3900D(BaseInstrument):
         self.fetch = FetchSubsystem(self)
         self.elog = LoggingSubsystem(self, 'ELOG')
         self.dlog = LoggingSubsystem(self, 'DLOG')
-        bind_subsystem_guards(self, (self.system,self.source,self.output,self.status,self.trigger,
-            self.arb,self.battery,self.initiate,self.abort,self.io,self.ieee,self.measurement,
-            self.sense,self.fetch,self.elog,self.dlog))
 
 
     def identity_snapshot(self, *, refresh=False):
