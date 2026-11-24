@@ -57,3 +57,21 @@ def test_no_legacy_retry_call_sites_in_package():
                 assert not any(a.name.endswith("utils.retry") for a in node.names), path
             if isinstance(node, ast.Call):
                 assert not (isinstance(node.func, ast.Name) and node.func.id == "retry"), path
+
+
+def test_retry_refresh_updates_cached_identity_and_revokes_remote():
+    t = ScriptedScpiTransport().on("*IDN?", "ITECH,IT-M3902D-80-40,S1,1").on("SYST:REM")
+    with ITM3900D("sim", transport=t, require_remote=True) as d:
+        d.enter_remote()
+        d.identity_snapshot()
+        calls = []
+        def reply(_):
+            calls.append(1)
+            if len(calls) == 1:
+                raise TransportTimeoutError("lost")
+            return "ITECH,IT-M3902D-80-40,S2,1"
+        t.on("*IDN?", reply)
+        query_identity_with_retry(d, policy=RetryPolicy(attempts=2, max_elapsed_s=1))
+        assert d.identity_snapshot().serial_number == "S2"
+        assert d.requested_mode is None
+        assert t.history == ["SYST:REM", "*IDN?", "*IDN?", "*IDN?"]
