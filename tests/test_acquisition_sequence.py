@@ -59,7 +59,7 @@ def test_fault_each_step_never_continues_or_replays(failure):
 
 
 def test_other_thread_cannot_interleave_compound_sequence():
-    entered, release, attempting = threading.Event(), threading.Event(), threading.Event()
+    entered, release, attempting, second_done = (threading.Event() for _ in range(4))
     t = transport().on("*IDN?", "ID")
     errors = []
     def block(_):
@@ -78,13 +78,17 @@ def test_other_thread_cannot_interleave_compound_sequence():
                 d.identify()
             except BaseException as exc:
                 errors.append(exc)
+            finally:
+                second_done.set()
         a, b = threading.Thread(target=first), threading.Thread(target=second)
         a.start()
         try:
             assert entered.wait(2)
             b.start()
             assert attempting.wait(2)
-            assert t.history == [COMMANDS[0]]
+            # Scripted transport history takes the same transport lock as the
+            # blocked handler; inspecting it here would deadlock the test.
+            assert not second_done.wait(.05)
         finally:
             release.set()
             a.join(3)
