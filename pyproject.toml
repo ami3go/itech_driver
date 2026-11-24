@@ -19,6 +19,7 @@ Issues = "https://github.com/ami3go/itech_driver/issues"
 [project.optional-dependencies]
 visa = ["pyvisa>=1.14"]
 serial = ["pyserial>=3.5"]
+discovery = ["pyvisa>=1.14", "pyserial>=3.5", "zeroconf>=0.132"]
 test = ["pytest>=8", "pytest-timeout>=2.4,!=2.5.0", "hypothesis>=6", "pyvisa-sim>=0.7.1", "pyserial>=3.5", "pytest-cov>=5"]
 dev = ["pytest>=8", "pytest-timeout>=2.4,!=2.5.0", "hypothesis>=6", "pyvisa-sim>=0.7.1", "pyserial>=3.5", "pytest-cov>=5", "build>=1.2"]
 
