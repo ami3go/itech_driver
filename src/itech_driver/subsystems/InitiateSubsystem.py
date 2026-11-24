@@ -1,3 +1,5 @@
+import math
+from scpi_driver_core import ConfigurationError
 from scpi_driver_core.scpi.parsers import parse_bool
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
@@ -26,7 +28,24 @@ class InitiateSubsystem:
     def continuous_acq_query(self) -> bool:  # Added: Missing query method
         return parse_bool(self._p.query_scpi('INITiate:CONTinuous:ACQuire?'))
 
-    def dlog(self):
+    def dlog(self, *, storage_confirmed: bool = False,
+             seconds_since_previous_end: float | None = None,
+             no_previous_recording_confirmed: bool = False):
+        """Start DLOG after explicit confirmation of external prerequisites.
+
+        No guide-qualified query for USB storage or recording completion is
+        available yet. These arguments are operator/caller attestations, not
+        instrument readback. See guide p.108.
+        """
+        if storage_confirmed is not True:
+            raise ConfigurationError("confirm USB recording storage and compatible connection")
+        if no_previous_recording_confirmed is True:
+            if seconds_since_previous_end is not None:
+                raise ConfigurationError("conflicting DLOG history confirmations")
+        else:
+            elapsed = seconds_since_previous_end
+            if isinstance(elapsed, bool) or not isinstance(elapsed, (int, float)) or not math.isfinite(elapsed) or elapsed < 5:
+                raise ConfigurationError("confirm previous recording ended at least 5 seconds ago")
         self._p.write_scpi('INITiate:DLOG')
 
     def elog(self):
