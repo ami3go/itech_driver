@@ -55,7 +55,7 @@ def create_instrument(model: str, resource_name: str, **kwargs) -> BaseInstrumen
 
 
 def auto_detect_instrument(resource_name: str, *, require_remote: bool = False,
-                           application_limits=None, **kwargs) -> BaseInstrument:
+                           application_limits=None, require_qualified_capabilities=False, **kwargs) -> BaseInstrument:
     """Probe once, then adopt the same live session for a recognized model.
 
     Unknown valid identities retain only generic common commands. An explicit
@@ -64,18 +64,19 @@ def auto_detect_instrument(resource_name: str, *, require_remote: bool = False,
     from scpi_driver_core import IdentityError
     from ..identity import is_itm3900d
 
-    ITM3900D._validate_policy(require_remote, application_limits)
+    ITM3900D._validate_policy(require_remote, application_limits, require_qualified_capabilities)
     temp = GenericSCPIInstrument(resource_name, **kwargs)
     try:
         identity = temp.identity_snapshot()
         if not is_itm3900d(identity):
-            if require_remote or application_limits is not None:
+            if require_remote or application_limits is not None or require_qualified_capabilities:
                 raise IdentityError("vendor safety policy requires recognized ITECH model")
             return temp
         # Only this factory holds temp. The session (including its immutable
         # identity cache) is transferred, not the transport reopened.
         driver = ITM3900D._from_live_session(
-            temp.session, require_remote=require_remote, application_limits=application_limits
+            temp.session, require_remote=require_remote, application_limits=application_limits,
+            require_qualified_capabilities=require_qualified_capabilities
         )
         return driver
     except BaseException as primary:
