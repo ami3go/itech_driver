@@ -113,3 +113,29 @@ def test_off_residual_not_confirmed_is_nonzero(monkeypatch):
         cli.main(BASE + ["--output", "off"] + RESIDUAL)
     assert t.history.count("OUTP:STAT OFF") == 1
     assert "OUTP:STAT ON" not in t.history
+
+
+def test_interruption_during_hold_attempts_one_off(monkeypatch):
+    t = transport()
+    install(monkeypatch, t)
+    def interrupt(_):
+        raise KeyboardInterrupt()
+    monkeypatch.setattr(cli.time, "sleep", interrupt)
+    with pytest.raises(SystemExit):
+        cli.main(BASE + ON)
+    assert t.history.count("OUTP:STAT ON") == 1
+    assert t.history.count("OUTP:STAT OFF") == 1
+
+
+def test_post_on_measurement_outside_envelope_causes_off(monkeypatch):
+    t = transport()
+    calls = []
+    def measured(_):
+        calls.append(1)
+        return "12" if len(calls) == 2 else "0"
+    t.on("MEAS:VOLT?", measured)
+    install(monkeypatch, t)
+    with pytest.raises(SystemExit):
+        cli.main(BASE + ON)
+    assert t.history.count("OUTP:STAT ON") == 1
+    assert t.history.count("OUTP:STAT OFF") == 1

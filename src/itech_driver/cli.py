@@ -113,23 +113,43 @@ def _verified_off(instr, args):
 
 def _run_supervised_on(instr, args, caps):
     generation = instr.session.generation
-    result = request_output_on(instr, authorized=True,
-        max_voltage_v=caps.voltage.maximum,
-        max_current_a=caps.current.maximum,
-        max_power_w=caps.power_limit.maximum)
-    # The helper raises on failed preflight, before ON; a returned result
-    # indicates one ON attempt. Never retry it or reconnect to issue cleanup.
+    attempted = False
+
+    def cleanup():
+        if instr.session.is_connected and instr.session.generation == generation:
+            _verified_off(instr, args)
+        else:
+            raise SafetyGuardError("No automatic reconnect or OFF replay. Output state UNKNOWN; use independent bench safety procedure.")
+
     try:
+        try:
+            result = request_output_on(instr, authorized=True,
+                max_voltage_v=caps.voltage.maximum,
+                max_current_a=caps.current.maximum,
+                max_power_w=caps.power_limit.maximum)
+        except KeyboardInterrupt:
+            # Interrupt may have arrived after transmission, so conservatively
+            # attempt one same-session OFF, even if preflight was interrupted.
+            attempted = True
+            raise
+        # Helper raises on rejected preflight before ON; return means an ON attempt.
+        attempted = True
         if result.outcome != "observed" or result.programmed is not True:
             raise SafetyGuardError("ON outcome unknown; physical output state unconfirmed")
         print("Instrument reports output ON; supervised interval started.")
         time.sleep(args.hold_seconds)
-    finally:
-        if instr.session.is_connected and instr.session.generation == generation:
-            _verified_off(instr, args)
-        else:
-            print("No automatic reconnect or OFF replay. Output state UNKNOWN; use independent bench safety procedure.",
-                  file=sys.stderr)
+    except BaseException as primary:
+        if attempted:
+            try:
+                cleanup()
+            except BaseException as error:
+                # Preserve the primary failure, but explicitly report cleanup failure.
+                print(f"Cleanup failed: {error}; physical output state UNKNOWN.", file=sys.stderr)
+                if hasattr(primary, "add_note"):
+                    primary.add_note(f"OFF cleanup failed: {error!r}")
+        raise
+    else:
+        cleanup()
 
 
 def control_instrument(args) -> None:

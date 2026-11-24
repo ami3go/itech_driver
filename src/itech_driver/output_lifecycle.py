@@ -77,7 +77,12 @@ def request_output_on(driver, *, authorized=False, max_voltage_v, max_current_a,
         observed = observe_output(driver,requested=True)
         if observed.programmed is not True or observed.questionable != 0 or observed.outcome != "observed":
             return OutputEvidence(True,observed.programmed,observed.questionable,observed.voltage_v,observed.current_a,"unknown",observed.error)
-        return observed
+        if (abs(observed.voltage_v) > max_voltage_v or abs(observed.current_a) > max_current_a
+            or abs(observed.voltage_v * observed.current_a) > max_power_w):
+        return OutputEvidence(True, observed.programmed, observed.questionable,
+                              observed.voltage_v, observed.current_a, "unknown",
+                              "measured output exceeds caller envelope")
+    return observed
 
 
 def request_output_off(driver, *, max_residual_v, max_residual_a, max_samples=3):
