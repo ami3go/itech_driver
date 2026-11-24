@@ -10,7 +10,7 @@ def test_ambiguous_write_is_never_replayed(command):
     def lost_ack(_):
         raise TransportTimeoutError("transmitted but completion unknown")
 
-    t = ScriptedScpiTransport().on(command, lost_ack)
+    t = ScriptedScpiTransport(error_query="SYST:SIMERR?").on(command, lost_ack)
     with ITM3900D("sim", transport=t) as d:
         with pytest.raises(TimeoutError):
             d.write_scpi(command)
@@ -23,7 +23,7 @@ def test_lost_query_reply_is_never_replayed(command):
     def lost_reply(_):
         raise TransportTimeoutError("query reached instrument but response lost")
 
-    t = ScriptedScpiTransport().on(command, lost_reply)
+    t = ScriptedScpiTransport(error_query="SYST:SIMERR?").on(command, lost_reply)
     with ITM3900D("sim", transport=t) as d:
         with pytest.raises(TimeoutError):
             d.query_scpi(command)
