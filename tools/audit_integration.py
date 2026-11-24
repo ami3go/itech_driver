@@ -63,6 +63,15 @@ def audit(repo,base,prs,*,fetch=True,archive=None):
             result["audit_tree"]=git(work,"rev-parse","HEAD^{tree}").stdout.strip()
             result["status"]="CONFLICTS" if any(r["status"] in ("CONFLICT","MERGE_ERROR") for r in result["results"]) else "CLEAN_MERGE_AUDIT"
             if archive is not None and result["status"]=="CLEAN_MERGE_AUDIT":
+                # Apply the explicit reconciliation to the disposable integrated tree
+                # before the matrix tests. The source PRs and master remain untouched.
+                from refactoring_phase1 import reconcile
+                result["pre_reconciliation_tree"]=result["audit_tree"]
+                reconcile(work)
+                git(work,"add","--","src/itech_driver","tests/test_remote_mode.py","docs/command_registry.json")
+                git(work,"commit","-m","ITECH-REF-AUTO-01: reconcile #186–189")
+                result["audit_tree"]=git(work,"rev-parse","HEAD^{tree}").stdout.strip()
+                result["reconciliation"]="phase1 #186–189; guide qualification pending"
                 archive=Path(archive).resolve()
                 git(work,"archive","--format=zip","--output="+str(archive),"HEAD")
                 result["archive_sha256"]=hashlib.sha256(archive.read_bytes()).hexdigest()
