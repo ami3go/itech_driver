@@ -12,9 +12,9 @@ each nested typed operation. Common identity remains available.
 The evidence reference is an external caller attestation, not manufacturer
 certification or HIL authorization. No built-in firmware support matrix is
 asserted. Legacy constructors retain permissive behavior for compatibility;
-strict mode is opt-in. Raw SCPI/client/session, directly instantiated
-subsystems and separate lifecycle helpers are explicit low-level paths not
-covered by the attached subsystem guard. Existing remote mode and parameter
+strict mode is opt-in. Raw SCPI/client/session are explicit low-level paths outside the typed guards.
+Directly instantiated subsystems are covered by class-level enforcement below.
+Compound lifecycle helpers perform the preflight documented below. Existing remote mode and parameter
 validation still apply. This is not a hardware safety boundary or complete
 #173 acceptance.
 
@@ -24,3 +24,6 @@ Acquisition and ARB arm preflight all nested required capabilities before the fi
 
 ## Class-level enforcement
 Guard installation now occurs on subsystem classes rather than attached instances. Directly constructed subsystem objects with an ITM3900D parent therefore use the same qualification lock and method evidence. Explicitly unsupported battery execution, acquisition readback, generic trigger functions and DLOG raw-data methods cannot be promoted by a caller profile. The legacy compatibility default remains unchanged. Raw SCPI and direct core access remain explicit low-level interfaces; no firmware support is inferred.
+
+## Single capability inventory
+Method qualification keys and restricted dispositions now derive directly from the immutable runtime command registry rather than a second 300-key list. IEEE identity and the offline planner are excluded; ELOG and DLOG retain separate evidence and DLOG raw data remains restricted. Class installation checks actual methods against the derived set. Legacy opt-in behavior is unchanged; external model/firmware evidence remains necessary.

@@ -112,3 +112,16 @@ def test_additional_unimplemented_methods_cannot_be_promoted(key):
     t = ScriptedScpiTransport()
     with pytest.raises(ConfigurationError):
         profile(t, methods={key: MethodEvidence(CapabilityState.SUPPORTED, "synthetic")})
+
+
+def test_capability_inventory_is_derived_from_runtime_registry():
+    from itech_driver.command_specs import COMMAND_SPECS, ResultKind
+    from itech_driver.method_qualification import METHOD_KEYS, RESTRICTED
+    keys = set(COMMAND_SPECS) - {"IEEE488.idn", "LoggingSubsystem.commands",
+                               "LoggingSubsystem.raw_data_query", "LoggingSubsystem.state_query"}
+    keys.update("LoggingSubsystem." + kind + "." + name
+                for kind in ("DLOG", "ELOG") for name in ("raw_data_query", "state_query"))
+    assert METHOD_KEYS == keys
+    assert RESTRICTED == {k for k, s in COMMAND_SPECS.items()
+                          if s.kind is ResultKind.RESTRICTED} | {"LoggingSubsystem.DLOG.raw_data_query"}
+    assert RESTRICTED <= METHOD_KEYS
