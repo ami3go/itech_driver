@@ -68,17 +68,23 @@ def auto_detect_instrument(resource_name: str, **kwargs) -> BaseInstrument:
         BaseInstrument: Detected instrument instance or GenericSCPIInstrument
     """
     from scpi_driver_core.scpi.parsers import parse_identity
+    from ..identity import is_itm3900d
 
     # Close temporary connection before opening the model-specific driver.
     # Unknown valid identities retain generic support; failed I/O is not hidden.
     temp = GenericSCPIInstrument(resource_name, **kwargs)
     try:
         identity = parse_identity(temp.identify())
-        model = identity.model.upper()
-        if not any(token in model for token in ('IT-M3900D', 'ITM3900D', 'IT3900D')):
+        if not is_itm3900d(identity):
             return temp
-    except BaseException:
-        temp.close()
+    except BaseException as primary:
+        try:
+            temp.close()
+        except Exception as cleanup:
+            if hasattr(primary, 'add_note'):
+                primary.add_note(f'Identification cleanup failed: {cleanup!r}')
+            else:
+                primary.cleanup_error = cleanup
         raise
     temp.close()
     return ITM3900D(resource_name, **kwargs)

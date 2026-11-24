@@ -1,0 +1,426 @@
+{
+  "status": "NOT_READY",
+  "scope": "original review issues #7–#76; #77 is this gate",
+  "rows": [
+    {
+      "issue": 7,
+      "primary_pr": 79,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 8,
+      "primary_pr": 80,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 9,
+      "primary_pr": 81,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 10,
+      "primary_pr": 82,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 11,
+      "primary_pr": 1,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 12,
+      "primary_pr": 5,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 13,
+      "primary_pr": 83,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 14,
+      "primary_pr": 84,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 15,
+      "primary_pr": 85,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 16,
+      "primary_pr": 86,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 17,
+      "primary_pr": 87,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 18,
+      "primary_pr": 88,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 19,
+      "primary_pr": 89,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 20,
+      "primary_pr": 90,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 21,
+      "primary_pr": 91,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 22,
+      "primary_pr": 92,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 23,
+      "primary_pr": 93,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 24,
+      "primary_pr": 94,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 25,
+      "primary_pr": 95,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 26,
+      "primary_pr": 96,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 27,
+      "primary_pr": 97,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 28,
+      "primary_pr": 98,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 29,
+      "primary_pr": 99,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 30,
+      "primary_pr": 100,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 31,
+      "primary_pr": 101,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 32,
+      "primary_pr": 102,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 33,
+      "primary_pr": 103,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 34,
+      "primary_pr": 104,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 35,
+      "primary_pr": 105,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 36,
+      "primary_pr": 106,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 37,
+      "primary_pr": 107,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 38,
+      "primary_pr": 108,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 39,
+      "primary_pr": 109,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 40,
+      "primary_pr": 110,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 41,
+      "primary_pr": 111,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 42,
+      "primary_pr": 112,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 43,
+      "primary_pr": 113,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 44,
+      "primary_pr": 114,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 45,
+      "primary_pr": 115,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 46,
+      "primary_pr": 116,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 47,
+      "primary_pr": 117,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 48,
+      "primary_pr": 118,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 49,
+      "primary_pr": 119,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 50,
+      "primary_pr": 120,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 51,
+      "primary_pr": 121,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 52,
+      "primary_pr": 122,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 53,
+      "primary_pr": 123,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 54,
+      "primary_pr": 124,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 55,
+      "primary_pr": 125,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 56,
+      "primary_pr": 126,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 57,
+      "primary_pr": 127,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 58,
+      "primary_pr": 128,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 59,
+      "primary_pr": 129,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 60,
+      "primary_pr": 130,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 61,
+      "primary_pr": 131,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 62,
+      "primary_pr": 132,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 63,
+      "primary_pr": 133,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 64,
+      "primary_pr": 134,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 65,
+      "primary_pr": 136,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 66,
+      "primary_pr": 138,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 67,
+      "primary_pr": 139,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 68,
+      "primary_pr": 140,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 69,
+      "primary_pr": 141,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 70,
+      "primary_pr": 1,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 71,
+      "primary_pr": 78,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 72,
+      "primary_pr": 142,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 73,
+      "primary_pr": 143,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 74,
+      "primary_pr": 144,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 75,
+      "primary_pr": 145,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    },
+    {
+      "issue": 76,
+      "primary_pr": 146,
+      "integrated": false,
+      "physical_qualification": "NOT_RUN"
+    }
+  ]
+}

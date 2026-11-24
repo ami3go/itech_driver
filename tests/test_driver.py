@@ -9,7 +9,7 @@ from scpi_driver_core.simulation import ScriptedReply, ScriptedScpiTransport
 from itech_driver import ITM3900D, GenericSCPIInstrument, auto_detect_instrument
 from itech_driver.exceptions import TimeoutError
 
-IDN = "ITECH,IT-M3900D,SIM001,1.0"
+IDN = "ITECH,IT-M3902D-80-40,SIM001,1.0"
 
 
 def make_driver(transport):
@@ -32,13 +32,14 @@ def test_session_and_subsystem_wiring():
 def test_exact_command_coverage():
     t = ScriptedScpiTransport()
     commands = [
-        "SOUR1:VOLT 12.5", "OUTP1:STAT OFF", "ARB:FUNCTION:SHAPE UDEF",
+        "SOUR:VOLT 12.5", "OUTP:STAT OFF", "ARB:FUNCTION:SHAPE UDEF",
         "BATT:CHAR:VOLT 3.5", "IO:SELect 1", "TRIG:ACQ:SOUR EXT",
-        "TRIG:ACQ", "INITiate:ARB", "ABORt:ARB", "*CLS",
+        "INIT:ACQ", "INITiate:ARB", "ABORt:ARB", "*CLS",
     ]
     for command in commands:
         t.on(command)
-    t.on("SOUR1:VOLT?", "12.5").on("OUTP1:STAT?", "OFF")
+    t.on("SOUR:VOLT? MIN", "0").on("SOUR:VOLT? MAX", "30")
+    t.on("SOUR:VOLT?", "12.5").on("OUTP:STAT?", "OFF")
     t.on("STAT:OPER:COND?", "4").on("SYST:VERSion?", "1999.0")
     with make_driver(t) as d:
         d.source.voltage_set(12.5)
@@ -50,7 +51,7 @@ def test_exact_command_coverage():
         d.initiate.arb()
         d.abort.arb()
         d.ieee.clear_status()
-        assert [s.upper() for s in t.history] == [s.upper() for s in commands]
+        assert [s.upper() for s in t.history] == [s.upper() for s in ["SOUR:VOLT? MIN","SOUR:VOLT? MAX",*commands]]
         assert d.source.voltage_query() == 12.5
         assert d.output.state_query() is False
         assert d.status.oper_condition_query() == 4
@@ -81,7 +82,7 @@ def test_query_timeout_is_not_replayed():
 
 @pytest.mark.parametrize("response", ["UNKNOWN", "ONWARD", "2", "-1"])
 def test_malformed_output_is_not_silently_false(response):
-    t = ScriptedScpiTransport().on("OUTP1:STAT?", response)
+    t = ScriptedScpiTransport().on("OUTP:STAT?", response)
     with make_driver(t) as d, pytest.raises(ResponseParseError):
         d.output.state_query()
 
