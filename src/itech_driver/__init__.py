@@ -26,7 +26,9 @@ from .subsystems.InitiateSubsystem import InitiateSubsystem
 from .subsystems.AbortSubsystem import AbortSubsystem
 
 
-__version__ = "0.2.0"
+from importlib.metadata import version as _distribution_version
+
+__version__ = _distribution_version("itech-itm3900d-driver")
 __all__ = [
     # Base classes
     'BaseInstrument',
