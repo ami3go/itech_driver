@@ -70,3 +70,6 @@ __all__.append('connect_vcp')
 
 from .discovery import discover_instruments
 __all__.append('discover_instruments')
+
+from .connection import ConnectionConfig
+__all__.append("ConnectionConfig")
