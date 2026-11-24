@@ -58,7 +58,7 @@ class SourceSubsystem:
     def voltage_set(self, value: Number, channel: int = 1):
         self._check_channel(channel)
         self._check_setpoint(value)
-        self._p.write_scpi(f'SOUR:VOLT {value}')
+        self._limit_set('SOUR:VOLT', value)
 
     def voltage_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
@@ -67,7 +67,7 @@ class SourceSubsystem:
     def current_set(self, value: Number, channel: int = 1):
         self._check_channel(channel)
         self._check_setpoint(value)
-        self._p.write_scpi(f'SOUR:CURR {value}')
+        self._limit_set('SOUR:CURR', value)
 
     def current_query(self, channel: int = 1) -> float:
         self._check_channel(channel)

@@ -12,6 +12,10 @@ devices:
         q: "\n"
         r: "\n"
     dialogues:
+      - q: "SOUR:VOLT? MIN"
+        r: "0"
+      - q: "SOUR:VOLT? MAX"
+        r: "30"
       - q: "*IDN?"
         r: "ITECH,IT-M3900D,SIM001,1.0"
       - q: "OUTP:STAT OFF"

@@ -38,6 +38,7 @@ def test_exact_command_coverage():
     ]
     for command in commands:
         t.on(command)
+    t.on("SOUR:VOLT? MIN", "0").on("SOUR:VOLT? MAX", "30")
     t.on("SOUR:VOLT?", "12.5").on("OUTP:STAT?", "OFF")
     t.on("STAT:OPER:COND?", "4").on("SYST:VERSion?", "1999.0")
     with make_driver(t) as d:
@@ -50,7 +51,7 @@ def test_exact_command_coverage():
         d.initiate.arb()
         d.abort.arb()
         d.ieee.clear_status()
-        assert [s.upper() for s in t.history] == [s.upper() for s in commands]
+        assert [s.upper() for s in t.history] == [s.upper() for s in ["SOUR:VOLT? MIN","SOUR:VOLT? MAX",*commands]]
         assert d.source.voltage_query() == 12.5
         assert d.output.state_query() is False
         assert d.status.oper_condition_query() == 4
