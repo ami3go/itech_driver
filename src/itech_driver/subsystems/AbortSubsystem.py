@@ -1,3 +1,4 @@
+from scpi_driver_core import UnsupportedOperationError
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
 # Abort Subsystem (ABORt)
@@ -13,8 +14,8 @@ class AbortSubsystem:
     def arb(self):
         self._p.write_scpi('ABORt:ARB')
 
-    def dlog(self):  # Added: Missing DLOG abort
-        self._p.write_scpi('ABORt:DLOG')
+    def dlog(self):
+        raise UnsupportedOperationError("DLOG stop command not qualified for IT-M3900D")
 
-    def elog(self):  # Added: Missing ELOG abort
-        self._p.write_scpi('ABORt:ELOG')
+    def elog(self):
+        raise UnsupportedOperationError("ELOG stop command not qualified for IT-M3900D")
