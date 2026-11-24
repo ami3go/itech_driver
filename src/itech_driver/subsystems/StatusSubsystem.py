@@ -1,4 +1,4 @@
-from ..command_specs import execute
+from ..command_specs import execute, execute_parameterized, command_spec
 from scpi_driver_core import ConfigurationError, ResponseParseError
 from scpi_driver_core.scpi.parsers import parse_int
 from ..base import  BaseInstrument, BoolLike, Number
@@ -19,10 +19,10 @@ class StatusSubsystem:
         return execute(self._p, "StatusSubsystem.oper_condition_query")
 
     def oper_enable_set(self, mask: int):
-        self._mask_set('STAT:OPER:ENAB', mask)
+        self._mask_set(command_spec("StatusSubsystem.oper_enable_set").header, mask)
 
     def oper_enable_query(self) -> int:
-        return self._mask_query('STAT:OPER:ENAB')
+        return self._mask_query(command_spec("StatusSubsystem.oper_enable_query").header)
 
     def oper_event_query(self) -> int:
         return execute(self._p, "StatusSubsystem.oper_event_query")
@@ -32,10 +32,10 @@ class StatusSubsystem:
         return execute(self._p, "StatusSubsystem.ques_condition_query")
 
     def ques_enable_set(self, mask: int):
-        self._mask_set('STAT:QUES:ENAB', mask)
+        self._mask_set(command_spec("StatusSubsystem.ques_enable_set").header, mask)
 
     def ques_enable_query(self) -> int:
-        return self._mask_query('STAT:QUES:ENAB')
+        return self._mask_query(command_spec("StatusSubsystem.ques_enable_query").header)
 
     def ques_event_query(self) -> int:
         return execute(self._p, "StatusSubsystem.ques_event_query")
@@ -67,25 +67,25 @@ class StatusSubsystem:
         return mask
 
     def oper_positive_transition_set(self, mask: int):
-        self._mask_set("STAT:OPER:PTR", mask)
+        self._mask_set(command_spec("StatusSubsystem.oper_positive_transition_set").header, mask)
 
     def oper_positive_transition_query(self) -> int:
-        return self._mask_query("STAT:OPER:PTR")
+        return self._mask_query(command_spec("StatusSubsystem.oper_positive_transition_query").header)
 
     def oper_negative_transition_set(self, mask: int):
-        self._mask_set("STAT:OPER:NTR", mask)
+        self._mask_set(command_spec("StatusSubsystem.oper_negative_transition_set").header, mask)
 
     def oper_negative_transition_query(self) -> int:
-        return self._mask_query("STAT:OPER:NTR")
+        return self._mask_query(command_spec("StatusSubsystem.oper_negative_transition_query").header)
 
     def ques_positive_transition_set(self, mask: int):
-        self._mask_set("STAT:QUES:PTR", mask)
+        self._mask_set(command_spec("StatusSubsystem.ques_positive_transition_set").header, mask)
 
     def ques_positive_transition_query(self) -> int:
-        return self._mask_query("STAT:QUES:PTR")
+        return self._mask_query(command_spec("StatusSubsystem.ques_positive_transition_query").header)
 
     def ques_negative_transition_set(self, mask: int):
-        self._mask_set("STAT:QUES:NTR", mask)
+        self._mask_set(command_spec("StatusSubsystem.ques_negative_transition_set").header, mask)
 
     def ques_negative_transition_query(self) -> int:
-        return self._mask_query("STAT:QUES:NTR")
+        return self._mask_query(command_spec("StatusSubsystem.ques_negative_transition_query").header)

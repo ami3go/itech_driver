@@ -3,6 +3,8 @@
 Exact readback syntax, units and hardware-dependent limits need further
 qualification. The caller supplies protocol values, not inferred rates.
 """
+from ..command_specs import execute, execute_parameterized, command_spec
+
 from scpi_driver_core import ConfigurationError, UnsupportedOperationError
 from ..utils.validation import finite_number
 
@@ -30,13 +32,13 @@ class SenseSubsystem:
         self._p = parent
 
     def acquisition_points_set(self, points: int):
-        self._p.write_scpi(f"SENS:ACQ:POIN {_points(points)}")
+        execute_parameterized(self._p, "SenseSubsystem.acquisition_points_set", f"{_points(points)}")
 
     def acquisition_offset_set(self, points: int):
-        self._p.write_scpi(f"SENS:ACQ:OFFS:POIN {_offset(points)}")
+        execute_parameterized(self._p, "SenseSubsystem.acquisition_offset_set", f"{_offset(points)}")
 
     def acquisition_interval_set(self, interval: float):
-        self._p.write_scpi(f"SENS:ACQ:TINT {_interval(interval)}")
+        execute_parameterized(self._p, "SenseSubsystem.acquisition_interval_set", f"{_interval(interval)}")
 
     def acquisition_points_query(self):
         raise UnsupportedOperationError("acquisition points readback not guide-qualified")

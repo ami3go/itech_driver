@@ -1,4 +1,4 @@
-from ..command_specs import execute
+from ..command_specs import execute, execute_parameterized, command_spec
 import math
 from scpi_driver_core import ConfigurationError, ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_float
@@ -31,7 +31,7 @@ class TriggerSubsystem:
             self.acquire_arm()
 
     def acquire_mode_set(self, mode: str):
-        self._p.write_scpi(f'TRIG:ACQ:MODE {mode}')
+        execute_parameterized(self._p, "TriggerSubsystem.acquire_mode_set", f'{mode}')
 
     def acquire_mode_query(self) -> str:
         return execute(self._p, "TriggerSubsystem.acquire_mode_query")
@@ -107,13 +107,13 @@ class TriggerSubsystem:
         return str(value)
 
     def acquire_voltage_level_set(self, value: Number):
-        self._p.write_scpi(f"TRIG:ACQ:VOLT:LEV {self._numeric_arg(value)}")
+        execute_parameterized(self._p, "TriggerSubsystem.acquire_voltage_level_set", f"{self._numeric_arg(value)}")
 
     def acquire_voltage_level_query(self) -> float:
         return execute(self._p, "TriggerSubsystem.acquire_voltage_level_query")
 
     def acquire_current_level_set(self, value: Number):
-        self._p.write_scpi(f"TRIG:ACQ:CURR:LEV {self._numeric_arg(value)}")
+        execute_parameterized(self._p, "TriggerSubsystem.acquire_current_level_set", f"{self._numeric_arg(value)}")
 
     def acquire_current_level_query(self) -> float:
         return execute(self._p, "TriggerSubsystem.acquire_current_level_query")
