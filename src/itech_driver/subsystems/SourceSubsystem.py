@@ -1,4 +1,5 @@
 import math
+import warnings
 from scpi_driver_core import ConfigurationError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float
 from ..base import  BaseInstrument, BoolLike, Number
@@ -94,24 +95,56 @@ class SourceSubsystem:
         self._check_channel(channel)
         return parse_bool(self._p.query_scpi(f'SOUR:CURR:OVER:PROT:STAT?'))
 
-    def power_limit_set(self, value: Number, channel: int = 1):
+    def opp_threshold_set(self, value: Number, channel: int = 1):
         self._check_channel(channel)
         self._check_setpoint(value)
         self._p.write_scpi(f'SOUR:POW:OVER:PROT:LEV {value}')
 
-    def power_limit_query(self, channel: int = 1) -> float:
+    def opp_threshold_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi(f'SOUR:POW:OVER:PROT:LEV?'))
+        return parse_float(self._p.query_scpi('SOUR:POW:OVER:PROT:LEV?'))
 
-    def power_limit_enable(self, enable: BoolLike, channel: int = 1):  # Added: Missing enable method
+    def opp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
         if type(enable) not in (bool, int) or enable not in (0, 1):
             raise ConfigurationError("protection enable must be bool or 0/1")
         self._p.write_scpi(f'SOUR:POW:OVER:PROT:STAT {1 if enable else 0}')
 
-    def power_limit_enable_query(self, channel: int = 1) -> bool:  # Added: Missing query method
+    def opp_enable_query(self, channel: int = 1) -> bool:
         self._check_channel(channel)
-        return parse_bool(self._p.query_scpi(f'SOUR:POW:OVER:PROT:STAT?'))
+        return parse_bool(self._p.query_scpi('SOUR:POW:OVER:PROT:STAT?'))
+
+    def output_power_limit_set(self, value: Number, channel: int = 1):
+        """Set the programmed power limit, not the OPP trip threshold."""
+        self._check_channel(channel)
+        self._check_setpoint(value)
+        self._p.write_scpi(f'SOUR:POW:LIM {value}')
+
+    def output_power_limit_query(self, channel: int = 1) -> float:
+        self._check_channel(channel)
+        return parse_float(self._p.query_scpi('SOUR:POW:LIM?'))
+
+    # Retain historical behavior explicitly during migration; never silently
+    # turn an existing OPP threshold operation into a different setting.
+    def power_limit_set(self, value: Number, channel: int = 1):
+        warnings.warn("power_limit_set historically sets OPP; use opp_threshold_set "
+                      "or output_power_limit_set", DeprecationWarning, stacklevel=2)
+        return self.opp_threshold_set(value, channel)
+
+    def power_limit_query(self, channel: int = 1) -> float:
+        warnings.warn("power_limit_query historically reads OPP; use opp_threshold_query "
+                      "or output_power_limit_query", DeprecationWarning, stacklevel=2)
+        return self.opp_threshold_query(channel)
+
+    def power_limit_enable(self, enable: BoolLike, channel: int = 1):
+        warnings.warn("power_limit_enable historically enables OPP; use opp_enable",
+                      DeprecationWarning, stacklevel=2)
+        return self.opp_enable(enable, channel)
+
+    def power_limit_enable_query(self, channel: int = 1) -> bool:
+        warnings.warn("power_limit_enable_query historically reads OPP; use opp_enable_query",
+                      DeprecationWarning, stacklevel=2)
+        return self.opp_enable_query(channel)
 
     # Remote sense enable
     def remote_sense_set(self, enable: BoolLike, channel: int = 1):
