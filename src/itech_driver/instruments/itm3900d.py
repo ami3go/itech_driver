@@ -3,6 +3,7 @@
 from contextlib import contextmanager
 from scpi_driver_core import ScpiDriverError, SafetyGuardError, ConfigurationError, UnsupportedOperationError
 from ..method_qualification import MethodQualification, bind_subsystem_guards
+from ..arb_integer_qualification import ArbIntegerQualification
 from ..base import BaseInstrument
 from ..capabilities import ApplicationLimits, discover_capabilities, descriptor_for
 from ..subsystems.LoggingSubsystem import LoggingSubsystem
@@ -55,6 +56,9 @@ class ITM3900D(BaseInstrument):
         self._require_qualified_capabilities = require_qualified_capabilities
         self._method_qualification = None
         self._qualification_generation = None
+        self._require_arb_integer_qualification = False
+        self._arb_integer_qualification = None
+        self._arb_integer_generation = None
         self._application_limits = application_limits or ApplicationLimits()
         self.require_remote = require_remote
         self._mode_request = None
@@ -102,12 +106,31 @@ class ITM3900D(BaseInstrument):
                 if profile is not None and (descriptor_for(identity) is None or identity.model.strip().upper() != profile.model or identity.firmware_version != profile.firmware):
                     self._method_qualification = None
                     self._qualification_generation = None
+                arb_profile = self._arb_integer_qualification
+                if arb_profile is not None:
+                    try:
+                        arb_profile.check_identity(identity)
+                    except UnsupportedOperationError:
+                        self._arb_integer_generation = None
                 return identity
             except ScpiDriverError:
                 self._invalidate_mode()
                 self._method_qualification = None
                 self._qualification_generation = None
+                self._arb_integer_generation = None
                 raise
+
+    def bind_arb_integer_qualification(self, profile: ArbIntegerQualification):
+        """Bind explicit command bounds to this live identity and generation."""
+        with self.session.operation_lock():
+            # Failed rebinding must never restore permissive family-only behavior.
+            self._require_arb_integer_qualification = True
+            self._arb_integer_generation = None
+            if not isinstance(profile, ArbIntegerQualification):
+                raise ConfigurationError("ArbIntegerQualification required")
+            self._arb_integer_qualification = profile
+            profile.check_identity(self.identity_snapshot(refresh=True))
+            self._arb_integer_generation = self.session.generation
 
     def bind_method_qualification(self, profile: MethodQualification):
         """Explicit identity read; a failed bind leaves strict mode closed."""
@@ -127,14 +150,12 @@ class ITM3900D(BaseInstrument):
 
     @contextmanager
     def _qualified_method_scope(self, key):
-        if not self._require_qualified_capabilities:
-            yield
-            return
         with self.session.operation_lock():
-            if (self._method_qualification is None or not self.session.is_connected
-                    or self._qualification_generation != self.session.generation):
-                raise UnsupportedOperationError("bind current-session method qualification before subsystem use")
-            self._method_qualification.require(key)
+            if self._require_qualified_capabilities:
+                if (self._method_qualification is None or not self.session.is_connected
+                        or self._qualification_generation != self.session.generation):
+                    raise UnsupportedOperationError("bind current-session method qualification before subsystem use")
+                self._method_qualification.require(key)
             yield
 
     def model_descriptor(self, *, refresh=True):

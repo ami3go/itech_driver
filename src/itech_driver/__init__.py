@@ -76,3 +76,6 @@ __all__.append("ConnectionConfig")
 
 from .method_qualification import MethodQualification, MethodEvidence
 __all__.extend(["MethodQualification", "MethodEvidence"])
+
+from .arb_integer_qualification import ArbIntegerBounds, ArbIntegerQualification
+__all__.extend(["ArbIntegerBounds", "ArbIntegerQualification"])
