@@ -2,6 +2,8 @@ import pytest
 from scpi_driver_core import ConfigurationError
 from scpi_driver_core.simulation import ScriptedScpiTransport
 from itech_driver import ITM3900D
+from itech_driver.protection import ProtectionThresholdQualification
+from itech_driver.capabilities import Range
 
 
 @pytest.mark.parametrize("name,header", [["ovp_delay","VOLT:OVER:PROT:DEL"],["ocp_delay","CURR:OVER:PROT:DEL"],["opp_delay","POW:OVER:PROT:DEL"],["uvp_delay","VOLT:UND:PROT:DEL"],["ucp_delay","CURR:UND:PROT:DEL"],["uvp_warmup","VOLT:UND:PROT:WARM"],["ucp_warmup","CURR:UND:PROT:WARM"]])
@@ -19,13 +21,13 @@ def test_protection_times(name, header):
 @pytest.mark.parametrize("name,quantity", [("uvp","VOLT"),("ucp","CURR")])
 def test_under_protection(name, quantity):
     h = f"SOUR:{quantity}:UND:PROT"
-    t = ScriptedScpiTransport().on(h+":LEV 2").on(h+":LEV?","2").on(h+":STAT 1").on(h+":STAT?","1")
+    t = ScriptedScpiTransport().on("*IDN?", "ITECH,IT-M3902D-80-40,SIM,1").on(h+":LEV 2").on(h+":LEV?","2").on(h+":STAT 1").on(h+":STAT?","1")
     with ITM3900D("sim", transport=t) as d:
-        getattr(d.source,name+"_set")(2)
+        getattr(d.source,name+"_set")(2, qualification=ProtectionThresholdQualification("IT-M3902D-80-40", "1", name, Range(0, 10), "synthetic test only"))
         assert getattr(d.source,name+"_query")() == 2
         getattr(d.source,name+"_enable")(True)
         assert getattr(d.source,name+"_enable_query")()
-        assert t.history == [h+":LEV 2",h+":LEV?",h+":STAT 1",h+":STAT?"]
+        assert t.history == ["*IDN?", h+":LEV 2",h+":LEV?",h+":STAT 1",h+":STAT?"]
         with pytest.raises(ConfigurationError):
             getattr(d.source,name+"_enable")("OFF")
-        assert len(t.history) == 4
+        assert len(t.history) == 5
