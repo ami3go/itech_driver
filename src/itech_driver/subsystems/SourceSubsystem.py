@@ -1,3 +1,5 @@
+import math
+from scpi_driver_core import ConfigurationError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
@@ -22,18 +24,36 @@ class SourceSubsystem:
     def function_mode_query(self) -> str:
         return self._p.query_scpi('SOUR:FUNC:MODE?')
 
+    @staticmethod
+    def _check_channel(channel: int) -> None:
+        if type(channel) is not int or channel != 1:
+            raise ConfigurationError("IT-M3900D source uses a single unnumbered output; channel must be 1")
+
+    @staticmethod
+    def _check_setpoint(value: Number) -> None:
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+            raise ConfigurationError("setpoint must be a finite real number")
+        if value < 0:
+            raise ConfigurationError("setpoint must be nonnegative")
+
     # Voltage / Current setpoints
     def voltage_set(self, value: Number, channel: int = 1):
-        self._p.write_scpi(f'SOUR{channel}:VOLT {value}')
+        self._check_channel(channel)
+        self._check_setpoint(value)
+        self._p.write_scpi(f'SOUR:VOLT {value}')
 
     def voltage_query(self, channel: int = 1) -> float:
-        return parse_float(self._p.query_scpi(f'SOUR{channel}:VOLT?'))
+        self._check_channel(channel)
+        return parse_float(self._p.query_scpi('SOUR:VOLT?'))
 
     def current_set(self, value: Number, channel: int = 1):
-        self._p.write_scpi(f'SOUR{channel}:CURR {value}')
+        self._check_channel(channel)
+        self._check_setpoint(value)
+        self._p.write_scpi(f'SOUR:CURR {value}')
 
     def current_query(self, channel: int = 1) -> float:
-        return parse_float(self._p.query_scpi(f'SOUR{channel}:CURR?'))
+        self._check_channel(channel)
+        return parse_float(self._p.query_scpi('SOUR:CURR?'))
 
     # Protections
     def ovp_set(self, value: Number, channel: int = 1):

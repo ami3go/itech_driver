@@ -32,13 +32,13 @@ def test_session_and_subsystem_wiring():
 def test_exact_command_coverage():
     t = ScriptedScpiTransport()
     commands = [
-        "SOUR1:VOLT 12.5", "OUTP1:STAT OFF", "ARB:FUNCTION:SHAPE UDEF",
+        "SOUR:VOLT 12.5", "OUTP1:STAT OFF", "ARB:FUNCTION:SHAPE UDEF",
         "BATT:CHAR:VOLT 3.5", "IO:SELect 1", "TRIG:ACQ:SOUR EXT",
         "TRIG:ACQ", "INITiate:ARB", "ABORt:ARB", "*CLS",
     ]
     for command in commands:
         t.on(command)
-    t.on("SOUR1:VOLT?", "12.5").on("OUTP1:STAT?", "OFF")
+    t.on("SOUR:VOLT?", "12.5").on("OUTP1:STAT?", "OFF")
     t.on("STAT:OPER:COND?", "4").on("SYST:VERSion?", "1999.0")
     with make_driver(t) as d:
         d.source.voltage_set(12.5)

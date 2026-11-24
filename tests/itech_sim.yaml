@@ -21,10 +21,10 @@ devices:
       voltage:
         default: 1.0
         getter:
-          q: "SOUR1:VOLT?"
+          q: "SOUR:VOLT?"
           r: "{:.1f}"
         setter:
-          q: "SOUR1:VOLT {:.1f}"
+          q: "SOUR:VOLT {:.1f}"
         specs:
           min: 0.0
           max: 30.0
