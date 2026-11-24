@@ -52,20 +52,23 @@ class OutputSubsystem:
         if delay_s is not None and (type(delay_s) is not int or not 1 <= delay_s <= 3600):
             raise ConfigurationError("watchdog delay must be an integer in 1..3600 seconds")
         with self._p.session.operation_lock():
+            self._p._require_methods("OutputSubsystem.watchdog_query", *(() if delay_s is None and not enable else ("OutputSubsystem.watchdog_delay_query",)))
             self._p._assert_write_authorized()
+            state_header = command_spec("OutputSubsystem.watchdog_query").header.removesuffix("?")
+            delay_header = command_spec("OutputSubsystem.watchdog_delay_query").header.removesuffix("?")
             if not enable:
-                self._p.write_scpi("OUTP:PROT:WDOG:STAT 0")
+                self._p.write_scpi(state_header + " 0")
                 if self.watchdog_query() is not False:
                     raise ResponseParseError("watchdog disable readback mismatch", raw="ON")
             if delay_s is not None:
-                self._p.write_scpi(f"OUTP:PROT:WDOG:DEL {delay_s}")
+                self._p.write_scpi(f"{delay_header} {delay_s}")
                 actual = self.watchdog_delay_query()
                 if actual != delay_s:
                     raise ResponseParseError("watchdog delay readback mismatch", raw=str(actual))
             elif enable:
                 self.watchdog_delay_query()
             if enable:
-                self._p.write_scpi("OUTP:PROT:WDOG:STAT 1")
+                self._p.write_scpi(state_header + " 1")
                 if self.watchdog_query() is not True:
                     raise ResponseParseError("watchdog enable readback mismatch", raw="OFF")
             elif delay_s is not None and self.watchdog_query() is not False:
