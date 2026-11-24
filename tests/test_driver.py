@@ -58,12 +58,17 @@ def test_exact_command_coverage():
 
 
 def test_no_replay_on_ambiguous_timeout():
-    t = ScriptedScpiTransport().on("*TRG", ScriptedReply(raises=TransportTimeoutError("timeout")))
+    def ambiguous_write(_command):
+        # Handler runs after bytes have reached the transport and history.
+        raise TransportTimeoutError("timeout after transmission")
+
+    t = ScriptedScpiTransport().on("*TRG", ambiguous_write)
     with make_driver(t) as d:
         with pytest.raises(TimeoutError) as failure:
             d.ieee.trigger()
         assert isinstance(failure.value.__cause__, TransportTimeoutError)
         assert t.history == ["*TRG"]
+        assert not d.session.is_connected
 
 
 def test_query_timeout_is_not_replayed():
