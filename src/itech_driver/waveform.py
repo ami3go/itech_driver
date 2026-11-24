@@ -154,3 +154,44 @@ class ConstantDwell:
         """Candidate count/dwell setters only; no upload until index semantics verified."""
         self.pairs(envelope,max_points=max_points)
         return (f"ARB:CDW:POIN {len(self.levels)}",f"ARB:CDW:DWEL {self.dwell_s}")
+
+
+@dataclass(frozen=True)
+class SequenceStep:
+    waveform: Pulse | Sine
+    repeats: int
+
+
+@dataclass(frozen=True)
+class Sequence:
+    steps: tuple[SequenceStep,...]
+
+    def commands(self, envelope: Envelope, *, max_steps: int, max_repeats: int,
+                 first_index: int, min_frequency_hz: float, max_frequency_hz: float,
+                 amplitude_convention: str) -> tuple[str,...]:
+        """Offline candidate sequence, requiring confirmed index origin.
+
+        Pacing and termination semantics are deliberately not encoded.
+        """
+        if type(first_index) is not int or first_index not in (0,1):
+            raise ConfigurationError("explicit confirmed index origin required")
+        if type(max_steps) is not int or type(max_repeats) is not int or max_steps <= 0 or max_repeats <= 0:
+            raise ConfigurationError("explicit sequence budgets required")
+        if not isinstance(self.steps,tuple) or not 1 <= len(self.steps) <= max_steps:
+            raise ConfigurationError("invalid sequence length")
+        result = [f"ARB:SEQ:LENG {len(self.steps)}"]
+        for index,step in enumerate(self.steps,first_index):
+            if not isinstance(step,SequenceStep) or type(step.repeats) is not int or not 1 <= step.repeats <= max_repeats:
+                raise ConfigurationError("invalid finite step repeat count")
+            if isinstance(step.waveform,Pulse):
+                shape = "PULS"
+                fields = step.waveform.commands(envelope)
+            elif isinstance(step.waveform,Sine):
+                shape = "SIN"
+                fields = step.waveform.commands(envelope,min_frequency_hz=min_frequency_hz,
+                    max_frequency_hz=max_frequency_hz,amplitude_convention=amplitude_convention)
+            else:
+                raise ConfigurationError("sequence supports pulse/sine plans only")
+            result.extend((f"ARB:SEQ:SEL {index}",f"ARB:SEQ:FUNC {shape}",f"ARB:SEQ:COUN {step.repeats}"))
+            result.extend(command.replace("ARB:","ARB:SEQ:",1) for command in fields)
+        return tuple(result)
