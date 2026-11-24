@@ -56,7 +56,7 @@ class Range:
 @dataclass(frozen=True)
 class Capabilities:
     model: str
-    firmware: str
+    firmware: str | None
     ratings: Ratings
     voltage: Range
     current: Range
@@ -78,7 +78,7 @@ def discover_capabilities(driver):
             if not 0 <= lo <= hi or hi <= 0 or lo > ceiling:
                 raise ResponseParseError("invalid instrument capability range", raw=f"{lo},{hi}")
             return Range(lo, min(hi, ceiling))
-        return Capabilities(ident.model, ident.firmware, ratings,
+        return Capabilities(ident.model, ident.firmware_version, ratings,
                             probe("SOUR:VOLT", ratings.voltage_v),
                             probe("SOUR:CURR", ratings.current_a),
                             probe("SOUR:VOLT:LIM", ratings.voltage_v),
