@@ -1,0 +1,28 @@
+spec: "1.0"
+devices:
+  itech:
+    eom:
+      GPIB INSTR:
+        q: "\n"
+        r: "\n"
+    dialogues:
+      - q: "*IDN?"
+        r: "ITECH,IT-M3900D,SIM001,1.0"
+      - q: "OUTP1:STAT OFF"
+      - q: "OUTP1:STAT?"
+        r: "OFF"
+    properties:
+      voltage:
+        default: 1.0
+        getter:
+          q: "SOUR1:VOLT?"
+          r: "{:.1f}"
+        setter:
+          q: "SOUR1:VOLT {:.1f}"
+        specs:
+          min: 0.0
+          max: 30.0
+          type: float
+resources:
+  GPIB::9::INSTR:
+    device: itech

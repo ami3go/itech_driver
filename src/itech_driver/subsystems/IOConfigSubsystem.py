@@ -1,3 +1,4 @@
+from scpi_driver_core.scpi.parsers import parse_bool, parse_int
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
 # Configurable IO Subsystem (IO)
@@ -11,14 +12,14 @@ class IOConfigSubsystem:
         self._p.write_scpi(f'IO:SELect {int(idx)}')
 
     def select_query(self) -> int:
-        return int(self._p.query_scpi('IO:SELect?'))
+        return parse_int(self._p.query_scpi('IO:SELect?'))
 
     def direction_set(self, pin_list: str, dir_mask: BoolLike):
         # pin_list could be '1,2,3' or similar per manual
         self._p.write_scpi(f'IO:DIREction {pin_list},{1 if dir_mask else 0}')
 
     def direction_query(self, pin_list: str) -> bool:  # Added: Missing query method
-        return bool(int(self._p.query_scpi(f'IO:DIREction? {pin_list}')))
+        return parse_bool(self._p.query_scpi(f'IO:DIREction? {pin_list}'))
 
     def pwm_enable(self, ch: int, enable: BoolLike):
         self._p.write_scpi(f'IO:PWM:ENABle {int(ch)},{1 if enable else 0}')

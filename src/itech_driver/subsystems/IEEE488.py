@@ -1,3 +1,4 @@
+from scpi_driver_core.scpi.parsers import parse_int
 from typing import Optional
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
@@ -23,7 +24,7 @@ class IEEE488:
         self._p.write_scpi('*OPC')
 
     def self_test(self) -> int:
-        return int(self._p.query_scpi('*TST?'))
+        return parse_int(self._p.query_scpi('*TST?'))
 
     def trigger(self):
         self._p.write_scpi('*TRG')

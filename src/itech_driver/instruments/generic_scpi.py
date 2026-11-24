@@ -2,6 +2,8 @@
 
 from typing import Dict, Any, Optional
 from ..base import BaseInstrument
+from scpi_driver_core.exceptions import ScpiDriverError
+from ..subsystems.IEEE488 import IEEE488
 from ..subsystems.SourceSubsystem import SourceSubsystem
 from ..subsystems.OutputSubsystem import OutputSubsystem
 from ..subsystems.SystemSubsystem import SystemSubsystem
@@ -21,6 +23,7 @@ class GenericSCPIInstrument(BaseInstrument):
         self.source = SourceSubsystem(self)
         self.output = OutputSubsystem(self)
         self.system = SystemSubsystem(self)
+        self.ieee = IEEE488(self)
         # self.measurement = MeasurementSubsystem(self)
 
         self._instrument_info = None
@@ -45,10 +48,12 @@ class GenericSCPIInstrument(BaseInstrument):
 
     def _test_command(self, command: str) -> bool:
         """Test if a SCPI command is supported."""
+        if not command.strip().endswith('?') or ';' in command:
+            raise ValueError('capability checks require a single query')
         try:
             self.query_scpi(command)
             return True
-        except:
+        except ScpiDriverError:
             return False
 
     def get_instrument_info(self) -> Dict[str, Any]:
@@ -66,7 +71,7 @@ class GenericSCPIInstrument(BaseInstrument):
                     'capabilities': self.detect_capabilities(),
                     'is_identified': True
                 }
-            except:
+            except ScpiDriverError:
                 self._instrument_info = {
                     'manufacturer': 'Unknown',
                     'model': 'Generic SCPI',
