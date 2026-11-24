@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from scpi_driver_core import ScpiDriverError, SafetyGuardError
 from typing import Any, List, Optional, Union
 from ..base import BaseInstrument, Number, BoolLike
+from ..subsystems.MeasurementSubsystem import MeasurementSubsystem
 from ..subsystems.ArbSubsystem import ArbSubsystem
 from ..subsystems.AbortSubsystem import AbortSubsystem
 from ..subsystems.BatterySubsystem import BatterySubsystem
@@ -42,6 +43,7 @@ class ITM3900D(BaseInstrument):
         self.abort = AbortSubsystem(self)
         self.io = IOConfigSubsystem(self)
         self.ieee = IEEE488(self)
+        self.measurement = MeasurementSubsystem(self)
 
 
     @property
