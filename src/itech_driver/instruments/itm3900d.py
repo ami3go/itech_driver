@@ -2,8 +2,7 @@
 
 from contextlib import contextmanager
 from scpi_driver_core import ScpiDriverError, SafetyGuardError
-from typing import Any, List, Optional, Union
-from ..base import BaseInstrument, Number, BoolLike
+from ..base import BaseInstrument
 from ..capabilities import discover_capabilities
 from ..subsystems.LoggingSubsystem import LoggingSubsystem
 from ..subsystems.FetchSubsystem import FetchSubsystem
@@ -20,7 +19,6 @@ from ..subsystems.SourceSubsystem import SourceSubsystem
 from ..subsystems.StatusSubsystem import StatusSubsystem
 from ..subsystems.SystemSubsystem import SystemSubsystem
 from ..subsystems.TriggerSubsystem import TriggerSubsystem
-# from ..subsystems. import
 
 
 class ITM3900D(BaseInstrument):
