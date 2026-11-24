@@ -1,0 +1,2923 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "d0174d457d208d0e9ce84f7463c080c7b7582994",
+  "reference": {
+    "title": "IT-M3900D Series Programming Guide",
+    "url": "https://www.altoo.dk/files/itech/manuals/IT-M3900D-Programming-Guide.pdf",
+    "revision": "unconfirmed",
+    "page_image_status": "unavailable; indexed text only"
+  },
+  "scope": "All public methods declared in the 11 existing subsystem modules. Base transport/raw API and unimplemented guide commands are not yet inventoried.",
+  "entries": [
+    {
+      "method": "AbortSubsystem.acquire",
+      "source": "src/itech_driver/subsystems/AbortSubsystem.py",
+      "baseline_line": 10,
+      "source_expressions": [
+        "self._p.write_scpi('ABORt:ACQuire')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "AbortSubsystem.arb",
+      "source": "src/itech_driver/subsystems/AbortSubsystem.py",
+      "baseline_line": 13,
+      "source_expressions": [
+        "self._p.write_scpi('ABORt:ARB')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "AbortSubsystem.dlog",
+      "source": "src/itech_driver/subsystems/AbortSubsystem.py",
+      "baseline_line": 16,
+      "source_expressions": [
+        "self._p.write_scpi('ABORt:DLOG')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "AbortSubsystem.elog",
+      "source": "src/itech_driver/subsystems/AbortSubsystem.py",
+      "baseline_line": 19,
+      "source_expressions": [
+        "self._p.write_scpi('ABORt:ELOG')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.function_shape_set",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 11,
+      "source_expressions": [
+        "self._p.write_scpi(f'ARB:FUNCTION:SHAPE {shape}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.function_shape_query",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 14,
+      "source_expressions": [
+        "return self._p.query_scpi('ARB:FUNCTION:SHAPE?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.function_type_set",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 17,
+      "source_expressions": [
+        "self._p.write_scpi(f'ARB:FUNCTION:TYPE {typ}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.function_type_query",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 20,
+      "source_expressions": [
+        "return self._p.query_scpi('ARB:FUNCTION:TYPE?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.udef_count_set",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 24,
+      "source_expressions": [
+        "self._p.write_scpi(f'ARB:UDEFined:COUNt {int(steps)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.udef_count_query",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 27,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('ARB:UDEFined:COUNt?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.udef_level_set",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 30,
+      "source_expressions": [
+        "self._p.write_scpi(f'ARB:UDEFined:LEVel {int(step)},{float(level)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.udef_level_query",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 33,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi(f'ARB:UDEFined:LEVel? {int(step)}'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.udef_dwell_set",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 36,
+      "source_expressions": [
+        "self._p.write_scpi(f'ARB:UDEFined:DWELl {int(step)},{float(seconds)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.udef_dwell_query",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 39,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi(f'ARB:UDEFined:DWELl? {int(step)}'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.udef_slew_set",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 42,
+      "source_expressions": [
+        "self._p.write_scpi(f'ARB:UDEFined:SLEW {int(step)},{float(slew_val)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.udef_slew_query",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 45,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi(f'ARB:UDEFined:SLEW? {int(step)}'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.count_set",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 48,
+      "source_expressions": [
+        "self._p.write_scpi(f'ARB:COUNT {int(cnt)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.count_query",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 51,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('ARB:COUNT?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.terminate_last_set",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 54,
+      "source_expressions": [
+        "self._p.write_scpi(f'ARB:TERMinate:LAST {int(last_state)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.terminate_last_query",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 57,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('ARB:TERMinate:LAST?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.save",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 60,
+      "source_expressions": [
+        "self._p.write_scpi(f'ARB:SAVE {int(index)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.recall",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 63,
+      "source_expressions": [
+        "self._p.write_scpi(f'ARB:RECall {int(index)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.init",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 66,
+      "source_expressions": [
+        "self._p.write_scpi('INITiate:ARB')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.trigger",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 69,
+      "source_expressions": [
+        "self._p.write_scpi('TRIGger:ARB')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.pause_set",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 72,
+      "source_expressions": [
+        "self._p.write_scpi(f'ARB:PAUSe:STATe {1 if enable else 0}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.pause_query",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 75,
+      "source_expressions": [
+        "return parse_bool(self._p.query_scpi('ARB:PAUSe:STATe?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.abort",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 78,
+      "source_expressions": [
+        "self._p.write_scpi('ABORt:ARB')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "ArbSubsystem.state_query",
+      "source": "src/itech_driver/subsystems/ArbSubsystem.py",
+      "baseline_line": 81,
+      "source_expressions": [
+        "return self._p.query_scpi('ARB:STATe?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.charge_voltage_set",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 11,
+      "source_expressions": [
+        "self._p.write_scpi(f'BATT:CHAR:VOLT {volts}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.charge_voltage_query",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 14,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi('BATT:CHAR:VOLT?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.charge_current_set",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 17,
+      "source_expressions": [
+        "self._p.write_scpi(f'BATT:CHAR:CURR {amps}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.charge_current_query",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 20,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi('BATT:CHAR:CURR?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.shutdown_voltage_set",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 23,
+      "source_expressions": [
+        "self._p.write_scpi(f'BATT:SHUT:VOLT {volts}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.shutdown_voltage_query",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 26,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi('BATT:SHUT:VOLT?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.shutdown_current_set",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 29,
+      "source_expressions": [
+        "self._p.write_scpi(f'BATT:SHUT:CURR {amps}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.shutdown_current_query",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 32,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi('BATT:SHUT:CURR?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.shutdown_capacity_set",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 35,
+      "source_expressions": [
+        "self._p.write_scpi(f'BATT:SHUT:CAP {ah}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.shutdown_capacity_query",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 38,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi('BATT:SHUT:CAP?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.shutdown_time_set",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 41,
+      "source_expressions": [
+        "self._p.write_scpi(f'BATT:SHUT:TIME {int(seconds)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.shutdown_time_query",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 44,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('BATT:SHUT:TIME?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.mode_set",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 47,
+      "source_expressions": [
+        "self._p.write_scpi(f'BATT:MODE {mode}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.mode_query",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 51,
+      "source_expressions": [
+        "return self._p.query_scpi('BATT:MODE?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.state_set",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 54,
+      "source_expressions": [
+        "self._p.write_scpi(f'BATT:STATe {1 if enable else 0}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "BatterySubsystem.state_query",
+      "source": "src/itech_driver/subsystems/BatterySubsystem.py",
+      "baseline_line": 57,
+      "source_expressions": [
+        "return parse_bool(self._p.query_scpi('BATT:STATe?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IEEE488.idn",
+      "source": "src/itech_driver/subsystems/IEEE488.py",
+      "baseline_line": 12,
+      "source_expressions": [
+        "return self._p.query_scpi('*IDN?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IEEE488.reset",
+      "source": "src/itech_driver/subsystems/IEEE488.py",
+      "baseline_line": 15,
+      "source_expressions": [
+        "self._p.write_scpi('*RST')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IEEE488.clear_status",
+      "source": "src/itech_driver/subsystems/IEEE488.py",
+      "baseline_line": 18,
+      "source_expressions": [
+        "self._p.write_scpi('*CLS')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IEEE488.opc",
+      "source": "src/itech_driver/subsystems/IEEE488.py",
+      "baseline_line": 21,
+      "source_expressions": [
+        "return self._p.query_scpi('*OPC?')",
+        "self._p.write_scpi('*OPC')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IEEE488.self_test",
+      "source": "src/itech_driver/subsystems/IEEE488.py",
+      "baseline_line": 26,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('*TST?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IEEE488.trigger",
+      "source": "src/itech_driver/subsystems/IEEE488.py",
+      "baseline_line": 29,
+      "source_expressions": [
+        "self._p.write_scpi('*TRG')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IEEE488.save",
+      "source": "src/itech_driver/subsystems/IEEE488.py",
+      "baseline_line": 32,
+      "source_expressions": [
+        "self._p.write_scpi(f'*SAV {int(slot)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IEEE488.recall",
+      "source": "src/itech_driver/subsystems/IEEE488.py",
+      "baseline_line": 35,
+      "source_expressions": [
+        "self._p.write_scpi(f'*RCL {int(slot)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IOConfigSubsystem.select",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 11,
+      "source_expressions": [
+        "self._p.write_scpi(f'IO:SELect {int(idx)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IOConfigSubsystem.select_query",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 14,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('IO:SELect?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IOConfigSubsystem.direction_set",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 17,
+      "source_expressions": [
+        "self._p.write_scpi(f'IO:DIREction {pin_list},{1 if dir_mask else 0}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IOConfigSubsystem.direction_query",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 21,
+      "source_expressions": [
+        "return parse_bool(self._p.query_scpi(f'IO:DIREction? {pin_list}'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IOConfigSubsystem.pwm_enable",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 24,
+      "source_expressions": [
+        "self._p.write_scpi(f'IO:PWM:ENABle {int(ch)},{1 if enable else 0}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IOConfigSubsystem.pwm_freq_set",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 27,
+      "source_expressions": [
+        "self._p.write_scpi(f'IO:PWM:FREQuency {int(ch)},{float(freq)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "IOConfigSubsystem.pwm_duty_set",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 30,
+      "source_expressions": [
+        "self._p.write_scpi(f'IO:PWM:DUTY {int(ch)},{int(duty_percent)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "InitiateSubsystem.acquire",
+      "source": "src/itech_driver/subsystems/InitiateSubsystem.py",
+      "baseline_line": 11,
+      "source_expressions": [
+        "self._p.write_scpi('INITiate:ACQuire')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "InitiateSubsystem.arb",
+      "source": "src/itech_driver/subsystems/InitiateSubsystem.py",
+      "baseline_line": 14,
+      "source_expressions": [
+        "self._p.write_scpi('INITiate:ARB')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "InitiateSubsystem.continuous_arb_set",
+      "source": "src/itech_driver/subsystems/InitiateSubsystem.py",
+      "baseline_line": 17,
+      "source_expressions": [
+        "self._p.write_scpi(f'INITiate:CONTinuous:ARB {1 if enable else 0}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "InitiateSubsystem.continuous_arb_query",
+      "source": "src/itech_driver/subsystems/InitiateSubsystem.py",
+      "baseline_line": 20,
+      "source_expressions": [
+        "return parse_bool(self._p.query_scpi('INITiate:CONTinuous:ARB?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "InitiateSubsystem.continuous_acq_set",
+      "source": "src/itech_driver/subsystems/InitiateSubsystem.py",
+      "baseline_line": 23,
+      "source_expressions": [
+        "self._p.write_scpi(f'INITiate:CONTinuous:ACQuire {1 if enable else 0}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "InitiateSubsystem.continuous_acq_query",
+      "source": "src/itech_driver/subsystems/InitiateSubsystem.py",
+      "baseline_line": 26,
+      "source_expressions": [
+        "return parse_bool(self._p.query_scpi('INITiate:CONTinuous:ACQuire?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "InitiateSubsystem.dlog",
+      "source": "src/itech_driver/subsystems/InitiateSubsystem.py",
+      "baseline_line": 29,
+      "source_expressions": [
+        "self._p.write_scpi('INITiate:DLOG')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "InitiateSubsystem.elog",
+      "source": "src/itech_driver/subsystems/InitiateSubsystem.py",
+      "baseline_line": 32,
+      "source_expressions": [
+        "self._p.write_scpi('INITiate:ELOG')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "OutputSubsystem.state_set",
+      "source": "src/itech_driver/subsystems/OutputSubsystem.py",
+      "baseline_line": 12,
+      "source_expressions": [
+        "self._p.write_scpi(f'OUTP{channel}:STAT {\"ON\" if on else \"OFF\"}')"
+      ],
+      "guide": {
+        "page": 93,
+        "syntax": "OUTP:STAT <value>",
+        "arguments": "0/OFF/1/ON",
+        "response": "none",
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "OutputSubsystem.state_query",
+      "source": "src/itech_driver/subsystems/OutputSubsystem.py",
+      "baseline_line": 15,
+      "source_expressions": [
+        "return parse_bool(self._p.query_scpi(f'OUTP{channel}:STAT?'))"
+      ],
+      "guide": {
+        "page": 94,
+        "syntax": "OUTP:STAT?",
+        "arguments": "none",
+        "response": "verify exact response",
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "OutputSubsystem.delay_rise_set",
+      "source": "src/itech_driver/subsystems/OutputSubsystem.py",
+      "baseline_line": 18,
+      "source_expressions": [
+        "self._p.write_scpi(f'OUTP:DELay:RISE {seconds}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "OutputSubsystem.delay_rise_query",
+      "source": "src/itech_driver/subsystems/OutputSubsystem.py",
+      "baseline_line": 21,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi('OUTP:DELay:RISE?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "OutputSubsystem.delay_fall_set",
+      "source": "src/itech_driver/subsystems/OutputSubsystem.py",
+      "baseline_line": 24,
+      "source_expressions": [
+        "self._p.write_scpi(f'OUTP:DELay:FALL {seconds}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "OutputSubsystem.delay_fall_query",
+      "source": "src/itech_driver/subsystems/OutputSubsystem.py",
+      "baseline_line": 27,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi('OUTP:DELay:FALL?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "OutputSubsystem.inhibit_mode_set",
+      "source": "src/itech_driver/subsystems/OutputSubsystem.py",
+      "baseline_line": 30,
+      "source_expressions": [
+        "self._p.write_scpi(f'OUTP:INHibit:MODE {mode}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "OutputSubsystem.inhibit_mode_query",
+      "source": "src/itech_driver/subsystems/OutputSubsystem.py",
+      "baseline_line": 33,
+      "source_expressions": [
+        "return self._p.query_scpi('OUTP:INHibit:MODE?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "OutputSubsystem.protection_clear",
+      "source": "src/itech_driver/subsystems/OutputSubsystem.py",
+      "baseline_line": 36,
+      "source_expressions": [
+        "self._p.write_scpi('OUTP:PROTection:CLEar')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "OutputSubsystem.watchdog_set",
+      "source": "src/itech_driver/subsystems/OutputSubsystem.py",
+      "baseline_line": 39,
+      "source_expressions": [
+        "self._p.write_scpi(f'OUTP:PROT:WDOG:STAT {1 if enable else 0}')",
+        "self._p.write_scpi(f'OUTP:PROT:WDOG:DEL {int(delay_s)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "OutputSubsystem.watchdog_query",
+      "source": "src/itech_driver/subsystems/OutputSubsystem.py",
+      "baseline_line": 44,
+      "source_expressions": [
+        "return parse_bool(self._p.query_scpi('OUTP:PROT:WDOG:STAT?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "OutputSubsystem.watchdog_delay_query",
+      "source": "src/itech_driver/subsystems/OutputSubsystem.py",
+      "baseline_line": 47,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('OUTP:PROT:WDOG:DEL?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.function_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 11,
+      "source_expressions": [
+        "self._p.write_scpi(f'SOUR:FUNC {mode}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.function_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 15,
+      "source_expressions": [
+        "return self._p.query_scpi('SOUR:FUNC?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.function_mode_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 18,
+      "source_expressions": [
+        "self._p.write_scpi(f'SOUR:FUNC:MODE {mode}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.function_mode_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 22,
+      "source_expressions": [
+        "return self._p.query_scpi('SOUR:FUNC:MODE?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.voltage_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 26,
+      "source_expressions": [
+        "self._p.write_scpi(f'SOUR{channel}:VOLT {value}')"
+      ],
+      "guide": {
+        "page": 57,
+        "syntax": "SOUR:VOLT <value>",
+        "arguments": "numeric voltage",
+        "response": "none",
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.voltage_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 29,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi(f'SOUR{channel}:VOLT?'))"
+      ],
+      "guide": {
+        "page": 58,
+        "syntax": "SOUR:VOLT?",
+        "arguments": "none",
+        "response": "numeric voltage",
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.current_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 32,
+      "source_expressions": [
+        "self._p.write_scpi(f'SOUR{channel}:CURR {value}')"
+      ],
+      "guide": {
+        "page": 38,
+        "syntax": "SOUR:CURR <value>",
+        "arguments": "numeric current",
+        "response": "none",
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.current_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 35,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi(f'SOUR{channel}:CURR?'))"
+      ],
+      "guide": {
+        "page": 39,
+        "syntax": "SOUR:CURR?",
+        "arguments": "none",
+        "response": "numeric current",
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.ovp_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 39,
+      "source_expressions": [
+        "self._p.write_scpi(f'SOUR{channel}:VOLT:PROT:LEV {value}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.ovp_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 42,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi(f'SOUR{channel}:VOLT:PROT:LEV?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.ovp_enable",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 45,
+      "source_expressions": [
+        "self._p.write_scpi(f'SOUR{channel}:VOLT:PROT:STAT {1 if enable else 0}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.ovp_enable_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 48,
+      "source_expressions": [
+        "return parse_bool(self._p.query_scpi(f'SOUR{channel}:VOLT:PROT:STAT?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.ocp_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 51,
+      "source_expressions": [
+        "self._p.write_scpi(f'SOUR{channel}:CURR:PROT:LEV {value}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.ocp_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 54,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi(f'SOUR{channel}:CURR:PROT:LEV?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.ocp_enable",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 57,
+      "source_expressions": [
+        "self._p.write_scpi(f'SOUR{channel}:CURR:PROT:STAT {1 if enable else 0}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.ocp_enable_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 60,
+      "source_expressions": [
+        "return parse_bool(self._p.query_scpi(f'SOUR{channel}:CURR:PROT:STAT?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.power_limit_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 63,
+      "source_expressions": [
+        "self._p.write_scpi(f'SOUR{channel}:POW:PROT:LEV {value}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.power_limit_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 66,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi(f'SOUR{channel}:POW:PROT:LEV?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.power_limit_enable",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 69,
+      "source_expressions": [
+        "self._p.write_scpi(f'SOUR{channel}:POW:PROT:STAT {1 if enable else 0}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.power_limit_enable_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 72,
+      "source_expressions": [
+        "return parse_bool(self._p.query_scpi(f'SOUR{channel}:POW:PROT:STAT?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.remote_sense_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 76,
+      "source_expressions": [
+        "self._p.write_scpi(f'SOUR{channel}:REM:SENS {1 if enable else 0}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.remote_sense_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 79,
+      "source_expressions": [
+        "return parse_bool(self._p.query_scpi(f'SOUR{channel}:REM:SENS?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.transient_mode_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 83,
+      "source_expressions": [
+        "self._p.write_scpi(f'SOUR:FUNC:MODE {mode}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SourceSubsystem.transient_mode_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 86,
+      "source_expressions": [
+        "return self._p.query_scpi('SOUR:FUNC:MODE?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "StatusSubsystem.oper_condition_query",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 12,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('STAT:OPER:COND?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "StatusSubsystem.oper_enable_set",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 15,
+      "source_expressions": [
+        "self._p.write_scpi(f'STAT:OPER:ENAB {int(mask)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "StatusSubsystem.oper_enable_query",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 18,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('STAT:OPER:ENAB?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "StatusSubsystem.oper_event_query",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 21,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('STAT:OPER:EVEN?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "StatusSubsystem.ques_condition_query",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 25,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('STAT:QUES:COND?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "StatusSubsystem.ques_enable_set",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 28,
+      "source_expressions": [
+        "self._p.write_scpi(f'STAT:QUES:ENAB {int(mask)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "StatusSubsystem.ques_enable_query",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 31,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('STAT:QUES:ENAB?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "StatusSubsystem.ques_event_query",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 34,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('STAT:QUES:EVEN?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "StatusSubsystem.std_event_enable_set",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 38,
+      "source_expressions": [
+        "self._p.write_scpi(f'*ESE {int(mask)}')  # Standard IEEE command"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "StatusSubsystem.std_event_enable_query",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 41,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('*ESE?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "StatusSubsystem.std_event_register_query",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 44,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('*ESR?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "StatusSubsystem.status_byte",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 47,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('*STB?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.preset",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 11,
+      "source_expressions": [
+        "self._p.write_scpi('SYST:PRES')  # Corrected: Standard SCPI preset command"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.version",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 14,
+      "source_expressions": [
+        "return self._p.query_scpi('SYST:VERSion?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.error",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 17,
+      "source_expressions": [
+        "return self._p.query_scpi('SYST:ERRor?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.clear",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 20,
+      "source_expressions": [
+        "self._p.write_scpi('SYST:CLEar')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.remote",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 23,
+      "source_expressions": [
+        "self._p.write_scpi('SYST:REMote')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.local",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 26,
+      "source_expressions": [
+        "self._p.write_scpi('SYST:LOCal')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.beeper_immediate",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 29,
+      "source_expressions": [
+        "self._p.write_scpi('SYST:BEEPer:IMMediate')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.beeper_state_set",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 32,
+      "source_expressions": [
+        "self._p.write_scpi(f'SYST:BEEPer:STATe {\"ON\" if on else \"OFF\"}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.beeper_state_query",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 35,
+      "source_expressions": [
+        "response = self._p.query_scpi('SYST:BEEPer:STATe?').strip().upper()"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.date_set",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 39,
+      "source_expressions": [
+        "self._p.write_scpi(f'SYST:DATE {yyyy},{mm},{dd}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.date_query",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 42,
+      "source_expressions": [
+        "return self._p.query_scpi('SYST:DATE?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.time_set",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 45,
+      "source_expressions": [
+        "self._p.write_scpi(f'SYST:TIME {hh},{mm},{ss}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.time_query",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 48,
+      "source_expressions": [
+        "return self._p.query_scpi('SYST:TIME?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.comm_select",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 52,
+      "source_expressions": [
+        "self._p.write_scpi(f'SYST:COMMunicate:SELect {iface}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.comm_select_query",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 56,
+      "source_expressions": [
+        "return self._p.query_scpi('SYST:COMMunicate:SELect?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.comm_gpib_addr_set",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 59,
+      "source_expressions": [
+        "self._p.write_scpi(f'SYST:COMMunicate:GPIB:ADDRess {int(addr)}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.comm_gpib_addr_query",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 62,
+      "source_expressions": [
+        "return parse_int(self._p.query_scpi('SYST:COMMunicate:GPIB:ADDRess?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.lan_ip_set",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 65,
+      "source_expressions": [
+        "self._p.write_scpi(f'SYST:COMMunicate:LAN:IP {ip_cfg}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.lan_ip_query",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 69,
+      "source_expressions": [
+        "return self._p.query_scpi('SYST:COMMunicate:LAN:IP?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.lan_subnet_set",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 72,
+      "source_expressions": [
+        "self._p.write_scpi(f'SYST:COMMunicate:LAN:SMASk {mask}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.lan_subnet_query",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 75,
+      "source_expressions": [
+        "return self._p.query_scpi('SYST:COMMunicate:LAN:SMASk?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.lan_gateway_set",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 78,
+      "source_expressions": [
+        "self._p.write_scpi(f'SYST:COMMunicate:LAN:DGATeway {gw}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "SystemSubsystem.lan_gateway_query",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 81,
+      "source_expressions": [
+        "return self._p.query_scpi('SYST:COMMunicate:LAN:DGATeway?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.acquire_immediate",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 11,
+      "source_expressions": [
+        "self._p.write_scpi('TRIG:ACQuire:IMMediate')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.acquire_start",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 14,
+      "source_expressions": [
+        "self._p.write_scpi(f'TRIG:ACQ:SOUR {source}')",
+        "self._p.write_scpi('TRIG:ACQ')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.acquire_mode_set",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 18,
+      "source_expressions": [
+        "self._p.write_scpi(f'TRIG:ACQ:MODE {mode}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.acquire_mode_query",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 21,
+      "source_expressions": [
+        "return self._p.query_scpi('TRIG:ACQ:MODE?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.source_set",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 24,
+      "source_expressions": [
+        "self._p.write_scpi(f'TRIG:SOUR {src}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.source_query",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 27,
+      "source_expressions": [
+        "return self._p.query_scpi('TRIG:SOUR?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.level_set",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 30,
+      "source_expressions": [
+        "self._p.write_scpi(f'TRIG:LEV {val}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.level_query",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 33,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi('TRIG:LEV?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.delay_set",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 36,
+      "source_expressions": [
+        "self._p.write_scpi(f'TRIG:DEL {seconds}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.delay_query",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 39,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi('TRIG:DEL?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.elog_trigger_voltage_high_set",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 43,
+      "source_expressions": [
+        "self._p.write_scpi(f'TRIG:ELOG:VOLTage:HYSTeresis:HIGH {val}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.elog_trigger_voltage_low_set",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 46,
+      "source_expressions": [
+        "self._p.write_scpi(f'TRIG:ELOG:VOLTage:HYSTeresis:LOW {val}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.elog_status_query",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 49,
+      "source_expressions": [
+        "return self._p.query_scpi('ELOG:STAT?')  # Note: This might need TRIG: prefix"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.hysteresis_set",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 52,
+      "source_expressions": [
+        "self._p.write_scpi(f'TRIG:HYSTeresis {val}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    },
+    {
+      "method": "TriggerSubsystem.hysteresis_query",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 55,
+      "source_expressions": [
+        "return parse_float(self._p.query_scpi('TRIG:HYSTeresis?'))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run"
+    }
+  ]
+}
