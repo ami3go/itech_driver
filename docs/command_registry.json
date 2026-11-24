@@ -1833,7 +1833,8 @@
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
-      "hil": "not_run"
+      "hil": "not_run",
+      "alias_of": "SourceSubsystem.opp_threshold_set"
     },
     {
       "method": "SourceSubsystem.power_limit_query",
@@ -1852,7 +1853,8 @@
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
-      "hil": "not_run"
+      "hil": "not_run",
+      "alias_of": "SourceSubsystem.opp_threshold_query"
     },
     {
       "method": "SourceSubsystem.power_limit_enable",
@@ -1871,7 +1873,8 @@
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
-      "hil": "not_run"
+      "hil": "not_run",
+      "alias_of": "SourceSubsystem.opp_enable"
     },
     {
       "method": "SourceSubsystem.power_limit_enable_query",
@@ -1890,7 +1893,8 @@
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
-      "hil": "not_run"
+      "hil": "not_run",
+      "alias_of": "SourceSubsystem.opp_enable_query"
     },
     {
       "method": "SourceSubsystem.remote_sense_set",
@@ -1928,7 +1932,8 @@
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
-      "hil": "not_run"
+      "hil": "not_run",
+      "implementation_status": "restricted_unqualified"
     },
     {
       "method": "SourceSubsystem.transient_mode_set",
@@ -1947,7 +1952,8 @@
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
-      "hil": "not_run"
+      "hil": "not_run",
+      "alias_of": "SourceSubsystem.function_mode_set"
     },
     {
       "method": "SourceSubsystem.transient_mode_query",
@@ -1966,7 +1972,8 @@
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
-      "hil": "not_run"
+      "hil": "not_run",
+      "alias_of": "SourceSubsystem.function_mode_query"
     },
     {
       "method": "StatusSubsystem.oper_condition_query",

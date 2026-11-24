@@ -1,7 +1,11 @@
 """Rated single-unit envelopes; not firmware qualification or parallel ratings."""
 from dataclasses import dataclass
-from scpi_driver_core import ConfigurationError, IdentityError, ResponseParseError
-from scpi_driver_core.scpi.parsers import parse_identity, parse_float
+from enum import Enum
+import math
+from types import MappingProxyType
+from typing import Mapping
+from scpi_driver_core import ConfigurationError, IdentityError, ResponseParseError, UnsupportedOperationError
+from scpi_driver_core.scpi.parsers import parse_float
 
 
 @dataclass(frozen=True)
@@ -12,7 +16,7 @@ class Ratings:
 
 
 # ITECH IT-M3900D user manual, quick reference pp.2–3; nominal ratings.
-RATINGS = {
+RATINGS = MappingProxyType({
     "IT-M3901D-10-170": Ratings(10, 170, 1700),
     "IT-M3903D-10-340": Ratings(10, 340, 3400),
     "IT-M3905D-10-510": Ratings(10, 510, 5100),
@@ -39,7 +43,58 @@ RATINGS = {
     "IT-M3912D-800-48": Ratings(800, 48, 12000),
     "IT-M3906D-1500-12": Ratings(1500, 12, 6000),
     "IT-M3912D-1500-24": Ratings(1500, 24, 12000),
-}
+})
+
+
+class CapabilityState(str, Enum):
+    SUPPORTED = "supported"
+    UNSUPPORTED = "unsupported"
+    UNKNOWN = "unknown"
+    UNQUALIFIED = "unqualified"
+
+
+# Feature evidence, not a claim of firmware or physical qualification.
+_FEATURES = ("identity", "voltage_set", "current_set", "voltage_measure",
+             "current_measure", "output_control", "ovp", "ocp",
+             "arb", "battery", "external_analog", "remote_sense_query")
+
+
+def unknown_feature_states():
+    return MappingProxyType(dict.fromkeys(_FEATURES, CapabilityState.UNKNOWN))
+
+
+@dataclass(frozen=True)
+class ModelDescriptor:
+    model: str
+    ratings: Ratings
+    channels: int
+    features: Mapping[str, CapabilityState]
+
+    def state(self, feature: str) -> CapabilityState:
+        return self.features.get(feature, CapabilityState.UNKNOWN)
+
+    def require(self, feature: str) -> None:
+        if self.state(feature) is not CapabilityState.SUPPORTED:
+            raise UnsupportedOperationError(
+                f"{self.model}: {feature} is {self.state(feature).value}"
+            )
+
+
+# Existing nominal-rating source only; feature/firmware guide qualification
+# must be established separately. Do not turn the existence of a method into support.
+MODEL_DESCRIPTORS = MappingProxyType({
+    name: ModelDescriptor(name, rating, 1, MappingProxyType({
+        **dict.fromkeys(_FEATURES, CapabilityState.UNQUALIFIED),
+        "identity": CapabilityState.SUPPORTED,
+    }))
+    for name, rating in RATINGS.items()
+})
+
+
+def descriptor_for(identity):
+    if identity.manufacturer.strip().upper() != "ITECH":
+        return None
+    return MODEL_DESCRIPTORS.get(identity.model.strip().upper())
 
 
 @dataclass(frozen=True)
@@ -47,10 +102,56 @@ class Range:
     minimum: float
     maximum: float
 
+    def __post_init__(self):
+        if (any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v)
+                for v in (self.minimum, self.maximum))
+                or self.minimum > self.maximum):
+            raise ConfigurationError("range must contain ordered finite real bounds")
+
     def validate(self, value):
-        import math
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not self.minimum <= value <= self.maximum:
             raise ConfigurationError(f"value outside permitted range {self.minimum}..{self.maximum}: {value!r}")
+
+
+@dataclass(frozen=True)
+class ApplicationLimits:
+    voltage: Range | None = None
+    current: Range | None = None
+    power: Range | None = None
+
+    def __post_init__(self):
+        for value in (self.voltage, self.current, self.power):
+            if value is not None and not isinstance(value, Range):
+                raise ConfigurationError("application limits must be Range or None")
+
+    @classmethod
+    def from_config(cls, config):
+        """Translate persisted application bounds; never interpret them as ratings."""
+        def combine(quantity, ceiling):
+            raw = config.get(f"default_{quantity}_range")
+            bounds = Range(*raw) if raw is not None else None
+            return (intersect_range(bounds, Range(0, ceiling)) if bounds is not None
+                    else Range(0, ceiling)) if ceiling is not None else bounds
+        limits = config.get("safe_limits")
+        power = limits["max_power"]
+        return cls(combine("voltage", limits["max_voltage"]),
+                   combine("current", limits["max_current"]),
+                   Range(0, power) if power is not None else None)
+
+
+def intersect_range(*ranges):
+    if not ranges or any(not isinstance(r, Range) for r in ranges):
+        raise ConfigurationError("all required operating ranges must be known")
+    return Range(max(r.minimum for r in ranges), min(r.maximum for r in ranges))
+
+
+@dataclass(frozen=True)
+class ElectricalRanges:
+    voltage: Range
+    current: Range
+    voltage_limit: Range
+    current_limit: Range
+    power_limit: Range
 
 
 @dataclass(frozen=True)
@@ -63,24 +164,74 @@ class Capabilities:
     voltage_limit: Range
     current_limit: Range
     power_limit: Range
+    live_ranges: ElectricalRanges | None = None
 
 
-def discover_capabilities(driver):
-    """Explicit read-only probe; do not change output or drain error queue."""
+# Only these programmed setpoint/range commands share nominal electrical bounds.
+# Protection trip thresholds and timing parameters have separate semantics.
+ELECTRICAL_COMMANDS = MappingProxyType({
+    "SOUR:VOLT": ("voltage_v", "voltage"),
+    "SOUR:CURR": ("current_a", "current"),
+    "SOUR:VOLT:LIM": ("voltage_v", "voltage"),
+    "SOUR:CURR:LIM": ("current_a", "current"),
+    "SOUR:POW:LIM": ("power_w", "power"),
+})
+
+
+def effective_command_range(descriptor, header, live, application=None):
+    """Intersect the known rating, live command bounds and application envelope."""
+    if not isinstance(descriptor, ModelDescriptor) or not isinstance(live, Range):
+        raise ConfigurationError("known model descriptor and live range required")
+    if application is None:
+        application = ApplicationLimits()
+    if not isinstance(application, ApplicationLimits):
+        raise ConfigurationError("application limits must be ApplicationLimits")
+    if header not in ELECTRICAL_COMMANDS:
+        raise ConfigurationError("no electrical rating mapping for command")
+    rating_key, application_key = ELECTRICAL_COMMANDS[header]
+    ceiling = getattr(descriptor.ratings, rating_key)
+    user_range = getattr(application, application_key)
+    return intersect_range(live, Range(0, ceiling),
+                           *(() if user_range is None else (user_range,)))
+
+
+def effective_ranges(descriptor, live, application=None):
+    """Intersect nominal, live and optional application bounds independently.
+
+    This is not physical qualification or a claim of simultaneous full-rated
+    voltage/current delivery.
+    """
+    if not isinstance(live, ElectricalRanges):
+        raise ConfigurationError("known live electrical ranges required")
+    return ElectricalRanges(*(
+        effective_command_range(descriptor, header, getattr(live, name), application)
+        for header, name in (("SOUR:VOLT", "voltage"), ("SOUR:CURR", "current"),
+                             ("SOUR:VOLT:LIM", "voltage_limit"),
+                             ("SOUR:CURR:LIM", "current_limit"),
+                             ("SOUR:POW:LIM", "power_limit"))
+    ))
+
+
+def discover_capabilities(driver, *, application_limits=None):
+    """Explicit read-only probe; retain reported ranges separately from effective limits."""
     with driver.session.operation_lock():
-        ident = parse_identity(driver.identify())
-        ratings = RATINGS.get(ident.model.strip().upper())
-        if ident.manufacturer.strip().upper() != "ITECH" or ratings is None:
+        ident = driver.identity_snapshot(refresh=True)
+        descriptor = descriptor_for(ident)
+        if descriptor is None:
             raise IdentityError("unknown or unsupported ITECH model: " + ident.model)
         def probe(header, ceiling):
             lo = parse_float(driver.query_scpi(header + "? MIN"))
             hi = parse_float(driver.query_scpi(header + "? MAX"))
             if not 0 <= lo <= hi or hi <= 0 or lo > ceiling:
                 raise ResponseParseError("invalid instrument capability range", raw=f"{lo},{hi}")
-            return Range(lo, min(hi, ceiling))
+            return Range(lo, hi)
+        ratings = descriptor.ratings
+        live = ElectricalRanges(probe("SOUR:VOLT", ratings.voltage_v),
+                                probe("SOUR:CURR", ratings.current_a),
+                                probe("SOUR:VOLT:LIM", ratings.voltage_v),
+                                probe("SOUR:CURR:LIM", ratings.current_a),
+                                probe("SOUR:POW:LIM", ratings.power_w))
+        effective = effective_ranges(descriptor, live, application_limits)
         return Capabilities(ident.model, ident.firmware_version, ratings,
-                            probe("SOUR:VOLT", ratings.voltage_v),
-                            probe("SOUR:CURR", ratings.current_a),
-                            probe("SOUR:VOLT:LIM", ratings.voltage_v),
-                            probe("SOUR:CURR:LIM", ratings.current_a),
-                            probe("SOUR:POW:LIM", ratings.power_w))
+                            effective.voltage, effective.current, effective.voltage_limit,
+                            effective.current_limit, effective.power_limit, live)

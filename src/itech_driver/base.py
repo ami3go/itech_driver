@@ -7,6 +7,7 @@ import time
 from typing import Union
 
 from scpi_driver_core import ScpiClient, ScpiSession
+from scpi_driver_core.models import Identity
 from scpi_driver_core.exceptions import (
     ConfigurationError, ScpiTimeoutError, TransportError, UnsupportedOperationError,
     ResponseParseError,
@@ -52,20 +53,24 @@ class BaseInstrument:
                 resource_manager=resource_manager, chunk_size=chunk_size,
             )
         codec = ScpiTextCodec(command_terminator=terminator, response_terminator=terminator)
-        self.session = ScpiSession(
+        self._bind_session(ScpiSession(
             resource_name, ScpiClient(transport, codec=codec, timeout_s=seconds),
             communication_timeout_s=seconds,
-        )
-        self._p = self
-        self.system = self.source = self.output = self.status = None
-        self.trigger = self.arb = self.battery = self.initiate = None
-        self.abort = self.io = self.ieee = None
+        ))
         try:
             self.session.open()
         except ScpiTimeoutError as exc:
             raise TimeoutError(str(exc)) from exc
         except TransportError as exc:
             raise InstrumentNotFoundError(str(exc)) from exc
+
+    def _bind_session(self, session: ScpiSession) -> None:
+        """Bind one existing core session; does not open or probe transport."""
+        self.session = session
+        self._p = self
+        self.system = self.source = self.output = self.status = None
+        self.trigger = self.arb = self.battery = self.initiate = None
+        self.abort = self.io = self.ieee = None
 
     @property
     def client(self) -> ScpiClient:
@@ -132,6 +137,15 @@ class BaseInstrument:
         if type(max_entries) is not int or not 1 <= max_entries <= 21:
             raise ConfigurationError("max_entries must be an integer in 1..21")
         return ScpiErrorQueue(self.client, maximum_entries=max_entries).drain()
+
+    def identity_snapshot(self, *, refresh: bool = False) -> Identity:
+        """Immutable generation-scoped metadata via the shared core."""
+        try:
+            return self.session.get_identity(refresh=refresh)
+        except ScpiTimeoutError as exc:
+            raise TimeoutError(str(exc)) from exc
+        except TransportError as exc:
+            raise CommandError(str(exc)) from exc
 
     def identify(self) -> str:
         return self.query_scpi("*IDN?")

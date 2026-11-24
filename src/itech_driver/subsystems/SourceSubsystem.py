@@ -1,8 +1,9 @@
 import math
 import warnings
-from scpi_driver_core import ConfigurationError, ResponseParseError, UnsupportedOperationError
+from scpi_driver_core import ConfigurationError, IdentityError, ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float
 from ..base import  BaseInstrument, BoolLike, Number
+from ..capabilities import ELECTRICAL_COMMANDS, Range, effective_command_range
 # -------------------------
 # Source Subsystem (SOURce)
 # -------------------------
@@ -150,10 +151,21 @@ class SourceSubsystem:
         self._check_setpoint(value)
         with self._p.session.operation_lock():
             self._p._assert_write_authorized()
+            descriptor = None
+            if header in ELECTRICAL_COMMANDS:
+                descriptor = self._p.model_descriptor(refresh=False)
+                if descriptor is None:
+                    raise IdentityError("recognized rated ITECH model required for electrical setting")
             minimum = self._limit_query(header, "MIN")
             maximum = self._limit_query(header, "MAX")
-            if not 0 <= minimum <= maximum or not minimum <= value <= maximum:
-                raise ConfigurationError("limit outside reported instrument range")
+            if not 0 <= minimum <= maximum:
+                raise ConfigurationError("invalid reported instrument range")
+            permitted = Range(minimum, maximum)
+            if descriptor is not None:
+                permitted = effective_command_range(
+                    descriptor, header, permitted, self._p.application_limits
+                )
+            permitted.validate(value)
             self._p.write_scpi(f"{header} {value}")
 
     def voltage_limit_set(self, value: Number, channel: int = 1):

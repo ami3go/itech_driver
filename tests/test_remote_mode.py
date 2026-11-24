@@ -8,7 +8,7 @@ from itech_driver.exceptions import TimeoutError
 def fixture():
     return (ScriptedScpiTransport().on("SYST:REM").on("SYST:LOC")
             .on("SOUR:VOLT? MIN", "0").on("SOUR:VOLT? MAX", "10")
-            .on("SOUR:VOLT 1").on("*IDN?", "ITECH,IT-M3900D,SIM,1")
+            .on("SOUR:VOLT 1").on("*IDN?", "ITECH,IT-M3902D-80-40,SIM,1")
             .on("*RST"))
 
 
@@ -23,7 +23,7 @@ def test_remote_guard_and_context_order():
             assert d.requested_mode == "remote"
             d.source.voltage_set(1)
         assert d.requested_mode == "local"
-    assert t.history == ["*IDN?", "SYST:REM", "SOUR:VOLT? MIN", "SOUR:VOLT? MAX", "SOUR:VOLT 1", "SYST:LOC"]
+    assert t.history == ["*IDN?", "SYST:REM", "*IDN?", "SOUR:VOLT? MIN", "SOUR:VOLT? MAX", "SOUR:VOLT 1", "SYST:LOC"]
 
 
 def test_system_methods_and_generation():
@@ -87,7 +87,7 @@ def test_missing_range_terminator_invalidates_remote_authorization():
         assert t.state.name == "FAULTED"
         with pytest.raises(SafetyGuardError):
             d.output.state_set(True)
-        assert t.history == ["SYST:REM", "SOUR:VOLT? MIN"]
+        assert t.history == ["SYST:REM", "*IDN?", "SOUR:VOLT? MIN"]
 
 
 def test_fragmented_range_reply_preserves_exact_order():
@@ -99,4 +99,4 @@ def test_fragmented_range_reply_preserves_exact_order():
     with ITM3900D("sim", transport=t, require_remote=True) as d:
         d.enter_remote()
         d.source.voltage_set(1)
-    assert t.history == ["SYST:REM", "SOUR:VOLT? MIN", "SOUR:VOLT? MAX", "SOUR:VOLT 1"]
+    assert t.history == ["SYST:REM", "*IDN?", "SOUR:VOLT? MIN", "SOUR:VOLT? MAX", "SOUR:VOLT 1"]

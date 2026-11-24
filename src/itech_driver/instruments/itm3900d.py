@@ -1,9 +1,9 @@
 """ITECH IT-M3900D series power supply driver."""
 
 from contextlib import contextmanager
-from scpi_driver_core import ScpiDriverError, SafetyGuardError
+from scpi_driver_core import ScpiDriverError, SafetyGuardError, ConfigurationError
 from ..base import BaseInstrument
-from ..capabilities import discover_capabilities
+from ..capabilities import ApplicationLimits, discover_capabilities, descriptor_for
 from ..subsystems.LoggingSubsystem import LoggingSubsystem
 from ..subsystems.FetchSubsystem import FetchSubsystem
 from ..subsystems.SenseSubsystem import SenseSubsystem
@@ -25,12 +25,45 @@ class ITM3900D(BaseInstrument):
     """ITECH IT-M3900D series power supply."""
     
     def __init__(self, resource_name: str, timeout: int = 5000, 
-                 termination: str = '\n', interface_kwargs: dict = None, *, require_remote: bool = False, **kwargs):
+                 termination: str = '\n', interface_kwargs: dict = None, *, require_remote: bool = False, application_limits: ApplicationLimits | None = None, **kwargs):
+        self._initialize_policy(require_remote, application_limits)
+        super().__init__(resource_name, timeout, termination, interface_kwargs, **kwargs)
+        try:
+            self._initialize_subsystems()
+        except BaseException as primary:
+            try:
+                self.close()
+            except Exception as cleanup:
+                if hasattr(primary, "add_note"):
+                    primary.add_note(f"Subsystem initialization cleanup failed: {cleanup!r}")
+                else:
+                    primary.cleanup_error = cleanup
+            raise
+
+    @staticmethod
+    def _validate_policy(require_remote, application_limits):
+        if type(require_remote) is not bool:
+            raise ConfigurationError("require_remote must be bool")
+        if application_limits is not None and not isinstance(application_limits, ApplicationLimits):
+            raise ConfigurationError("application_limits must be ApplicationLimits")
+
+    def _initialize_policy(self, require_remote, application_limits):
+        self._validate_policy(require_remote, application_limits)
+        self._application_limits = application_limits or ApplicationLimits()
         self.require_remote = require_remote
         self._mode_request = None
         self._mode_generation = None
-        super().__init__(resource_name, timeout, termination, interface_kwargs, **kwargs)
-        
+
+    @classmethod
+    def _from_live_session(cls, session, *, require_remote, application_limits):
+        """Internal factory adoption; caller owns cleanup until successful return."""
+        driver = cls.__new__(cls)
+        driver._initialize_policy(require_remote, application_limits)
+        driver._bind_session(session)
+        driver._initialize_subsystems()
+        return driver
+
+    def _initialize_subsystems(self):
         # Initialize subsystems
         self.system = SystemSubsystem(self)
         self.source = SourceSubsystem(self)
@@ -52,8 +85,27 @@ class ITM3900D(BaseInstrument):
         self.dlog = LoggingSubsystem(self, 'DLOG')
 
 
-    def discover_capabilities(self):
-        return discover_capabilities(self)
+    def identity_snapshot(self, *, refresh=False):
+        with self.session.operation_lock():
+            try:
+                return super().identity_snapshot(refresh=refresh)
+            except ScpiDriverError:
+                self._invalidate_mode()
+                raise
+
+    def model_descriptor(self, *, refresh=True):
+        """Return nominal descriptor, or None for an unknown identity."""
+        return descriptor_for(self.identity_snapshot(refresh=refresh))
+
+    @property
+    def application_limits(self):
+        """Immutable application bounds for this driver instance."""
+        return self._application_limits
+
+    def discover_capabilities(self, *, application_limits=None):
+        if application_limits is None:
+            application_limits = self.application_limits
+        return discover_capabilities(self, application_limits=application_limits)
 
     @property
     def requested_mode(self):

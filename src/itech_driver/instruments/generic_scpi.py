@@ -1,7 +1,7 @@
 """Generic SCPI identification; unknown instruments have no qualified controls."""
 from typing import Dict, Any
 from ..base import BaseInstrument
-from scpi_driver_core.scpi.parsers import parse_identity
+from ..capabilities import unknown_feature_states
 from ..subsystems.IEEE488 import IEEE488
 
 
@@ -11,6 +11,10 @@ class GenericSCPIInstrument(BaseInstrument):
     def __init__(self, resource_name: str, **kwargs):
         super().__init__(resource_name, **kwargs)
         self.ieee = IEEE488(self)
+
+    def capability_states(self):
+        """Explicit immutable unknown states; performs no speculative I/O."""
+        return unknown_feature_states()
 
     def detect_capabilities(self) -> Dict[str, bool | None]:
         """None denotes unknown, not proof of support or lack of support.
@@ -22,9 +26,9 @@ class GenericSCPIInstrument(BaseInstrument):
         return dict.fromkeys(("voltage_set", "current_set", "voltage_measure",
                               "current_measure", "output_control", "ovp", "ocp"))
 
-    def get_instrument_info(self) -> Dict[str, Any]:
-        """Read fresh identity; never reuse evidence from a previous session."""
-        identity = parse_identity(self.identify())
+    def get_instrument_info(self, *, refresh: bool = True) -> Dict[str, Any]:
+        """Compatibility dictionary; fresh by default, opt into session cache."""
+        identity = self.identity_snapshot(refresh=refresh)
         return {
             "manufacturer": identity.manufacturer,
             "model": identity.model,

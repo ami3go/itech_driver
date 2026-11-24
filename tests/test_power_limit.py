@@ -4,7 +4,7 @@ from itech_driver import ITM3900D
 
 
 def test_limit_and_opp_are_distinct():
-    t = ScriptedScpiTransport()
+    t = ScriptedScpiTransport().on("*IDN?", "ITECH,IT-M3902D-80-40,SIM,1")
     t.on("SOUR:POW:LIM? MIN", "0").on("SOUR:POW:LIM? MAX", "100")
     t.on("SOUR:POW:LIM 20").on("SOUR:POW:LIM?", "20")
     t.on("SOUR:POW:OVER:PROT:LEV 25").on("SOUR:POW:OVER:PROT:LEV?", "25")
@@ -16,7 +16,7 @@ def test_limit_and_opp_are_distinct():
         assert d.source.opp_threshold_query() == 25
         d.source.opp_enable(True)
         assert d.source.opp_enable_query()
-        assert t.history == ["SOUR:POW:LIM? MIN", "SOUR:POW:LIM? MAX", "SOUR:POW:LIM 20", "SOUR:POW:OVER:PROT:LEV 25",
+        assert t.history == ["*IDN?", "SOUR:POW:LIM? MIN", "SOUR:POW:LIM? MAX", "SOUR:POW:LIM 20", "SOUR:POW:OVER:PROT:LEV 25",
                              "SOUR:POW:LIM?", "SOUR:POW:OVER:PROT:LEV?",
                              "SOUR:POW:OVER:PROT:STAT 1", "SOUR:POW:OVER:PROT:STAT?"]
 

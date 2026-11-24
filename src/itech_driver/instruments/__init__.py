@@ -54,29 +54,30 @@ def create_instrument(model: str, resource_name: str, **kwargs) -> BaseInstrumen
     return INSTRUMENT_REGISTRY[model](resource_name, **kwargs)
 
 
-def auto_detect_instrument(resource_name: str, **kwargs) -> BaseInstrument:
-    """Auto-detect instrument type and return appropriate instance.
+def auto_detect_instrument(resource_name: str, *, require_remote: bool = False,
+                           application_limits=None, **kwargs) -> BaseInstrument:
+    """Probe once, then adopt the same live session for a recognized model.
 
-    This function tries to identify the instrument by querying its IDN string
-    and returns the most specific instrument class available.
-
-    Args:
-        resource_name: VISA resource string
-        **kwargs: Additional arguments passed to instrument constructor
-
-    Returns:
-        BaseInstrument: Detected instrument instance or GenericSCPIInstrument
+    Unknown valid identities retain only generic common commands. An explicit
+    vendor-specific safety policy cannot be silently discarded on fallback.
     """
-    from scpi_driver_core.scpi.parsers import parse_identity
+    from scpi_driver_core import IdentityError
     from ..identity import is_itm3900d
 
-    # Close temporary connection before opening the model-specific driver.
-    # Unknown valid identities retain generic support; failed I/O is not hidden.
+    ITM3900D._validate_policy(require_remote, application_limits)
     temp = GenericSCPIInstrument(resource_name, **kwargs)
     try:
-        identity = parse_identity(temp.identify())
+        identity = temp.identity_snapshot()
         if not is_itm3900d(identity):
+            if require_remote or application_limits is not None:
+                raise IdentityError("vendor safety policy requires recognized ITECH model")
             return temp
+        # Only this factory holds temp. The session (including its immutable
+        # identity cache) is transferred, not the transport reopened.
+        driver = ITM3900D._from_live_session(
+            temp.session, require_remote=require_remote, application_limits=application_limits
+        )
+        return driver
     except BaseException as primary:
         try:
             temp.close()
@@ -86,8 +87,6 @@ def auto_detect_instrument(resource_name: str, **kwargs) -> BaseInstrument:
             else:
                 primary.cleanup_error = cleanup
         raise
-    temp.close()
-    return ITM3900D(resource_name, **kwargs)
 
 
 def create_instrument_from_idn(resource_name: str, **kwargs) -> BaseInstrument:
