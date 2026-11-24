@@ -95,7 +95,7 @@ class ArbSubsystem:
         return self._p.initiate.arb()
 
     def trigger(self):
-        self._p.write_scpi('TRIGger:ARB')
+        execute(self._p, "ArbSubsystem.trigger")
 
     def pause_set(self, enable: BoolLike):
         execute_parameterized(self._p, "ArbSubsystem.pause_set", f'{1 if strict_bool(enable) else 0}')

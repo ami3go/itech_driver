@@ -81,7 +81,7 @@ class SourceSubsystem:
 
     def ovp_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["ovp"][0] + "?"))
+        return execute(self._p, "SourceSubsystem.ovp_query")
 
     def ovp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
@@ -90,7 +90,7 @@ class SourceSubsystem:
 
     def ovp_enable_query(self, channel: int = 1) -> bool:  # Added: Missing query method
         self._check_channel(channel)
-        return parse_bool(self._p.query_scpi(f'SOUR:VOLT:OVER:PROT:STAT?'))
+        return execute(self._p, "SourceSubsystem.ovp_enable_query")
 
     def ocp_set(self, value: Number, channel: int = 1, *, qualification: ProtectionThresholdQualification | None = None):
         self._check_channel(channel)
@@ -99,7 +99,7 @@ class SourceSubsystem:
 
     def ocp_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["ocp"][0] + "?"))
+        return execute(self._p, "SourceSubsystem.ocp_query")
 
     def ocp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
@@ -108,7 +108,7 @@ class SourceSubsystem:
 
     def ocp_enable_query(self, channel: int = 1) -> bool:  # Added: Missing query method
         self._check_channel(channel)
-        return parse_bool(self._p.query_scpi(f'SOUR:CURR:OVER:PROT:STAT?'))
+        return execute(self._p, "SourceSubsystem.ocp_enable_query")
 
     def opp_threshold_set(self, value: Number, channel: int = 1, *, qualification: ProtectionThresholdQualification | None = None):
         self._check_channel(channel)
@@ -117,7 +117,7 @@ class SourceSubsystem:
 
     def opp_threshold_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["opp"][0] + "?"))
+        return execute(self._p, "SourceSubsystem.opp_threshold_query")
 
     def opp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
@@ -296,7 +296,7 @@ class SourceSubsystem:
 
     def uvp_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["uvp"][0] + "?"))
+        return execute(self._p, "SourceSubsystem.uvp_query")
 
     def uvp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
@@ -314,7 +314,7 @@ class SourceSubsystem:
 
     def ucp_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["ucp"][0] + "?"))
+        return execute(self._p, "SourceSubsystem.ucp_query")
 
     def ucp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
@@ -402,9 +402,11 @@ class SourceSubsystem:
         if not all(flag is True for flag in (wiring_confirmed,deenergized_confirmed,option_confirmed)):
             raise ConfigurationError("confirm analog option, wiring and de-energized output")
         with self._p.session.operation_lock():
-            if parse_bool(self._p.query_scpi("OUTP:STAT?")):
+            self._p._require_methods("OutputSubsystem.state_query")
+            self._p._assert_write_authorized()
+            if self._p.output.state_query():
                 raise ConfigurationError("programmed output must be disabled")
-            self._p.write_scpi(f"SOUR:EXT:PROG {int(enabled)}")
+            self._p.write_scpi(command_spec("SourceSubsystem.external_programming_set").header + f" {int(enabled)}")
 
     @staticmethod
     def _analog_channel(channel):
@@ -416,7 +418,8 @@ class SourceSubsystem:
         channel = self._analog_channel(channel)
         if coefficient not in ("MX","MB"):
             raise ConfigurationError("coefficient must be MX or MB")
-        raw = self._p.query_scpi(f"SOUR:EXT:PROG:CHAN:{coefficient}? {channel}")
+        header = command_spec("SourceSubsystem.external_coefficient_query").header.format(coefficient=coefficient)
+        raw = self._p.query_scpi(f"{header} {channel}")
         value = parse_float(raw)
         if not -9000 <= value <= 9000:
             raise ResponseParseError("external coefficient outside documented bounds",raw=raw)
@@ -432,9 +435,12 @@ class SourceSubsystem:
         if option_confirmed is not True or deenergized_confirmed is not True:
             raise ConfigurationError("confirm analog option and de-energized output")
         with self._p.session.operation_lock():
-            if parse_bool(self._p.query_scpi("OUTP:STAT?")) or self.external_programming_query():
+            self._p._require_methods("OutputSubsystem.state_query", "SourceSubsystem.external_programming_query")
+            self._p._assert_write_authorized()
+            if self._p.output.state_query() or self.external_programming_query():
                 raise ConfigurationError("disable output and external control before changing coefficients")
-            self._p.write_scpi(f"SOUR:EXT:PROG:CHAN:{coefficient} {channel},{value}")
+            header = command_spec("SourceSubsystem.external_coefficient_set").header.format(coefficient=coefficient)
+            self._p.write_scpi(f"{header} {channel},{value}")
 
     def resistance_query(self, *, bound=None) -> float:
         """Query programmed internal resistance in ohms (CV priority only)."""
