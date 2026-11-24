@@ -112,10 +112,10 @@ class TriggerSubsystem:
         raise UnsupportedOperationError("select explicit acquisition voltage or current level")
 
     def delay_set(self, seconds: Number):
-        self._p.write_scpi(f'TRIG:DEL {seconds}')
+        raise UnsupportedOperationError("generic trigger delay is not documented for IT-M3900D")
 
     def delay_query(self) -> float:
-        return parse_float(self._p.query_scpi('TRIG:DEL?'))
+        raise UnsupportedOperationError("generic trigger delay is not documented for IT-M3900D")
 
     # ELOG related
     def elog_trigger_voltage_high_set(self, val: Number):
