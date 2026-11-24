@@ -8,6 +8,10 @@ class StatusSubsystem:
     def __init__(self, parent: BaseInstrument):
         self._p = parent
 
+    def preset(self):
+        """Preset status register masks; not an instrument reset."""
+        self._p.write_scpi('STAT:PRES')
+
     # Operation
     def oper_condition_query(self) -> int:
         return parse_int(self._p.query_scpi('STAT:OPER:COND?'))
