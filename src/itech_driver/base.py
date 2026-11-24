@@ -35,12 +35,9 @@ class BaseInstrument:
     ):
         if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or not math.isfinite(timeout) or timeout <= 0:
             raise ConfigurationError("timeout must be finite positive milliseconds")
-        if not isinstance(termination, str) or not termination:
-            raise ConfigurationError("termination must be a nonempty ASCII string")
-        try:
-            terminator = termination.encode("ascii")
-        except UnicodeEncodeError as exc:
-            raise ConfigurationError("termination must be ASCII") from exc
+        if termination not in ("\n", "\r\n", "\r"):
+            raise ConfigurationError("termination must be LF, CRLF or CR")
+        terminator = termination.encode("ascii")
         # Core currently does not expose arbitrary VISA open_resource kwargs.
         if interface_kwargs:
             raise ConfigurationError(
