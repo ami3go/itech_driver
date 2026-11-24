@@ -53,20 +53,24 @@ class BaseInstrument:
                 resource_manager=resource_manager, chunk_size=chunk_size,
             )
         codec = ScpiTextCodec(command_terminator=terminator, response_terminator=terminator)
-        self.session = ScpiSession(
+        self._bind_session(ScpiSession(
             resource_name, ScpiClient(transport, codec=codec, timeout_s=seconds),
             communication_timeout_s=seconds,
-        )
-        self._p = self
-        self.system = self.source = self.output = self.status = None
-        self.trigger = self.arb = self.battery = self.initiate = None
-        self.abort = self.io = self.ieee = None
+        ))
         try:
             self.session.open()
         except ScpiTimeoutError as exc:
             raise TimeoutError(str(exc)) from exc
         except TransportError as exc:
             raise InstrumentNotFoundError(str(exc)) from exc
+
+    def _bind_session(self, session: ScpiSession) -> None:
+        """Bind one existing core session; does not open or probe transport."""
+        self.session = session
+        self._p = self
+        self.system = self.source = self.output = self.status = None
+        self.trigger = self.arb = self.battery = self.initiate = None
+        self.abort = self.io = self.ieee = None
 
     @property
     def client(self) -> ScpiClient:
