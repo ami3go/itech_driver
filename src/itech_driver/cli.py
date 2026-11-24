@@ -22,6 +22,8 @@ def main(argv=None) -> None:
     discover_parser.add_argument('--port', type=int, default=30000)
     discover_parser.add_argument('--timeout', type=int, default=1000)
     discover_parser.add_argument('--vcp', action='store_true')
+    discover_parser.add_argument('--no-visa', action='store_true', help='Skip VISA enumeration')
+    discover_parser.add_argument('--no-mdns', action='store_true', help='Skip mDNS enumeration')
     discover_parser.add_argument('--baudrate', type=int, default=9600)
 
     # Control command
@@ -57,7 +59,8 @@ def discover_instruments(args=None) -> None:
         main(["discover", *sys.argv[1:]])
         return
     report = discover(subnet=args.subnet, port=args.port, timeout=args.timeout,
-                      probe_vcp=args.vcp, baudrate=args.baudrate)
+                      probe_vcp=args.vcp, baudrate=args.baudrate,
+                      use_visa=not args.no_visa, use_mdns=not args.no_mdns)
     for device in report.devices:
         print(device.identity.raw)
         for endpoint in device.endpoints:

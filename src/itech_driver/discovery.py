@@ -6,12 +6,9 @@ import threading
 
 from scpi_driver_core import ConfigurationError
 from scpi_driver_core.models import Identity
-from scpi_driver_core.scpi.parsers import parse_identity
 
 from .identity import is_itm3900d
-from .instruments import ITM3900D
-from .tcp import connect_tcp
-from .vcp import connect_vcp
+from .instruments import GenericSCPIInstrument
 
 
 @dataclass(frozen=True)
@@ -36,6 +33,7 @@ class DiscoveryReport:
 def _visa_candidates():
     import pyvisa
     # ResourceManager may be shared; do not close it here.
+    # PyVISA caches a process-shared manager; closing it can invalidate other drivers.
     resources = pyvisa.ResourceManager().list_resources()
     return [Endpoint("usbtmc" if r.upper().startswith("USB") else "visa-lan", r)
             for r in resources
@@ -78,9 +76,11 @@ def _mdns_candidates():
                     endpoints.append(Endpoint("tcp", address, info.port))
         return endpoints
     finally:
-        if browser is not None:
-            browser.cancel()
-        zc.close()
+        try:
+            if browser is not None:
+                browser.cancel()
+        finally:
+            zc.close()
 
 
 def _vcp_candidates():
@@ -102,19 +102,24 @@ def _subnet_candidates(subnet, port):
 
 
 def _probe(endpoint, timeout, baudrate):
+    from .connection import ConnectionConfig
     if endpoint.interface == "tcp":
-        driver = connect_tcp(endpoint.address, endpoint.port, timeout=timeout)
+        host = endpoint.address
+        authority = f"[{host}]" if ":" in host else host
+        config = ConnectionConfig(f"tcp://{authority}:{endpoint.port}", timeout_ms=timeout)
     elif endpoint.interface == "vcp":
-        driver = connect_vcp(endpoint.address, timeout=timeout, baudrate=baudrate)
+        config = ConnectionConfig(f"vcp:{endpoint.address}", timeout_ms=timeout, baudrate=baudrate)
     else:
-        driver = ITM3900D(endpoint.address, timeout=timeout)
-    with driver:
-        return parse_identity(driver.identify())
+        config = ConnectionConfig(endpoint.address, timeout_ms=timeout, interface="visa")
+    with GenericSCPIInstrument(config.resource, connection=config) as driver:
+        return driver.identity_snapshot()
 
 
 def discover_instruments(*, subnet=None, port=30000, timeout=1000, probe_vcp=False,
                          baudrate=9600, use_visa=True, use_mdns=True, workers=8):
     """Find devices by explicit invocation; optional backend failures are reported."""
+    if any(type(flag) is not bool for flag in (probe_vcp, use_visa, use_mdns)):
+        raise ConfigurationError("discovery provider flags must be bool")
     if type(timeout) is not int or not 1 <= timeout <= 10000:
         raise ConfigurationError("discovery timeout must be 1..10000 ms")
     if type(port) is not int or not 1 <= port <= 65535:
@@ -150,8 +155,8 @@ def discover_instruments(*, subnet=None, port=30000, timeout=1000, probe_vcp=Fal
             if error is not None:
                 diagnostics.append(f"{endpoint.interface} {endpoint.address}: {error}")
                 continue
-            serial = identity.serial_number
-            key = (identity.model.upper(), serial.upper()) if serial and serial not in ("0", "N/A", "UNKNOWN") else endpoint
+            serial = (identity.serial_number or "").strip().upper()
+            key = (identity.model.strip().upper(), serial) if serial and serial not in ("0", "N/A", "UNKNOWN") else endpoint
             if key not in grouped:
                 grouped[key] = (identity, [])
             grouped[key][1].append(endpoint)

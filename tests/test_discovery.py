@@ -41,3 +41,67 @@ def test_real_variant_autodetection():
     t = ScriptedScpiTransport().on("*IDN?", "ITECH,IT-M3902D-80-40,A,1")
     with auto_detect_instrument("sim", transport=t) as d:
         assert isinstance(d, ITM3900D)
+
+
+def test_cli_uses_common_discovery_without_visa(monkeypatch, capsys):
+    from itech_driver.cli import main
+    endpoint = discovery.Endpoint("vcp", "COM7")
+    def forbidden():
+        pytest.fail("disabled provider called")
+    monkeypatch.setattr(discovery, "_visa_candidates", forbidden)
+    monkeypatch.setattr(discovery, "_mdns_candidates", forbidden)
+    monkeypatch.setattr(discovery, "_vcp_candidates", lambda: [endpoint])
+    monkeypatch.setattr(discovery, "_probe", lambda *a: parse_identity("ITECH,IT-M3902D-80-40,S,1"))
+    main(["discover", "--no-visa", "--no-mdns", "--vcp"])
+    assert "COM7" in capsys.readouterr().out
+
+
+def test_probe_closes_injected_session_even_on_failure(monkeypatch):
+    from itech_driver import GenericSCPIInstrument
+    t = ScriptedScpiTransport().on("*IDN?", "bad")
+    def factory(resource, **kwargs):
+        return GenericSCPIInstrument(resource, transport=t)
+    monkeypatch.setattr(discovery, "GenericSCPIInstrument", factory)
+    from scpi_driver_core import IdentityError
+    with pytest.raises(IdentityError):
+        discovery._probe(discovery.Endpoint("tcp", "127.0.0.1", 30000), 100, 9600)
+    assert not t.is_open
+    assert t.history == ["*IDN?"]
+
+
+def test_probe_success_closes_and_never_writes_setting(monkeypatch):
+    from itech_driver import GenericSCPIInstrument
+    t = ScriptedScpiTransport().on("*IDN?", "ITECH,IT-M3902D-80-40,S,1")
+    monkeypatch.setattr(discovery, "GenericSCPIInstrument",
+                        lambda resource, **kwargs: GenericSCPIInstrument(resource, transport=t))
+    assert discovery._probe(discovery.Endpoint("vcp", "COM7"), 100, 9600).serial_number == "S"
+    assert not t.is_open
+    assert t.history == ["*IDN?"]
+
+
+def test_unknown_serials_not_deduplicated(monkeypatch):
+    a = discovery.Endpoint("tcp", "192.0.2.1", 30000)
+    b = discovery.Endpoint("tcp", "192.0.2.2", 30000)
+    monkeypatch.setattr(discovery, "_mdns_candidates", lambda: [a, b])
+    monkeypatch.setattr(discovery, "_probe", lambda *a: parse_identity("ITECH,IT-M3902D-80-40,unknown,1"))
+    assert len(discovery.discover_instruments(use_visa=False).devices) == 2
+
+
+def test_mdns_cleanup_when_cancel_raises(monkeypatch):
+    import sys
+    from types import SimpleNamespace
+    closed = []
+    class Z:
+        def close(self):
+            closed.append(True)
+    class B:
+        def __init__(self, *args):
+            pass
+        def cancel(self):
+            raise RuntimeError("cancel failed")
+    monkeypatch.setitem(sys.modules, "zeroconf", SimpleNamespace(
+        Zeroconf=Z, ServiceBrowser=B, ServiceListener=object))
+    monkeypatch.setattr(discovery.threading.Event, "wait", lambda *args: None)
+    with pytest.raises(RuntimeError, match="cancel failed"):
+        discovery._mdns_candidates()
+    assert closed == [True]
