@@ -167,31 +167,49 @@ class Capabilities:
     live_ranges: ElectricalRanges | None = None
 
 
-def effective_ranges(descriptor, live, application=None):
-    """Intersect known nominal, live and optional application ranges.
+# Only these programmed setpoint/range commands share nominal electrical bounds.
+# Protection trip thresholds and timing parameters have separate semantics.
+ELECTRICAL_COMMANDS = MappingProxyType({
+    "SOUR:VOLT": ("voltage_v", "voltage"),
+    "SOUR:CURR": ("current_a", "current"),
+    "SOUR:VOLT:LIM": ("voltage_v", "voltage"),
+    "SOUR:CURR:LIM": ("current_a", "current"),
+    "SOUR:POW:LIM": ("power_w", "power"),
+})
 
-    This does not imply physical qualification, nor that independently valid
-    voltage/current values may be delivered simultaneously at full rating.
-    """
-    if not isinstance(descriptor, ModelDescriptor) or not isinstance(live, ElectricalRanges):
-        raise ConfigurationError("known model descriptor and live ranges required")
+
+def effective_command_range(descriptor, header, live, application=None):
+    """Intersect the known rating, live command bounds and application envelope."""
+    if not isinstance(descriptor, ModelDescriptor) or not isinstance(live, Range):
+        raise ConfigurationError("known model descriptor and live range required")
     if application is None:
         application = ApplicationLimits()
     if not isinstance(application, ApplicationLimits):
         raise ConfigurationError("application limits must be ApplicationLimits")
-    ratings = descriptor.ratings
+    if header not in ELECTRICAL_COMMANDS:
+        raise ConfigurationError("no electrical rating mapping for command")
+    rating_key, application_key = ELECTRICAL_COMMANDS[header]
+    ceiling = getattr(descriptor.ratings, rating_key)
+    user_range = getattr(application, application_key)
+    return intersect_range(live, Range(0, ceiling),
+                           *(() if user_range is None else (user_range,)))
 
-    def bound(value, ceiling, user_range):
-        return intersect_range(value, Range(0, ceiling),
-                               *(() if user_range is None else (user_range,)))
 
-    return ElectricalRanges(
-        bound(live.voltage, ratings.voltage_v, application.voltage),
-        bound(live.current, ratings.current_a, application.current),
-        bound(live.voltage_limit, ratings.voltage_v, application.voltage),
-        bound(live.current_limit, ratings.current_a, application.current),
-        bound(live.power_limit, ratings.power_w, application.power),
-    )
+def effective_ranges(descriptor, live, application=None):
+    """Intersect nominal, live and optional application bounds independently.
+
+    This is not physical qualification or a claim of simultaneous full-rated
+    voltage/current delivery.
+    """
+    if not isinstance(live, ElectricalRanges):
+        raise ConfigurationError("known live electrical ranges required")
+    return ElectricalRanges(*(
+        effective_command_range(descriptor, header, getattr(live, name), application)
+        for header, name in (("SOUR:VOLT", "voltage"), ("SOUR:CURR", "current"),
+                             ("SOUR:VOLT:LIM", "voltage_limit"),
+                             ("SOUR:CURR:LIM", "current_limit"),
+                             ("SOUR:POW:LIM", "power_limit"))
+    ))
 
 
 def discover_capabilities(driver, *, application_limits=None):
