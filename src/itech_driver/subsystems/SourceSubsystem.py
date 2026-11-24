@@ -224,3 +224,97 @@ class SourceSubsystem:
 
     def transient_mode_query(self) -> str:
         return self.function_mode_query()
+
+    def ovp_delay_set(self, seconds: Number, channel: int = 1):
+        self._check_channel(channel)
+        self._limit_set("SOUR:VOLT:OVER:PROT:DEL", seconds)
+
+    def ovp_delay_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:VOLT:OVER:PROT:DEL", bound)
+
+    def ocp_delay_set(self, seconds: Number, channel: int = 1):
+        self._check_channel(channel)
+        self._limit_set("SOUR:CURR:OVER:PROT:DEL", seconds)
+
+    def ocp_delay_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:CURR:OVER:PROT:DEL", bound)
+
+    def opp_delay_set(self, seconds: Number, channel: int = 1):
+        self._check_channel(channel)
+        self._limit_set("SOUR:POW:OVER:PROT:DEL", seconds)
+
+    def opp_delay_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:POW:OVER:PROT:DEL", bound)
+
+    def uvp_delay_set(self, seconds: Number, channel: int = 1):
+        self._check_channel(channel)
+        self._limit_set("SOUR:VOLT:UND:PROT:DEL", seconds)
+
+    def uvp_delay_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:VOLT:UND:PROT:DEL", bound)
+
+    def ucp_delay_set(self, seconds: Number, channel: int = 1):
+        self._check_channel(channel)
+        self._limit_set("SOUR:CURR:UND:PROT:DEL", seconds)
+
+    def ucp_delay_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:CURR:UND:PROT:DEL", bound)
+
+    def uvp_warmup_set(self, seconds: Number, channel: int = 1):
+        self._check_channel(channel)
+        self._limit_set("SOUR:VOLT:UND:PROT:WARM", seconds)
+
+    def uvp_warmup_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:VOLT:UND:PROT:WARM", bound)
+
+    def ucp_warmup_set(self, seconds: Number, channel: int = 1):
+        self._check_channel(channel)
+        self._limit_set("SOUR:CURR:UND:PROT:WARM", seconds)
+
+    def ucp_warmup_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:CURR:UND:PROT:WARM", bound)
+
+    def uvp_set(self, value: Number, channel: int = 1):
+        self._check_channel(channel)
+        self._check_setpoint(value)
+        self._p.write_scpi(f"SOUR:VOLT:UND:PROT:LEV {value}")
+
+    def uvp_query(self, channel: int = 1) -> float:
+        self._check_channel(channel)
+        return parse_float(self._p.query_scpi("SOUR:VOLT:UND:PROT:LEV?"))
+
+    def uvp_enable(self, enable: BoolLike, channel: int = 1):
+        self._check_channel(channel)
+        if type(enable) not in (bool, int) or enable not in (0, 1):
+            raise ConfigurationError("protection enable must be bool or 0/1")
+        self._p.write_scpi(f"SOUR:VOLT:UND:PROT:STAT {int(enable)}")
+
+    def uvp_enable_query(self, channel: int = 1) -> bool:
+        self._check_channel(channel)
+        return parse_bool(self._p.query_scpi("SOUR:VOLT:UND:PROT:STAT?"))
+
+    def ucp_set(self, value: Number, channel: int = 1):
+        self._check_channel(channel)
+        self._check_setpoint(value)
+        self._p.write_scpi(f"SOUR:CURR:UND:PROT:LEV {value}")
+
+    def ucp_query(self, channel: int = 1) -> float:
+        self._check_channel(channel)
+        return parse_float(self._p.query_scpi("SOUR:CURR:UND:PROT:LEV?"))
+
+    def ucp_enable(self, enable: BoolLike, channel: int = 1):
+        self._check_channel(channel)
+        if type(enable) not in (bool, int) or enable not in (0, 1):
+            raise ConfigurationError("protection enable must be bool or 0/1")
+        self._p.write_scpi(f"SOUR:CURR:UND:PROT:STAT {int(enable)}")
+
+    def ucp_enable_query(self, channel: int = 1) -> bool:
+        self._check_channel(channel)
+        return parse_bool(self._p.query_scpi("SOUR:CURR:UND:PROT:STAT?"))
