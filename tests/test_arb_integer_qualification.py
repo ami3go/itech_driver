@@ -75,3 +75,13 @@ def test_strict_method_evidence_does_not_establish_integer_bounds():
 def test_no_qualification_can_expand_family_bounds():
     with pytest.raises(ConfigurationError):
         ArbIntegerQualification(MODEL, "1", {"save": ArbIntegerBounds(1, 11, "synthetic")})
+
+
+def test_invalid_initial_binding_is_fail_closed():
+    t = ScriptedScpiTransport()
+    with ITM3900D("sim", transport=t) as d:
+        with pytest.raises(ConfigurationError):
+            d.bind_arb_integer_qualification(None)
+        with pytest.raises(UnsupportedOperationError):
+            d.arb.count_set(2)
+    assert t.history == []

@@ -76,7 +76,8 @@ def validate_arb_integer(driver, method, value):
     """Reject invalid parameters before any I/O; validate explicit bound if configured."""
     exact_integer(value, minimum=1, maximum=FAMILY_INTEGER_MAX[method], name=method)
     profile = getattr(driver, "_arb_integer_qualification", None)
-    strict = getattr(driver, "_require_qualified_capabilities", False)
+    strict = (getattr(driver, "_require_qualified_capabilities", False)
+              or getattr(driver, "_require_arb_integer_qualification", False))
     if profile is None:
         if strict:
             raise UnsupportedOperationError("strict ARB operation requires command-specific integer bounds")

@@ -56,6 +56,7 @@ class ITM3900D(BaseInstrument):
         self._require_qualified_capabilities = require_qualified_capabilities
         self._method_qualification = None
         self._qualification_generation = None
+        self._require_arb_integer_qualification = False
         self._arb_integer_qualification = None
         self._arb_integer_generation = None
         self._application_limits = application_limits or ApplicationLimits()
@@ -123,6 +124,7 @@ class ITM3900D(BaseInstrument):
         """Bind explicit command bounds to this live identity and generation."""
         with self.session.operation_lock():
             # Failed rebinding must never restore permissive family-only behavior.
+            self._require_arb_integer_qualification = True
             self._arb_integer_generation = None
             if not isinstance(profile, ArbIntegerQualification):
                 raise ConfigurationError("ArbIntegerQualification required")
@@ -148,14 +150,12 @@ class ITM3900D(BaseInstrument):
 
     @contextmanager
     def _qualified_method_scope(self, key):
-        if not self._require_qualified_capabilities:
-            yield
-            return
         with self.session.operation_lock():
-            if (self._method_qualification is None or not self.session.is_connected
-                    or self._qualification_generation != self.session.generation):
-                raise UnsupportedOperationError("bind current-session method qualification before subsystem use")
-            self._method_qualification.require(key)
+            if self._require_qualified_capabilities:
+                if (self._method_qualification is None or not self.session.is_connected
+                        or self._qualification_generation != self.session.generation):
+                    raise UnsupportedOperationError("bind current-session method qualification before subsystem use")
+                self._method_qualification.require(key)
             yield
 
     def model_descriptor(self, *, refresh=True):
