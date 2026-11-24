@@ -117,19 +117,42 @@ class TriggerSubsystem:
     def delay_query(self) -> float:
         raise UnsupportedOperationError("generic trigger delay is not documented for IT-M3900D")
 
-    # ELOG related
+    @staticmethod
+    def _hysteresis_header(subsystem: str, quantity: str, bound: str) -> str:
+        if subsystem not in ("ACQ", "DLOG", "ELOG"):
+            raise ConfigurationError("hysteresis subsystem must be ACQ, DLOG or ELOG")
+        if quantity not in ("VOLT", "CURR"):
+            raise ConfigurationError("hysteresis quantity must be VOLT or CURR")
+        if bound not in ("HIGH", "LOW"):
+            raise ConfigurationError("hysteresis bound must be HIGH or LOW")
+        return f"TRIG:{subsystem}:{quantity}:HYST:{bound}"
+
+    def hysteresis_threshold_query(self, subsystem: str, quantity: str, bound: str) -> float:
+        header = self._hysteresis_header(subsystem, quantity, bound)
+        return parse_float(self._p.query_scpi(f"{header}?"))
+
+    def hysteresis_threshold_set(self, subsystem: str, quantity: str, bound: str, value: Number):
+        header = self._hysteresis_header(subsystem, quantity, bound)
+        arg = self._numeric_arg(value)
+        other = "LOW" if bound == "HIGH" else "HIGH"
+        # Driver-side ordering guard; independent controllers may change settings.
+        with self._p.session.operation_lock():
+            opposite = self.hysteresis_threshold_query(subsystem, quantity, other)
+            if (bound == "HIGH" and value < opposite) or (bound == "LOW" and value > opposite):
+                raise ConfigurationError("high trigger threshold must be >= low threshold")
+            self._p.write_scpi(f"{header} {arg}")
+
     def elog_trigger_voltage_high_set(self, val: Number):
-        self._p.write_scpi(f'TRIG:ELOG:VOLTage:HYSTeresis:HIGH {val}')
+        self.hysteresis_threshold_set("ELOG", "VOLT", "HIGH", val)
 
     def elog_trigger_voltage_low_set(self, val: Number):
-        self._p.write_scpi(f'TRIG:ELOG:VOLTage:HYSTeresis:LOW {val}')
+        self.hysteresis_threshold_set("ELOG", "VOLT", "LOW", val)
 
     def elog_status_query(self) -> str:
-        return self._p.query_scpi('ELOG:STAT?')  # Note: This might need TRIG: prefix
+        return self._p.query_scpi('ELOG:STAT?')  # Separate ELOG qualification required.
 
-    def hysteresis_set(self, val: Number):  # Added: General hysteresis setting
-        self._p.write_scpi(f'TRIG:HYSTeresis {val}')
+    def hysteresis_set(self, val: Number):
+        raise UnsupportedOperationError("specify subsystem, quantity and high/low threshold")
 
-    def hysteresis_query(self) -> float:  # Added: General hysteresis query
-        return parse_float(self._p.query_scpi('TRIG:HYSTeresis?'))
-
+    def hysteresis_query(self) -> float:
+        raise UnsupportedOperationError("specify subsystem, quantity and high/low threshold")
