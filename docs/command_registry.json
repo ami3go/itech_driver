@@ -444,7 +444,8 @@
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
-      "hil": "not_run"
+      "hil": "not_run",
+      "alias_of": "InitiateSubsystem.arb"
     },
     {
       "method": "ArbSubsystem.trigger",
@@ -520,7 +521,8 @@
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
-      "hil": "not_run"
+      "hil": "not_run",
+      "alias_of": "AbortSubsystem.arb"
     },
     {
       "method": "ArbSubsystem.state_query",

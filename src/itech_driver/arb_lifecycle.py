@@ -8,6 +8,7 @@ from enum import Enum
 from types import MappingProxyType
 from typing import Mapping
 from scpi_driver_core import ConfigurationError, ScpiDriverError, SafetyGuardError
+from .subsystems.ArbSubsystem import _repeat
 
 
 class ArbState(str,Enum):
@@ -46,6 +47,8 @@ class ArbLifecycle:
         self._generation=None
         self._trigger_source=None
         self._state=ArbState.UNKNOWN
+        self._trigger_attempted=False
+        self._abort_attempted=False
 
     def _live(self):
         return (self.driver.session.is_connected and
@@ -56,7 +59,7 @@ class ArbLifecycle:
             if not self._live():
                 return ArbEvidence(ArbState.UNKNOWN,None,"session changed or disconnected")
             try:
-                raw=self.driver.query_scpi("ARB:EXE:STAT?").strip()
+                raw=self.driver.arb.state_query()
             except ScpiDriverError as exc:
                 self._state=ArbState.UNKNOWN
                 return ArbEvidence(self._state,None,str(exc))
@@ -66,31 +69,37 @@ class ArbLifecycle:
     def arm(self,*,source: str,repeat_count: int,configuration_confirmed=False):
         if configuration_confirmed is not True:
             raise SafetyGuardError("explicit verified configuration required")
-        if source not in ("BUS","EXT") or type(repeat_count) is not int or repeat_count<=0:
+        if source not in ("BUS","EXT"):
             raise ConfigurationError("BUS/EXT and finite positive repeat count required")
+        _repeat(repeat_count)
         with self.driver.session.operation_lock():
             if not self.driver.session.is_connected:
                 raise SafetyGuardError("explicit connected session required")
             if self._live() and self._state in (ArbState.ARMED,ArbState.RUNNING,ArbState.UNKNOWN):
                 raise SafetyGuardError("existing execution not resolved")
+            self.driver._assert_write_authorized()
             self._generation=self.driver.session.generation
             self._trigger_source=source
+            self._trigger_attempted=False
+            self._abort_attempted=False
             self._state=ArbState.UNKNOWN
             try:
-                self.driver.write_scpi(f"TRIG:ARB:SOUR {source}")
-                self.driver.write_scpi(f"ARB:COUNT {repeat_count}")
-                self.driver.write_scpi("INIT:ARB")
+                self.driver.trigger.arb_source_set(source)
+                self.driver.arb.count_set(repeat_count)
+                self.driver.arb.init()
             except ScpiDriverError as exc:
                 return ArbEvidence(ArbState.UNKNOWN,None,str(exc))
             return self.observe()
 
     def trigger_bus(self):
         with self.driver.session.operation_lock():
-            if not self._live() or self._trigger_source!="BUS" or self._state!=ArbState.ARMED:
+            if (not self._live() or self._trigger_source!="BUS" or self._state!=ArbState.ARMED
+                    or self._trigger_attempted or self._abort_attempted):
                 raise SafetyGuardError("confirmed BUS-armed state in same session required")
+            self._trigger_attempted=True
             self._state=ArbState.UNKNOWN
             try:
-                self.driver.write_scpi("*TRG")
+                self.driver.ieee.trigger()
             except ScpiDriverError as exc:
                 return ArbEvidence(self._state,None,str(exc))
             return self.observe()
@@ -99,12 +108,19 @@ class ArbLifecycle:
         with self.driver.session.operation_lock():
             if not self._live():
                 return ArbEvidence(ArbState.UNKNOWN,None,"session changed; abort not transmitted")
+            if self._abort_attempted:
+                return ArbEvidence(ArbState.UNKNOWN,None,"abort already attempted; no replay")
+            self._abort_attempted=True
             self._state=ArbState.UNKNOWN
             try:
-                self.driver.write_scpi("ABOR:ARB")
+                self.driver.arb.abort()
             except ScpiDriverError as exc:
                 return ArbEvidence(self._state,None,str(exc))
-            return self.observe()
+            evidence = self.observe()
+            if evidence.state != ArbState.ABORTED:
+                self._state=ArbState.UNKNOWN
+                return ArbEvidence(self._state,evidence.raw_status,"abort not confirmed: "+evidence.reason)
+            return evidence
 
     def wait(self,*,max_polls: int,cancelled=lambda:False,between_polls=lambda:None):
         if type(max_polls) is not int or not 1<=max_polls<=10000:
@@ -113,11 +129,11 @@ class ArbLifecycle:
             if cancelled():
                 e=self.abort()
                 return ArbEvidence(e.state,e.raw_status,"cancel: "+e.reason,i)
-            e=self.observe()
-            if e.state in (ArbState.COMPLETE,ArbState.ABORTED,ArbState.ERROR,ArbState.UNKNOWN):
-                return ArbEvidence(e.state,e.raw_status,e.reason,i)
-            if i<max_polls:
-                between_polls()
-        # Last observation does not establish final state; no implicit replay.
-        self._state=ArbState.UNKNOWN
-        return ArbEvidence(ArbState.UNKNOWN,e.raw_status,"poll budget exhausted",max_polls)
+            with self.driver.session.operation_lock():
+                e=self.observe()
+                if e.state in (ArbState.COMPLETE,ArbState.ABORTED,ArbState.ERROR,ArbState.UNKNOWN):
+                    return ArbEvidence(e.state,e.raw_status,e.reason,i)
+                if i==max_polls:
+                    self._state=ArbState.UNKNOWN
+                    return ArbEvidence(ArbState.UNKNOWN,e.raw_status,"poll budget exhausted",i)
+            between_polls()
