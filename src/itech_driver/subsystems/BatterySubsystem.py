@@ -1,3 +1,4 @@
+import math
 from scpi_driver_core import ConfigurationError, ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float, parse_int
 from ..base import  BaseInstrument, BoolLike, Number
@@ -40,10 +41,12 @@ class BatterySubsystem:
         return parse_float(self._p.query_scpi('BATT:SHUT:CAP?'))
 
     def shutdown_time_set(self, seconds: Number):
-        self._p.write_scpi(f'BATT:SHUT:TIME {int(seconds)}')
+        if isinstance(seconds, bool) or not isinstance(seconds, (int, float)) or not math.isfinite(seconds) or seconds < 0:
+            raise ConfigurationError("battery cutoff time must be a finite nonnegative number of seconds")
+        self._p.write_scpi(f'BATT:SHUT:TIME {seconds}')
 
-    def shutdown_time_query(self) -> int:
-        return parse_int(self._p.query_scpi('BATT:SHUT:TIME?'))
+    def shutdown_time_query(self) -> float:
+        return parse_float(self._p.query_scpi('BATT:SHUT:TIME?'))
 
     def mode_set(self, mode: str):
         """Select battery-test function mode without starting a battery test."""
