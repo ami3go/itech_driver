@@ -64,3 +64,30 @@ class Pulse:
             ("END:SLEW",envelope.duration(self.end_slew_s)),
         )
         return tuple(f"ARB:PULS:{header} {value}" for header,value in fields)
+
+
+@dataclass(frozen=True)
+class Sine:
+    peak_to_peak: float
+    offset: float
+    frequency_hz: float
+
+    def commands(self, envelope: Envelope, *, min_frequency_hz: float,
+                 max_frequency_hz: float, amplitude_convention: str) -> tuple[str,...]:
+        """Build offline parameter plan; AMPL convention requires explicit confirmation."""
+        if not isinstance(envelope, Envelope):
+            raise ConfigurationError("explicit envelope required")
+        pp = number(self.peak_to_peak,"peak-to-peak")
+        offset = number(self.offset,"offset")
+        envelope.level(offset - pp / 2)
+        envelope.level(offset + pp / 2)
+        lo = number(min_frequency_hz,"minimum frequency",positive=True)
+        hi = number(max_frequency_hz,"maximum frequency",positive=True)
+        freq = number(self.frequency_hz,"frequency",positive=True)
+        if not lo <= freq <= hi:
+            raise ConfigurationError("frequency outside caller envelope")
+        if amplitude_convention not in ("peak_to_peak", "peak"):
+            raise ConfigurationError("explicit confirmed SCPI amplitude convention required")
+        amplitude = pp if amplitude_convention == "peak_to_peak" else pp / 2
+        return (f"ARB:SIN:AMPL {amplitude}", f"ARB:SIN:OFFS {offset}",
+                f"ARB:SIN:FREQ {freq}")
