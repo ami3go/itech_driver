@@ -8,7 +8,7 @@ from enum import Enum
 from types import MappingProxyType
 from typing import Mapping
 from scpi_driver_core import ConfigurationError, ScpiDriverError, SafetyGuardError
-from .subsystems.ArbSubsystem import _repeat
+from .arb_integer_qualification import validate_arb_integer
 
 
 class ArbState(str,Enum):
@@ -71,8 +71,8 @@ class ArbLifecycle:
             raise SafetyGuardError("explicit verified configuration required")
         if source not in ("BUS","EXT"):
             raise ConfigurationError("BUS/EXT and finite positive repeat count required")
-        _repeat(repeat_count)
         with self.driver.session.operation_lock():
+            validate_arb_integer(self.driver, "count_set", repeat_count)
             if not self.driver.session.is_connected:
                 raise SafetyGuardError("explicit connected session required")
             if self._live() and self._state in (ArbState.ARMED,ArbState.RUNNING,ArbState.UNKNOWN):
