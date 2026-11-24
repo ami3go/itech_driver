@@ -4,6 +4,7 @@ from scpi_driver_core import ConfigurationError, IdentityError, ResponseParseErr
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float
 from ..base import  BaseInstrument, BoolLike, Number
 from ..capabilities import ELECTRICAL_COMMANDS, Range, effective_command_range
+from ..utils.validation import validate_channel, nonnegative_number, strict_bool
 # -------------------------
 # Source Subsystem (SOURce)
 # -------------------------
@@ -45,15 +46,11 @@ class SourceSubsystem:
 
     @staticmethod
     def _check_channel(channel: int) -> None:
-        if type(channel) is not int or channel != 1:
-            raise ConfigurationError("IT-M3900D source uses a single unnumbered output; channel must be 1")
+        validate_channel(channel, 1)
 
     @staticmethod
     def _check_setpoint(value: Number) -> None:
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
-            raise ConfigurationError("setpoint must be a finite real number")
-        if value < 0:
-            raise ConfigurationError("setpoint must be nonnegative")
+        nonnegative_number(value, "setpoint")
 
     # Voltage / Current setpoints
     def voltage_set(self, value: Number, channel: int = 1):
@@ -86,8 +83,7 @@ class SourceSubsystem:
 
     def ovp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
-        if type(enable) not in (bool, int) or enable not in (0, 1):
-            raise ConfigurationError("protection enable must be bool or 0/1")
+        enable = strict_bool(enable, "enable")
         self._p.write_scpi(f'SOUR:VOLT:OVER:PROT:STAT {1 if enable else 0}')
 
     def ovp_enable_query(self, channel: int = 1) -> bool:  # Added: Missing query method
@@ -105,8 +101,7 @@ class SourceSubsystem:
 
     def ocp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
-        if type(enable) not in (bool, int) or enable not in (0, 1):
-            raise ConfigurationError("protection enable must be bool or 0/1")
+        enable = strict_bool(enable, "enable")
         self._p.write_scpi(f'SOUR:CURR:OVER:PROT:STAT {1 if enable else 0}')
 
     def ocp_enable_query(self, channel: int = 1) -> bool:  # Added: Missing query method
@@ -124,8 +119,7 @@ class SourceSubsystem:
 
     def opp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
-        if type(enable) not in (bool, int) or enable not in (0, 1):
-            raise ConfigurationError("protection enable must be bool or 0/1")
+        enable = strict_bool(enable, "enable")
         self._p.write_scpi(f'SOUR:POW:OVER:PROT:STAT {1 if enable else 0}')
 
     def opp_enable_query(self, channel: int = 1) -> bool:
@@ -221,8 +215,7 @@ class SourceSubsystem:
         Do not use this operation as evidence that the physical wiring is valid.
         """
         self._check_channel(channel)
-        if type(enable) not in (bool, int) or enable not in (0, 1):
-            raise ConfigurationError("remote sense state must be bool or 0/1")
+        enable = strict_bool(enable, "enable")
         self._p.write_scpi(f'SOUR:REM:SENS:STAT {1 if enable else 0}')
 
     def remote_sense_query(self, channel: int = 1) -> bool:
@@ -305,8 +298,7 @@ class SourceSubsystem:
 
     def uvp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
-        if type(enable) not in (bool, int) or enable not in (0, 1):
-            raise ConfigurationError("protection enable must be bool or 0/1")
+        enable = strict_bool(enable, "enable")
         self._p.write_scpi(f"SOUR:VOLT:UND:PROT:STAT {int(enable)}")
 
     def uvp_enable_query(self, channel: int = 1) -> bool:
@@ -324,8 +316,7 @@ class SourceSubsystem:
 
     def ucp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
-        if type(enable) not in (bool, int) or enable not in (0, 1):
-            raise ConfigurationError("protection enable must be bool or 0/1")
+        enable = strict_bool(enable, "enable")
         self._p.write_scpi(f"SOUR:CURR:UND:PROT:STAT {int(enable)}")
 
     def ucp_enable_query(self, channel: int = 1) -> bool:
