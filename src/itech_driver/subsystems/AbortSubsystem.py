@@ -1,3 +1,4 @@
+from ..command_specs import execute
 from scpi_driver_core import UnsupportedOperationError
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
@@ -9,10 +10,10 @@ class AbortSubsystem:
         self._p = parent
 
     def acquire(self):
-        self._p.write_scpi('ABORt:ACQuire')
+        execute(self._p, "AbortSubsystem.acquire")
 
     def arb(self):
-        self._p.write_scpi('ABORt:ARB')
+        execute(self._p, "AbortSubsystem.arb")
 
     def dlog(self):
         raise UnsupportedOperationError("DLOG stop command not qualified for IT-M3900D")

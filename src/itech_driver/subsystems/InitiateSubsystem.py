@@ -1,3 +1,4 @@
+from ..command_specs import execute
 import math
 from scpi_driver_core import ConfigurationError
 from scpi_driver_core.scpi.parsers import parse_bool
@@ -11,22 +12,22 @@ class InitiateSubsystem:
         self._p = parent
 
     def acquire(self):
-        self._p.write_scpi('INITiate:ACQuire')
+        execute(self._p, "InitiateSubsystem.acquire")
 
     def arb(self):
-        self._p.write_scpi('INITiate:ARB')
+        execute(self._p, "InitiateSubsystem.arb")
 
     def continuous_arb_set(self, enable: BoolLike):
         self._p.write_scpi(f'INITiate:CONTinuous:ARB {1 if enable else 0}')
 
     def continuous_arb_query(self) -> bool:  # Added: Missing query method
-        return parse_bool(self._p.query_scpi('INITiate:CONTinuous:ARB?'))
+        return execute(self._p, "InitiateSubsystem.continuous_arb_query")
 
     def continuous_acq_set(self, enable: BoolLike):
         self._p.write_scpi(f'INITiate:CONTinuous:ACQuire {1 if enable else 0}')
 
     def continuous_acq_query(self) -> bool:  # Added: Missing query method
-        return parse_bool(self._p.query_scpi('INITiate:CONTinuous:ACQuire?'))
+        return execute(self._p, "InitiateSubsystem.continuous_acq_query")
 
     def dlog(self, *, storage_confirmed: bool = False,
              seconds_since_previous_end: float | None = None,
@@ -46,8 +47,8 @@ class InitiateSubsystem:
             elapsed = seconds_since_previous_end
             if isinstance(elapsed, bool) or not isinstance(elapsed, (int, float)) or not math.isfinite(elapsed) or elapsed < 5:
                 raise ConfigurationError("confirm previous recording ended at least 5 seconds ago")
-        self._p.write_scpi('INITiate:DLOG')
+        execute(self._p, "InitiateSubsystem.dlog")
 
     def elog(self):
-        self._p.write_scpi('INITiate:ELOG')
+        execute(self._p, "InitiateSubsystem.elog")
 
