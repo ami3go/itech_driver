@@ -1,4 +1,4 @@
-from ..command_specs import execute
+from ..command_specs import execute, execute_parameterized, command_spec
 import math
 from scpi_driver_core import ConfigurationError, ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_float
@@ -26,11 +26,12 @@ class TriggerSubsystem:
         """Configure and arm only. Call the appropriate trigger separately."""
         token = self._normalize_source("ACQ", source)
         with self._p.session.operation_lock():
+            self._p._require_methods("TriggerSubsystem.acquire_source_set", "TriggerSubsystem.acquire_arm")
             self.acquire_source_set(token)
             self.acquire_arm()
 
     def acquire_mode_set(self, mode: str):
-        self._p.write_scpi(f'TRIG:ACQ:MODE {mode}')
+        execute_parameterized(self._p, "TriggerSubsystem.acquire_mode_set", f'{mode}')
 
     def acquire_mode_query(self) -> str:
         return execute(self._p, "TriggerSubsystem.acquire_mode_query")
@@ -58,10 +59,12 @@ class TriggerSubsystem:
 
     def _source_set(self, subsystem: str, source: str):
         token = self._normalize_source(subsystem, source)
-        self._p.write_scpi(f"TRIG:{subsystem}:SOUR {token}")
+        name = {"ACQ": "acquire", "ARB": "arb", "DLOG": "dlog", "ELOG": "elog"}[subsystem]
+        execute_parameterized(self._p, f"TriggerSubsystem.{name}_source_set", token)
 
     def _source_query(self, subsystem: str) -> str:
-        raw = self._p.query_scpi(f"TRIG:{subsystem}:SOUR?")
+        name = {"ACQ": "acquire", "ARB": "arb", "DLOG": "dlog", "ELOG": "elog"}[subsystem]
+        raw = execute(self._p, f"TriggerSubsystem.{name}_source_query")
         try:
             return self._normalize_source(subsystem, raw.strip())
         except ConfigurationError as exc:
@@ -106,13 +109,13 @@ class TriggerSubsystem:
         return str(value)
 
     def acquire_voltage_level_set(self, value: Number):
-        self._p.write_scpi(f"TRIG:ACQ:VOLT:LEV {self._numeric_arg(value)}")
+        execute_parameterized(self._p, "TriggerSubsystem.acquire_voltage_level_set", f"{self._numeric_arg(value)}")
 
     def acquire_voltage_level_query(self) -> float:
         return execute(self._p, "TriggerSubsystem.acquire_voltage_level_query")
 
     def acquire_current_level_set(self, value: Number):
-        self._p.write_scpi(f"TRIG:ACQ:CURR:LEV {self._numeric_arg(value)}")
+        execute_parameterized(self._p, "TriggerSubsystem.acquire_current_level_set", f"{self._numeric_arg(value)}")
 
     def acquire_current_level_query(self) -> float:
         return execute(self._p, "TriggerSubsystem.acquire_current_level_query")
@@ -137,11 +140,12 @@ class TriggerSubsystem:
             raise ConfigurationError("hysteresis quantity must be VOLT or CURR")
         if bound not in ("HIGH", "LOW"):
             raise ConfigurationError("hysteresis bound must be HIGH or LOW")
-        return f"TRIG:{subsystem}:{quantity}:HYST:{bound}"
+        return command_spec("TriggerSubsystem.hysteresis_threshold_set").header.format(subsystem=subsystem, quantity=quantity, bound=bound)
 
     def hysteresis_threshold_query(self, subsystem: str, quantity: str, bound: str) -> float:
         header = self._hysteresis_header(subsystem, quantity, bound)
-        return parse_float(self._p.query_scpi(f"{header}?"))
+        query = command_spec("TriggerSubsystem.hysteresis_threshold_query").header.format(subsystem=subsystem, quantity=quantity, bound=bound)
+        return parse_float(self._p.query_scpi(query))
 
     def hysteresis_threshold_set(self, subsystem: str, quantity: str, bound: str, value: Number):
         header = self._hysteresis_header(subsystem, quantity, bound)
@@ -149,6 +153,8 @@ class TriggerSubsystem:
         other = "LOW" if bound == "HIGH" else "HIGH"
         # Driver-side ordering guard; independent controllers may change settings.
         with self._p.session.operation_lock():
+            self._p._require_methods("TriggerSubsystem.hysteresis_threshold_query")
+            self._p._assert_write_authorized()
             opposite = self.hysteresis_threshold_query(subsystem, quantity, other)
             if (bound == "HIGH" and value < opposite) or (bound == "LOW" and value > opposite):
                 raise ConfigurationError("high trigger threshold must be >= low threshold")

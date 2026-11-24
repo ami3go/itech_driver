@@ -1,4 +1,4 @@
-from ..command_specs import execute
+from ..command_specs import execute, execute_parameterized, command_spec
 import math
 from scpi_driver_core import ConfigurationError
 from scpi_driver_core.scpi.parsers import parse_bool
@@ -18,13 +18,13 @@ class InitiateSubsystem:
         execute(self._p, "InitiateSubsystem.arb")
 
     def continuous_arb_set(self, enable: BoolLike):
-        self._p.write_scpi(f'INITiate:CONTinuous:ARB {1 if enable else 0}')
+        execute_parameterized(self._p, "InitiateSubsystem.continuous_arb_set", f'{1 if enable else 0}')
 
     def continuous_arb_query(self) -> bool:  # Added: Missing query method
         return execute(self._p, "InitiateSubsystem.continuous_arb_query")
 
     def continuous_acq_set(self, enable: BoolLike):
-        self._p.write_scpi(f'INITiate:CONTinuous:ACQuire {1 if enable else 0}')
+        execute_parameterized(self._p, "InitiateSubsystem.continuous_acq_set", f'{1 if enable else 0}')
 
     def continuous_acq_query(self) -> bool:  # Added: Missing query method
         return execute(self._p, "InitiateSubsystem.continuous_acq_query")

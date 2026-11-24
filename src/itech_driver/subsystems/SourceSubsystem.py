@@ -1,4 +1,4 @@
-from ..command_specs import execute
+from ..command_specs import execute, execute_parameterized, command_spec
 import math
 import warnings
 from scpi_driver_core import ConfigurationError, IdentityError, ResponseParseError, UnsupportedOperationError
@@ -34,17 +34,17 @@ class SourceSubsystem:
 
     def function_set(self, mode: str):
         """Select CV or CC priority, not a measurement of actual regulation mode."""
-        self._p.write_scpi(f"SOUR:FUNC {self._enum_arg(mode, self._FUNCTIONS)}")
+        execute_parameterized(self._p, "SourceSubsystem.function_set", f"{self._enum_arg(mode, self._FUNCTIONS)}")
 
     def function_query(self) -> str:
-        return self._enum_query("SOUR:FUNC", self._FUNCTIONS)
+        return self._enum_query(command_spec("SourceSubsystem.function_query").header, self._FUNCTIONS)
 
     def function_mode_set(self, mode: str):
         """Select fixed, list, or battery operation. Does not initiate or trigger."""
-        self._p.write_scpi(f"SOUR:FUNC:MODE {self._enum_arg(mode, self._MODES)}")
+        execute_parameterized(self._p, "SourceSubsystem.function_mode_set", f"{self._enum_arg(mode, self._MODES)}")
 
     def function_mode_query(self) -> str:
-        return self._enum_query("SOUR:FUNC:MODE", self._MODES)
+        return self._enum_query(command_spec("SourceSubsystem.function_mode_query").header, self._MODES)
 
     @staticmethod
     def _check_channel(channel: int) -> None:
@@ -58,7 +58,7 @@ class SourceSubsystem:
     def voltage_set(self, value: Number, channel: int = 1):
         self._check_channel(channel)
         self._check_setpoint(value)
-        self._limit_set('SOUR:VOLT', value)
+        self._limit_set(command_spec("SourceSubsystem.voltage_set").header, value)
 
     def voltage_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
@@ -67,7 +67,7 @@ class SourceSubsystem:
     def current_set(self, value: Number, channel: int = 1):
         self._check_channel(channel)
         self._check_setpoint(value)
-        self._limit_set('SOUR:CURR', value)
+        self._limit_set(command_spec("SourceSubsystem.current_set").header, value)
 
     def current_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
@@ -81,16 +81,16 @@ class SourceSubsystem:
 
     def ovp_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["ovp"][0] + "?"))
+        return execute(self._p, "SourceSubsystem.ovp_query")
 
     def ovp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
         enable = strict_bool(enable, "enable")
-        self._p.write_scpi(f'SOUR:VOLT:OVER:PROT:STAT {1 if enable else 0}')
+        execute_parameterized(self._p, "SourceSubsystem.ovp_enable", f'{1 if enable else 0}')
 
     def ovp_enable_query(self, channel: int = 1) -> bool:  # Added: Missing query method
         self._check_channel(channel)
-        return parse_bool(self._p.query_scpi(f'SOUR:VOLT:OVER:PROT:STAT?'))
+        return execute(self._p, "SourceSubsystem.ovp_enable_query")
 
     def ocp_set(self, value: Number, channel: int = 1, *, qualification: ProtectionThresholdQualification | None = None):
         self._check_channel(channel)
@@ -99,16 +99,16 @@ class SourceSubsystem:
 
     def ocp_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["ocp"][0] + "?"))
+        return execute(self._p, "SourceSubsystem.ocp_query")
 
     def ocp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
         enable = strict_bool(enable, "enable")
-        self._p.write_scpi(f'SOUR:CURR:OVER:PROT:STAT {1 if enable else 0}')
+        execute_parameterized(self._p, "SourceSubsystem.ocp_enable", f'{1 if enable else 0}')
 
     def ocp_enable_query(self, channel: int = 1) -> bool:  # Added: Missing query method
         self._check_channel(channel)
-        return parse_bool(self._p.query_scpi(f'SOUR:CURR:OVER:PROT:STAT?'))
+        return execute(self._p, "SourceSubsystem.ocp_enable_query")
 
     def opp_threshold_set(self, value: Number, channel: int = 1, *, qualification: ProtectionThresholdQualification | None = None):
         self._check_channel(channel)
@@ -117,12 +117,12 @@ class SourceSubsystem:
 
     def opp_threshold_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["opp"][0] + "?"))
+        return execute(self._p, "SourceSubsystem.opp_threshold_query")
 
     def opp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
         enable = strict_bool(enable, "enable")
-        self._p.write_scpi(f'SOUR:POW:OVER:PROT:STAT {1 if enable else 0}')
+        execute_parameterized(self._p, "SourceSubsystem.opp_enable", f'{1 if enable else 0}')
 
     def opp_enable_query(self, channel: int = 1) -> bool:
         self._check_channel(channel)
@@ -131,11 +131,11 @@ class SourceSubsystem:
     def output_power_limit_set(self, value: Number, channel: int = 1):
         """Set the programmed power limit, not the OPP trip threshold."""
         self._check_channel(channel)
-        self._limit_set('SOUR:POW:LIM', value)
+        self._limit_set(command_spec("SourceSubsystem.output_power_limit_set").header, value)
 
     def output_power_limit_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return self._limit_query('SOUR:POW:LIM')
+        return self._limit_query(command_spec("SourceSubsystem.output_power_limit_query").header)
 
     def _limit_query(self, header, bound=None):
         if bound is not None and bound not in ("MIN", "MAX", "DEF"):
@@ -166,27 +166,27 @@ class SourceSubsystem:
 
     def voltage_limit_set(self, value: Number, channel: int = 1):
         self._check_channel(channel)
-        self._limit_set("SOUR:VOLT:LIM", value)
+        self._limit_set(command_spec("SourceSubsystem.voltage_limit_set").header, value)
 
     def voltage_limit_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:VOLT:LIM", bound)
+        return self._limit_query(command_spec("SourceSubsystem.voltage_limit_query").header, bound)
 
     def current_limit_set(self, value: Number, channel: int = 1):
         self._check_channel(channel)
-        self._limit_set("SOUR:CURR:LIM", value)
+        self._limit_set(command_spec("SourceSubsystem.current_limit_set").header, value)
 
     def current_limit_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:CURR:LIM", bound)
+        return self._limit_query(command_spec("SourceSubsystem.current_limit_query").header, bound)
 
     def programmed_power_limit_set(self, value: Number, channel: int = 1):
         self._check_channel(channel)
-        self._limit_set("SOUR:POW:LIM", value)
+        self._limit_set(command_spec("SourceSubsystem.programmed_power_limit_set").header, value)
 
     def programmed_power_limit_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:POW:LIM", bound)
+        return self._limit_query(command_spec("SourceSubsystem.programmed_power_limit_query").header, bound)
 
     # Retain historical behavior explicitly during migration; never silently
     # turn an existing OPP threshold operation into a different setting.
@@ -218,7 +218,7 @@ class SourceSubsystem:
         """
         self._check_channel(channel)
         enable = strict_bool(enable, "enable")
-        self._p.write_scpi(f'SOUR:REM:SENS:STAT {1 if enable else 0}')
+        execute_parameterized(self._p, "SourceSubsystem.remote_sense_set", f'{1 if enable else 0}')
 
     def remote_sense_query(self, channel: int = 1) -> bool:
         self._check_channel(channel)
@@ -235,59 +235,59 @@ class SourceSubsystem:
 
     def ovp_delay_set(self, seconds: Number, channel: int = 1):
         self._check_channel(channel)
-        self._limit_set("SOUR:VOLT:OVER:PROT:DEL", seconds)
+        self._limit_set(command_spec("SourceSubsystem.ovp_delay_set").header, seconds)
 
     def ovp_delay_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:VOLT:OVER:PROT:DEL", bound)
+        return self._limit_query(command_spec("SourceSubsystem.ovp_delay_query").header, bound)
 
     def ocp_delay_set(self, seconds: Number, channel: int = 1):
         self._check_channel(channel)
-        self._limit_set("SOUR:CURR:OVER:PROT:DEL", seconds)
+        self._limit_set(command_spec("SourceSubsystem.ocp_delay_set").header, seconds)
 
     def ocp_delay_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:CURR:OVER:PROT:DEL", bound)
+        return self._limit_query(command_spec("SourceSubsystem.ocp_delay_query").header, bound)
 
     def opp_delay_set(self, seconds: Number, channel: int = 1):
         self._check_channel(channel)
-        self._limit_set("SOUR:POW:OVER:PROT:DEL", seconds)
+        self._limit_set(command_spec("SourceSubsystem.opp_delay_set").header, seconds)
 
     def opp_delay_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:POW:OVER:PROT:DEL", bound)
+        return self._limit_query(command_spec("SourceSubsystem.opp_delay_query").header, bound)
 
     def uvp_delay_set(self, seconds: Number, channel: int = 1):
         self._check_channel(channel)
-        self._limit_set("SOUR:VOLT:UND:PROT:DEL", seconds)
+        self._limit_set(command_spec("SourceSubsystem.uvp_delay_set").header, seconds)
 
     def uvp_delay_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:VOLT:UND:PROT:DEL", bound)
+        return self._limit_query(command_spec("SourceSubsystem.uvp_delay_query").header, bound)
 
     def ucp_delay_set(self, seconds: Number, channel: int = 1):
         self._check_channel(channel)
-        self._limit_set("SOUR:CURR:UND:PROT:DEL", seconds)
+        self._limit_set(command_spec("SourceSubsystem.ucp_delay_set").header, seconds)
 
     def ucp_delay_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:CURR:UND:PROT:DEL", bound)
+        return self._limit_query(command_spec("SourceSubsystem.ucp_delay_query").header, bound)
 
     def uvp_warmup_set(self, seconds: Number, channel: int = 1):
         self._check_channel(channel)
-        self._limit_set("SOUR:VOLT:UND:PROT:WARM", seconds)
+        self._limit_set(command_spec("SourceSubsystem.uvp_warmup_set").header, seconds)
 
     def uvp_warmup_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:VOLT:UND:PROT:WARM", bound)
+        return self._limit_query(command_spec("SourceSubsystem.uvp_warmup_query").header, bound)
 
     def ucp_warmup_set(self, seconds: Number, channel: int = 1):
         self._check_channel(channel)
-        self._limit_set("SOUR:CURR:UND:PROT:WARM", seconds)
+        self._limit_set(command_spec("SourceSubsystem.ucp_warmup_set").header, seconds)
 
     def ucp_warmup_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:CURR:UND:PROT:WARM", bound)
+        return self._limit_query(command_spec("SourceSubsystem.ucp_warmup_query").header, bound)
 
     def uvp_set(self, value: Number, channel: int = 1, *, qualification: ProtectionThresholdQualification | None = None):
         self._check_channel(channel)
@@ -296,12 +296,12 @@ class SourceSubsystem:
 
     def uvp_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["uvp"][0] + "?"))
+        return execute(self._p, "SourceSubsystem.uvp_query")
 
     def uvp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
         enable = strict_bool(enable, "enable")
-        self._p.write_scpi(f"SOUR:VOLT:UND:PROT:STAT {int(enable)}")
+        execute_parameterized(self._p, "SourceSubsystem.uvp_enable", f"{int(enable)}")
 
     def uvp_enable_query(self, channel: int = 1) -> bool:
         self._check_channel(channel)
@@ -314,12 +314,12 @@ class SourceSubsystem:
 
     def ucp_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["ucp"][0] + "?"))
+        return execute(self._p, "SourceSubsystem.ucp_query")
 
     def ucp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
         enable = strict_bool(enable, "enable")
-        self._p.write_scpi(f"SOUR:CURR:UND:PROT:STAT {int(enable)}")
+        execute_parameterized(self._p, "SourceSubsystem.ucp_enable", f"{int(enable)}")
 
     def ucp_enable_query(self, channel: int = 1) -> bool:
         self._check_channel(channel)
@@ -328,68 +328,68 @@ class SourceSubsystem:
     def voltage_rise_time_set(self, seconds: Number, channel: int = 1):
         """Set duration in seconds, not a slew rate in units/s."""
         self._check_channel(channel)
-        self._limit_set("SOUR:VOLT:SLEW:POS", seconds)
+        self._limit_set(command_spec("SourceSubsystem.voltage_rise_time_set").header, seconds)
 
     def voltage_rise_time_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:VOLT:SLEW:POS", bound)
+        return self._limit_query(command_spec("SourceSubsystem.voltage_rise_time_query").header, bound)
 
     def voltage_fall_time_set(self, seconds: Number, channel: int = 1):
         """Set duration in seconds, not a slew rate in units/s."""
         self._check_channel(channel)
-        self._limit_set("SOUR:VOLT:SLEW:NEG", seconds)
+        self._limit_set(command_spec("SourceSubsystem.voltage_fall_time_set").header, seconds)
 
     def voltage_fall_time_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:VOLT:SLEW:NEG", bound)
+        return self._limit_query(command_spec("SourceSubsystem.voltage_fall_time_query").header, bound)
 
     def voltage_both_time_set(self, seconds: Number, channel: int = 1):
         """Set duration in seconds, not a slew rate in units/s."""
         self._check_channel(channel)
-        self._limit_set("SOUR:VOLT:SLEW:BOTH", seconds)
+        self._limit_set(command_spec("SourceSubsystem.voltage_both_time_set").header, seconds)
 
     def voltage_both_time_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:VOLT:SLEW:BOTH", bound)
+        return self._limit_query(command_spec("SourceSubsystem.voltage_both_time_query").header, bound)
 
     def current_rise_time_set(self, seconds: Number, channel: int = 1):
         """Set duration in seconds, not a slew rate in units/s."""
         self._check_channel(channel)
-        self._limit_set("SOUR:CURR:SLEW:POS", seconds)
+        self._limit_set(command_spec("SourceSubsystem.current_rise_time_set").header, seconds)
 
     def current_rise_time_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:CURR:SLEW:POS", bound)
+        return self._limit_query(command_spec("SourceSubsystem.current_rise_time_query").header, bound)
 
     def current_fall_time_set(self, seconds: Number, channel: int = 1):
         """Set duration in seconds, not a slew rate in units/s."""
         self._check_channel(channel)
-        self._limit_set("SOUR:CURR:SLEW:NEG", seconds)
+        self._limit_set(command_spec("SourceSubsystem.current_fall_time_set").header, seconds)
 
     def current_fall_time_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:CURR:SLEW:NEG", bound)
+        return self._limit_query(command_spec("SourceSubsystem.current_fall_time_query").header, bound)
 
     def current_both_time_set(self, seconds: Number, channel: int = 1):
         """Set duration in seconds, not a slew rate in units/s."""
         self._check_channel(channel)
-        self._limit_set("SOUR:CURR:SLEW:BOTH", seconds)
+        self._limit_set(command_spec("SourceSubsystem.current_both_time_set").header, seconds)
 
     def current_both_time_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query("SOUR:CURR:SLEW:BOTH", bound)
+        return self._limit_query(command_spec("SourceSubsystem.current_both_time_query").header, bound)
 
     def cv_loop_speed_set(self, speed: str):
-        self._p.write_scpi(f"SOUR:CV:PRI {self._enum_arg(speed, {'HIGH': 'HIGH', 'LOW': 'LOW'})}")
+        execute_parameterized(self._p, "SourceSubsystem.cv_loop_speed_set", f"{self._enum_arg(speed, {'HIGH': 'HIGH', 'LOW': 'LOW'})}")
 
     def cv_loop_speed_query(self) -> str:
-        return self._enum_query("SOUR:CV:PRI", {"HIGH": "HIGH", "LOW": "LOW"})
+        return self._enum_query(command_spec("SourceSubsystem.cv_loop_speed_query").header, {"HIGH": "HIGH", "LOW": "LOW"})
 
     def cc_loop_speed_set(self, speed: str):
-        self._p.write_scpi(f"SOUR:CC:PRI {self._enum_arg(speed, {'HIGH': 'HIGH', 'LOW': 'LOW'})}")
+        execute_parameterized(self._p, "SourceSubsystem.cc_loop_speed_set", f"{self._enum_arg(speed, {'HIGH': 'HIGH', 'LOW': 'LOW'})}")
 
     def cc_loop_speed_query(self) -> str:
-        return self._enum_query("SOUR:CC:PRI", {"HIGH": "HIGH", "LOW": "LOW"})
+        return self._enum_query(command_spec("SourceSubsystem.cc_loop_speed_query").header, {"HIGH": "HIGH", "LOW": "LOW"})
 
     def external_programming_query(self) -> bool:
         return execute(self._p, "SourceSubsystem.external_programming_query")
@@ -402,9 +402,11 @@ class SourceSubsystem:
         if not all(flag is True for flag in (wiring_confirmed,deenergized_confirmed,option_confirmed)):
             raise ConfigurationError("confirm analog option, wiring and de-energized output")
         with self._p.session.operation_lock():
-            if parse_bool(self._p.query_scpi("OUTP:STAT?")):
+            self._p._require_methods("OutputSubsystem.state_query")
+            self._p._assert_write_authorized()
+            if self._p.output.state_query():
                 raise ConfigurationError("programmed output must be disabled")
-            self._p.write_scpi(f"SOUR:EXT:PROG {int(enabled)}")
+            self._p.write_scpi(command_spec("SourceSubsystem.external_programming_set").header + f" {int(enabled)}")
 
     @staticmethod
     def _analog_channel(channel):
@@ -416,7 +418,8 @@ class SourceSubsystem:
         channel = self._analog_channel(channel)
         if coefficient not in ("MX","MB"):
             raise ConfigurationError("coefficient must be MX or MB")
-        raw = self._p.query_scpi(f"SOUR:EXT:PROG:CHAN:{coefficient}? {channel}")
+        header = command_spec("SourceSubsystem.external_coefficient_query").header.format(coefficient=coefficient)
+        raw = self._p.query_scpi(f"{header} {channel}")
         value = parse_float(raw)
         if not -9000 <= value <= 9000:
             raise ResponseParseError("external coefficient outside documented bounds",raw=raw)
@@ -432,16 +435,19 @@ class SourceSubsystem:
         if option_confirmed is not True or deenergized_confirmed is not True:
             raise ConfigurationError("confirm analog option and de-energized output")
         with self._p.session.operation_lock():
-            if parse_bool(self._p.query_scpi("OUTP:STAT?")) or self.external_programming_query():
+            self._p._require_methods("OutputSubsystem.state_query", "SourceSubsystem.external_programming_query")
+            self._p._assert_write_authorized()
+            if self._p.output.state_query() or self.external_programming_query():
                 raise ConfigurationError("disable output and external control before changing coefficients")
-            self._p.write_scpi(f"SOUR:EXT:PROG:CHAN:{coefficient} {channel},{value}")
+            header = command_spec("SourceSubsystem.external_coefficient_set").header.format(coefficient=coefficient)
+            self._p.write_scpi(f"{header} {channel},{value}")
 
     def resistance_query(self, *, bound=None) -> float:
         """Query programmed internal resistance in ohms (CV priority only)."""
         with self._p.session.operation_lock():
             if self.function_query() != "VOLT":
                 raise ConfigurationError("internal resistance requires CV priority")
-            return self._limit_query("SOUR:RES",bound)
+            return self._limit_query(command_spec("SourceSubsystem.resistance_query").header,bound)
 
     def resistance_set(self, ohms: Number):
         """Set CV internal resistance using the device's reported range."""
@@ -449,4 +455,4 @@ class SourceSubsystem:
         with self._p.session.operation_lock():
             if self.function_query() != "VOLT":
                 raise ConfigurationError("internal resistance requires CV priority")
-            self._limit_set("SOUR:RES",ohms)
+            self._limit_set(command_spec("SourceSubsystem.resistance_set").header,ohms)

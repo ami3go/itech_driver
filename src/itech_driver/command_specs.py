@@ -21,6 +21,16 @@ class ResultKind(str, Enum):
     RAW = "raw"
     INT = "int"
     VOID_WRITE = "void_write"
+    PARAM_WRITE = "param_write"
+    PARAM_QUERY = "param_query"
+    HELPER = "helper"
+    RESTRICTED = "restricted"
+    ALIAS = "alias"
+    CORE = "core"
+    COMPOUND = "compound"
+    TEMPLATE = "template"
+    QUALIFIED = "qualified"
+    PLANNER = "planner"
 
 
 @dataclass(frozen=True)
@@ -33,10 +43,12 @@ class CommandSpec:
     guide_page: int | None = None
     replay: str = "never"
     effect: str = "unknown_read"
+    parameters: tuple[str, ...] = ()
+    dependencies: tuple[str, ...] = ()
 
     @property
     def modifies_state(self) -> bool:
-        return self.kind in (ResultKind.BOOL_WRITE, ResultKind.VOID_WRITE) or self.effect == "destructive_read"
+        return self.kind in (ResultKind.BOOL_WRITE, ResultKind.VOID_WRITE, ResultKind.PARAM_WRITE) or self.effect in ("write", "destructive_read", "conditional")
 
 
 _ROWS = (
@@ -131,9 +143,233 @@ _ADDITIONAL_ROWS = (
     ("AbortSubsystem.acquire", "ABORt:ACQuire", ResultKind.VOID_WRITE, "AbortSubsystem", "write"),
     ("AbortSubsystem.arb", "ABORt:ARB", ResultKind.VOID_WRITE, "AbortSubsystem", "write"),
 )
+_PARAMETERIZED_ROWS = (
+    ("ArbSubsystem.function_shape_set", "ARB:FUNCTION:SHAPE", ResultKind.PARAM_WRITE, "ArbSubsystem", "write", ("validated_payload",)),
+    ("ArbSubsystem.function_shape_query", "ARB:FUNCTION:SHAPE?", ResultKind.RAW, "ArbSubsystem", "unknown_read", ()),
+    ("ArbSubsystem.function_type_set", "ARB:FUNCTION:TYPE", ResultKind.PARAM_WRITE, "ArbSubsystem", "write", ("validated_payload",)),
+    ("ArbSubsystem.function_type_query", "ARB:FUNCTION:TYPE?", ResultKind.RAW, "ArbSubsystem", "unknown_read", ()),
+    ("ArbSubsystem.udef_count_set", "ARB:UDEFined:COUNt", ResultKind.PARAM_WRITE, "ArbSubsystem", "write", ("validated_payload",)),
+    ("ArbSubsystem.udef_count_query", "ARB:UDEFined:COUNt?", ResultKind.RAW, "ArbSubsystem", "unknown_read", ()),
+    ("ArbSubsystem.udef_level_set", "ARB:UDEFined:LEVel", ResultKind.PARAM_WRITE, "ArbSubsystem", "write", ("validated_payload",)),
+    ("ArbSubsystem.udef_level_query", "ARB:UDEFined:LEVel?", ResultKind.PARAM_QUERY, "ArbSubsystem", "unknown_read", ("validated_payload",)),
+    ("ArbSubsystem.udef_dwell_set", "ARB:UDEFined:DWELl", ResultKind.PARAM_WRITE, "ArbSubsystem", "write", ("validated_payload",)),
+    ("ArbSubsystem.udef_dwell_query", "ARB:UDEFined:DWELl?", ResultKind.PARAM_QUERY, "ArbSubsystem", "unknown_read", ("validated_payload",)),
+    ("ArbSubsystem.udef_slew_set", "ARB:UDEFined:SLEW", ResultKind.PARAM_WRITE, "ArbSubsystem", "write", ("validated_payload",)),
+    ("ArbSubsystem.udef_slew_query", "ARB:UDEFined:SLEW?", ResultKind.PARAM_QUERY, "ArbSubsystem", "unknown_read", ("validated_payload",)),
+    ("ArbSubsystem.count_set", "ARB:COUNT", ResultKind.PARAM_WRITE, "ArbSubsystem", "write", ("validated_payload",)),
+    ("ArbSubsystem.count_query", "ARB:COUNT?", ResultKind.RAW, "ArbSubsystem", "unknown_read", ()),
+    ("ArbSubsystem.save", "ARB:SAVE", ResultKind.PARAM_WRITE, "ArbSubsystem", "write", ("validated_payload",)),
+    ("ArbSubsystem.recall", "ARB:RECall", ResultKind.PARAM_WRITE, "ArbSubsystem", "write", ("validated_payload",)),
+    ("ArbSubsystem.pause_set", "ARB:PAUSe:STATe", ResultKind.PARAM_WRITE, "ArbSubsystem", "write", ("validated_payload",)),
+    ("ArbSubsystem.pause_query", "ARB:PAUSe:STATe?", ResultKind.RAW, "ArbSubsystem", "unknown_read", ()),
+    ("ArbSubsystem.state_query", "ARB:EXE:STAT?", ResultKind.RAW, "ArbSubsystem", "unknown_read", ()),
+    ("SourceSubsystem.function_set", "SOUR:FUNC", ResultKind.PARAM_WRITE, "SourceSubsystem", "write", ("validated_payload",)),
+    ("SourceSubsystem.function_query", "SOUR:FUNC", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.function_mode_set", "SOUR:FUNC:MODE", ResultKind.PARAM_WRITE, "SourceSubsystem", "write", ("validated_payload",)),
+    ("SourceSubsystem.function_mode_query", "SOUR:FUNC:MODE", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.voltage_set", "SOUR:VOLT", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.current_set", "SOUR:CURR", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.ovp_enable", "SOUR:VOLT:OVER:PROT:STAT", ResultKind.PARAM_WRITE, "SourceSubsystem", "write", ("validated_payload",)),
+    ("SourceSubsystem.ocp_enable", "SOUR:CURR:OVER:PROT:STAT", ResultKind.PARAM_WRITE, "SourceSubsystem", "write", ("validated_payload",)),
+    ("SourceSubsystem.opp_enable", "SOUR:POW:OVER:PROT:STAT", ResultKind.PARAM_WRITE, "SourceSubsystem", "write", ("validated_payload",)),
+    ("SourceSubsystem.output_power_limit_set", "SOUR:POW:LIM", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.output_power_limit_query", "SOUR:POW:LIM", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.voltage_limit_set", "SOUR:VOLT:LIM", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.voltage_limit_query", "SOUR:VOLT:LIM", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.current_limit_set", "SOUR:CURR:LIM", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.current_limit_query", "SOUR:CURR:LIM", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.programmed_power_limit_set", "SOUR:POW:LIM", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.programmed_power_limit_query", "SOUR:POW:LIM", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.remote_sense_set", "SOUR:REM:SENS:STAT", ResultKind.PARAM_WRITE, "SourceSubsystem", "write", ("validated_payload",)),
+    ("SourceSubsystem.ovp_delay_set", "SOUR:VOLT:OVER:PROT:DEL", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.ovp_delay_query", "SOUR:VOLT:OVER:PROT:DEL", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.ocp_delay_set", "SOUR:CURR:OVER:PROT:DEL", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.ocp_delay_query", "SOUR:CURR:OVER:PROT:DEL", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.opp_delay_set", "SOUR:POW:OVER:PROT:DEL", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.opp_delay_query", "SOUR:POW:OVER:PROT:DEL", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.uvp_delay_set", "SOUR:VOLT:UND:PROT:DEL", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.uvp_delay_query", "SOUR:VOLT:UND:PROT:DEL", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.ucp_delay_set", "SOUR:CURR:UND:PROT:DEL", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.ucp_delay_query", "SOUR:CURR:UND:PROT:DEL", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.uvp_warmup_set", "SOUR:VOLT:UND:PROT:WARM", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.uvp_warmup_query", "SOUR:VOLT:UND:PROT:WARM", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.ucp_warmup_set", "SOUR:CURR:UND:PROT:WARM", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.ucp_warmup_query", "SOUR:CURR:UND:PROT:WARM", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.uvp_enable", "SOUR:VOLT:UND:PROT:STAT", ResultKind.PARAM_WRITE, "SourceSubsystem", "write", ("validated_payload",)),
+    ("SourceSubsystem.ucp_enable", "SOUR:CURR:UND:PROT:STAT", ResultKind.PARAM_WRITE, "SourceSubsystem", "write", ("validated_payload",)),
+    ("SourceSubsystem.voltage_rise_time_set", "SOUR:VOLT:SLEW:POS", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.voltage_rise_time_query", "SOUR:VOLT:SLEW:POS", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.voltage_fall_time_set", "SOUR:VOLT:SLEW:NEG", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.voltage_fall_time_query", "SOUR:VOLT:SLEW:NEG", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.voltage_both_time_set", "SOUR:VOLT:SLEW:BOTH", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.voltage_both_time_query", "SOUR:VOLT:SLEW:BOTH", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.current_rise_time_set", "SOUR:CURR:SLEW:POS", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.current_rise_time_query", "SOUR:CURR:SLEW:POS", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.current_fall_time_set", "SOUR:CURR:SLEW:NEG", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.current_fall_time_query", "SOUR:CURR:SLEW:NEG", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.current_both_time_set", "SOUR:CURR:SLEW:BOTH", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("SourceSubsystem.current_both_time_query", "SOUR:CURR:SLEW:BOTH", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.cv_loop_speed_set", "SOUR:CV:PRI", ResultKind.PARAM_WRITE, "SourceSubsystem", "write", ("validated_payload",)),
+    ("SourceSubsystem.cv_loop_speed_query", "SOUR:CV:PRI", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.cc_loop_speed_set", "SOUR:CC:PRI", ResultKind.PARAM_WRITE, "SourceSubsystem", "write", ("validated_payload",)),
+    ("SourceSubsystem.cc_loop_speed_query", "SOUR:CC:PRI", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.resistance_query", "SOUR:RES", ResultKind.HELPER, "SourceSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SourceSubsystem.resistance_set", "SOUR:RES", ResultKind.HELPER, "SourceSubsystem", "write", ("validated_by_subsystem",)),
+    ("StatusSubsystem.oper_enable_set", "STAT:OPER:ENAB", ResultKind.HELPER, "StatusSubsystem", "write", ("validated_by_subsystem",)),
+    ("StatusSubsystem.oper_enable_query", "STAT:OPER:ENAB", ResultKind.HELPER, "StatusSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("StatusSubsystem.ques_enable_set", "STAT:QUES:ENAB", ResultKind.HELPER, "StatusSubsystem", "write", ("validated_by_subsystem",)),
+    ("StatusSubsystem.ques_enable_query", "STAT:QUES:ENAB", ResultKind.HELPER, "StatusSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("StatusSubsystem.oper_positive_transition_set", "STAT:OPER:PTR", ResultKind.HELPER, "StatusSubsystem", "write", ("validated_by_subsystem",)),
+    ("StatusSubsystem.oper_positive_transition_query", "STAT:OPER:PTR", ResultKind.HELPER, "StatusSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("StatusSubsystem.oper_negative_transition_set", "STAT:OPER:NTR", ResultKind.HELPER, "StatusSubsystem", "write", ("validated_by_subsystem",)),
+    ("StatusSubsystem.oper_negative_transition_query", "STAT:OPER:NTR", ResultKind.HELPER, "StatusSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("StatusSubsystem.ques_positive_transition_set", "STAT:QUES:PTR", ResultKind.HELPER, "StatusSubsystem", "write", ("validated_by_subsystem",)),
+    ("StatusSubsystem.ques_positive_transition_query", "STAT:QUES:PTR", ResultKind.HELPER, "StatusSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("StatusSubsystem.ques_negative_transition_set", "STAT:QUES:NTR", ResultKind.HELPER, "StatusSubsystem", "write", ("validated_by_subsystem",)),
+    ("StatusSubsystem.ques_negative_transition_query", "STAT:QUES:NTR", ResultKind.HELPER, "StatusSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("IOConfigSubsystem.select", "IO:SELect", ResultKind.PARAM_WRITE, "IOConfigSubsystem", "write", ("validated_payload",)),
+    ("IOConfigSubsystem.select_query", "IO:SELect?", ResultKind.RAW, "IOConfigSubsystem", "unknown_read", ()),
+    ("IOConfigSubsystem.direction_set", "IO:DIRE", ResultKind.PARAM_WRITE, "IOConfigSubsystem", "write", ("validated_payload",)),
+    ("IOConfigSubsystem.direction_query", "IO:DIRE?", ResultKind.PARAM_QUERY, "IOConfigSubsystem", "unknown_read", ("validated_payload",)),
+    ("IOConfigSubsystem.pwm_enable", "IO:PWM:ENABle", ResultKind.PARAM_WRITE, "IOConfigSubsystem", "write", ("validated_payload",)),
+    ("IOConfigSubsystem.pwm_freq_set", "IO:PWM:FREQuency", ResultKind.PARAM_WRITE, "IOConfigSubsystem", "write", ("validated_payload",)),
+    ("IOConfigSubsystem.pwm_duty_set", "IO:PWM:DUTY", ResultKind.PARAM_WRITE, "IOConfigSubsystem", "write", ("validated_payload",)),
+    ("IOConfigSubsystem.reverse_set", "IO:REVE", ResultKind.PARAM_WRITE, "IOConfigSubsystem", "write", ("validated_payload",)),
+    ("IOConfigSubsystem.reverse_query", "IO:REVE?", ResultKind.PARAM_QUERY, "IOConfigSubsystem", "unknown_read", ("validated_payload",)),
+    ("IOConfigSubsystem.pwm_enable_query", "IO:PWM?", ResultKind.PARAM_QUERY, "IOConfigSubsystem", "unknown_read", ("validated_payload",)),
+    ("IOConfigSubsystem.pwm_freq_query", "IO:PWM:FREQ", ResultKind.HELPER, "IOConfigSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("IOConfigSubsystem.pwm_duty_query", "IO:PWM:DUTY?", ResultKind.PARAM_QUERY, "IOConfigSubsystem", "unknown_read", ("validated_payload",)),
+    ("IOConfigSubsystem.pulse_width_query", "IO:PULS:WIDT", ResultKind.HELPER, "IOConfigSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("IOConfigSubsystem.pulse_width_set", "IO:PULS:WIDT", ResultKind.PARAM_WRITE, "IOConfigSubsystem", "write", ("validated_payload",)),
+    ("IOConfigSubsystem.pin_function_set", "IO:TYPE", ResultKind.PARAM_WRITE, "IOConfigSubsystem", "write", ("validated_payload",)),
+    ("IOConfigSubsystem.pin_function_query", "IO:TYPE?", ResultKind.PARAM_QUERY, "IOConfigSubsystem", "unknown_read", ("validated_payload",)),
+    ("IOConfigSubsystem.trigger_type_set", "IO:TRIG:TYPE", ResultKind.HELPER, "IOConfigSubsystem", "write", ("validated_by_subsystem",)),
+    ("IOConfigSubsystem.trigger_type_query", "IO:TRIG:TYPE", ResultKind.HELPER, "IOConfigSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("IOConfigSubsystem.trigger_source_set", "IO:TRIG:SOUR", ResultKind.HELPER, "IOConfigSubsystem", "write", ("validated_by_subsystem",)),
+    ("IOConfigSubsystem.trigger_source_query", "IO:TRIG:SOUR", ResultKind.HELPER, "IOConfigSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("IOConfigSubsystem.output_level_set", "IO:OUTP:LEV", ResultKind.PARAM_WRITE, "IOConfigSubsystem", "write", ("validated_payload",)),
+    ("IOConfigSubsystem.output_level_query", "IO:OUTP:LEV", ResultKind.HELPER, "IOConfigSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("IOConfigSubsystem.input_level_query", "IO:INP:LEV", ResultKind.HELPER, "IOConfigSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SenseSubsystem.acquisition_points_set", "SENS:ACQ:POIN", ResultKind.PARAM_WRITE, "SenseSubsystem", "write", ("validated_payload",)),
+    ("SenseSubsystem.acquisition_offset_set", "SENS:ACQ:OFFS:POIN", ResultKind.PARAM_WRITE, "SenseSubsystem", "write", ("validated_payload",)),
+    ("SenseSubsystem.acquisition_interval_set", "SENS:ACQ:TINT", ResultKind.PARAM_WRITE, "SenseSubsystem", "write", ("validated_payload",)),
+    ("BatterySubsystem.charge_voltage_set", "BATT:CHAR:VOLT", ResultKind.PARAM_WRITE, "BatterySubsystem", "write", ("validated_payload",)),
+    ("BatterySubsystem.charge_current_set", "BATT:CHAR:CURR", ResultKind.PARAM_WRITE, "BatterySubsystem", "write", ("validated_payload",)),
+    ("BatterySubsystem.shutdown_voltage_set", "BATT:SHUT:VOLT", ResultKind.PARAM_WRITE, "BatterySubsystem", "write", ("validated_payload",)),
+    ("BatterySubsystem.shutdown_current_set", "BATT:SHUT:CURR", ResultKind.PARAM_WRITE, "BatterySubsystem", "write", ("validated_payload",)),
+    ("BatterySubsystem.shutdown_capacity_set", "BATT:SHUT:CAP", ResultKind.PARAM_WRITE, "BatterySubsystem", "write", ("validated_payload",)),
+    ("BatterySubsystem.shutdown_time_set", "BATT:SHUT:TIME", ResultKind.PARAM_WRITE, "BatterySubsystem", "write", ("validated_payload",)),
+    ("BatterySubsystem.mode_query", "SOUR:FUNC:MODE?", ResultKind.RAW, "BatterySubsystem", "unknown_read", ()),
+    ("OutputSubsystem.delay_rise_set", "OUTP:DELay:RISE", ResultKind.PARAM_WRITE, "OutputSubsystem", "write", ("validated_payload",)),
+    ("OutputSubsystem.delay_fall_set", "OUTP:DELay:FALL", ResultKind.PARAM_WRITE, "OutputSubsystem", "write", ("validated_payload",)),
+    ("OutputSubsystem.inhibit_mode_set", "OUTP:INHibit:MODE", ResultKind.PARAM_WRITE, "OutputSubsystem", "write", ("validated_payload",)),
+    ("OutputSubsystem.watchdog_delay_query", "OUTP:PROT:WDOG:DEL?", ResultKind.RAW, "OutputSubsystem", "unknown_read", ()),
+    ("OutputSubsystem.power_on_mode_set", "OUTP:PON:STAT", ResultKind.PARAM_WRITE, "OutputSubsystem", "write", ("validated_payload",)),
+    ("OutputSubsystem.power_on_mode_query", "OUTP:PON:STAT?", ResultKind.RAW, "OutputSubsystem", "unknown_read", ()),
+    ("SystemSubsystem.beeper_state_set", "SYST:BEEPer:STATe", ResultKind.PARAM_WRITE, "SystemSubsystem", "write", ("validated_payload",)),
+    ("SystemSubsystem.date_set", "SYST:DATE", ResultKind.PARAM_WRITE, "SystemSubsystem", "write", ("validated_payload",)),
+    ("SystemSubsystem.time_set", "SYST:TIME", ResultKind.PARAM_WRITE, "SystemSubsystem", "write", ("validated_payload",)),
+    ("SystemSubsystem.comm_select", "SYST:COMMunicate:SELect", ResultKind.PARAM_WRITE, "SystemSubsystem", "write", ("validated_payload",)),
+    ("SystemSubsystem.comm_gpib_addr_set", "SYST:COMMunicate:GPIB:ADDRess", ResultKind.PARAM_WRITE, "SystemSubsystem", "write", ("validated_payload",)),
+    ("SystemSubsystem.lan_ip_set", "SYST:COMM:LAN:IP", ResultKind.HELPER, "SystemSubsystem", "write", ("validated_by_subsystem",)),
+    ("SystemSubsystem.lan_ip_query", "SYST:COMM:LAN:IP", ResultKind.HELPER, "SystemSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SystemSubsystem.lan_subnet_set", "SYST:COMM:LAN:SMAS", ResultKind.HELPER, "SystemSubsystem", "write", ("validated_by_subsystem",)),
+    ("SystemSubsystem.lan_subnet_query", "SYST:COMM:LAN:SMAS", ResultKind.HELPER, "SystemSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SystemSubsystem.lan_gateway_set", "SYST:COMM:LAN:DGAT", ResultKind.HELPER, "SystemSubsystem", "write", ("validated_by_subsystem",)),
+    ("SystemSubsystem.lan_gateway_query", "SYST:COMM:LAN:DGAT", ResultKind.HELPER, "SystemSubsystem", "unknown_read", ("validated_by_subsystem",)),
+    ("SystemSubsystem.lan_ip_mode_set", "SYST:COMM:LAN:IP:MODE", ResultKind.PARAM_WRITE, "SystemSubsystem", "write", ("validated_payload",)),
+    ("SystemSubsystem.lan_ip_mode_query", "SYST:COMM:LAN:IP:MODE?", ResultKind.RAW, "SystemSubsystem", "unknown_read", ()),
+    ("TriggerSubsystem.acquire_mode_set", "TRIG:ACQ:MODE", ResultKind.PARAM_WRITE, "TriggerSubsystem", "write", ("validated_payload",)),
+    ("TriggerSubsystem.acquire_voltage_level_set", "TRIG:ACQ:VOLT:LEV", ResultKind.PARAM_WRITE, "TriggerSubsystem", "write", ("validated_payload",)),
+    ("TriggerSubsystem.acquire_current_level_set", "TRIG:ACQ:CURR:LEV", ResultKind.PARAM_WRITE, "TriggerSubsystem", "write", ("validated_payload",)),
+    ("InitiateSubsystem.continuous_arb_set", "INITiate:CONTinuous:ARB", ResultKind.PARAM_WRITE, "InitiateSubsystem", "write", ("validated_payload",)),
+    ("InitiateSubsystem.continuous_acq_set", "INITiate:CONTinuous:ACQuire", ResultKind.PARAM_WRITE, "InitiateSubsystem", "write", ("validated_payload",)),
+)
+# Explicit disposition for all other public inventory entries.
+_FINAL_ROWS = (
+    ("AbortSubsystem.dlog", "", ResultKind.RESTRICTED, "AbortSubsystem", "unavailable", (), ()),
+    ("AbortSubsystem.elog", "", ResultKind.RESTRICTED, "AbortSubsystem", "unavailable", (), ()),
+    ("ArbSubsystem.terminate_last_set", "", ResultKind.RESTRICTED, "ArbSubsystem", "unavailable", (), ()),
+    ("ArbSubsystem.terminate_last_query", "", ResultKind.RESTRICTED, "ArbSubsystem", "unavailable", (), ()),
+    ("BatterySubsystem.state_set", "", ResultKind.RESTRICTED, "BatterySubsystem", "unavailable", (), ()),
+    ("BatterySubsystem.state_query", "", ResultKind.RESTRICTED, "BatterySubsystem", "unavailable", (), ()),
+    ("SourceSubsystem.remote_sense_query", "", ResultKind.RESTRICTED, "SourceSubsystem", "unavailable", (), ()),
+    ("SystemSubsystem.preset", "", ResultKind.RESTRICTED, "SystemSubsystem", "unavailable", (), ()),
+    ("TriggerSubsystem.source_set", "", ResultKind.RESTRICTED, "TriggerSubsystem", "unavailable", (), ()),
+    ("TriggerSubsystem.source_query", "", ResultKind.RESTRICTED, "TriggerSubsystem", "unavailable", (), ()),
+    ("TriggerSubsystem.level_set", "", ResultKind.RESTRICTED, "TriggerSubsystem", "unavailable", (), ()),
+    ("TriggerSubsystem.level_query", "", ResultKind.RESTRICTED, "TriggerSubsystem", "unavailable", (), ()),
+    ("TriggerSubsystem.delay_set", "", ResultKind.RESTRICTED, "TriggerSubsystem", "unavailable", (), ()),
+    ("TriggerSubsystem.delay_query", "", ResultKind.RESTRICTED, "TriggerSubsystem", "unavailable", (), ()),
+    ("TriggerSubsystem.hysteresis_set", "", ResultKind.RESTRICTED, "TriggerSubsystem", "unavailable", (), ()),
+    ("TriggerSubsystem.hysteresis_query", "", ResultKind.RESTRICTED, "TriggerSubsystem", "unavailable", (), ()),
+    ("SenseSubsystem.acquisition_interval_query", "", ResultKind.RESTRICTED, "SenseSubsystem", "unavailable", (), ()),
+    ("SenseSubsystem.acquisition_offset_query", "", ResultKind.RESTRICTED, "SenseSubsystem", "unavailable", (), ()),
+    ("SenseSubsystem.acquisition_points_query", "", ResultKind.RESTRICTED, "SenseSubsystem", "unavailable", (), ()),
+    ("ArbSubsystem.init", "", ResultKind.ALIAS, "ArbSubsystem", "delegated", (), ("InitiateSubsystem.arb",)),
+    ("ArbSubsystem.abort", "", ResultKind.ALIAS, "ArbSubsystem", "delegated", (), ("AbortSubsystem.arb",)),
+    ("SourceSubsystem.power_limit_set", "", ResultKind.ALIAS, "SourceSubsystem", "delegated", (), ("SourceSubsystem.opp_threshold_set",)),
+    ("SourceSubsystem.power_limit_query", "", ResultKind.ALIAS, "SourceSubsystem", "delegated", (), ("SourceSubsystem.opp_threshold_query",)),
+    ("SourceSubsystem.power_limit_enable", "", ResultKind.ALIAS, "SourceSubsystem", "delegated", (), ("SourceSubsystem.opp_enable",)),
+    ("SourceSubsystem.power_limit_enable_query", "", ResultKind.ALIAS, "SourceSubsystem", "delegated", (), ("SourceSubsystem.opp_enable_query",)),
+    ("SourceSubsystem.transient_mode_set", "", ResultKind.ALIAS, "SourceSubsystem", "delegated", (), ("SourceSubsystem.function_mode_set",)),
+    ("SourceSubsystem.transient_mode_query", "", ResultKind.ALIAS, "SourceSubsystem", "delegated", (), ("SourceSubsystem.function_mode_query",)),
+    ("IEEE488.idn", "*IDN?", ResultKind.CORE, "IEEE488", "read", (), ()),
+    ("IEEE488.reset", "*RST", ResultKind.CORE, "IEEE488", "write", (), ()),
+    ("IEEE488.clear_status", "*CLS", ResultKind.CORE, "IEEE488", "write", (), ()),
+    ("IEEE488.opc", "*OPC / *OPC?", ResultKind.CORE, "IEEE488", "conditional", ("wait:bool",), ()),
+    ("IEEE488.self_test", "*TST?", ResultKind.CORE, "IEEE488", "unknown_read", (), ()),
+    ("IEEE488.trigger", "*TRG", ResultKind.CORE, "IEEE488", "write", (), ()),
+    ("IEEE488.save", "*SAV", ResultKind.CORE, "IEEE488", "write", ("slot:int",), ()),
+    ("IEEE488.recall", "*RCL", ResultKind.CORE, "IEEE488", "write", ("slot:int",), ()),
+    ("StatusSubsystem.std_event_enable_set", "*ESE", ResultKind.CORE, "StatusSubsystem", "write", ("mask:uint8",), ()),
+    ("StatusSubsystem.std_event_enable_query", "*ESE?", ResultKind.CORE, "StatusSubsystem", "read", (), ()),
+    ("StatusSubsystem.std_event_register_query", "*ESR?", ResultKind.CORE, "StatusSubsystem", "destructive_read", (), ()),
+    ("StatusSubsystem.status_byte", "*STB?", ResultKind.CORE, "StatusSubsystem", "read", (), ()),
+    ("ArbSubsystem.trigger", "TRIGger:ARB", ResultKind.VOID_WRITE, "ArbSubsystem", "write", (), ()),
+    ("SourceSubsystem.ovp_set", "SOUR:VOLT:OVER:PROT:LEV", ResultKind.QUALIFIED, "SourceSubsystem", "write", ("value:finite_number","qualification:ProtectionThresholdQualification",), ()),
+    ("SourceSubsystem.ovp_query", "SOUR:VOLT:OVER:PROT:LEV?", ResultKind.FLOAT, "SourceSubsystem", "read", (), ()),
+    ("SourceSubsystem.ocp_set", "SOUR:CURR:OVER:PROT:LEV", ResultKind.QUALIFIED, "SourceSubsystem", "write", ("value:finite_number","qualification:ProtectionThresholdQualification",), ()),
+    ("SourceSubsystem.ocp_query", "SOUR:CURR:OVER:PROT:LEV?", ResultKind.FLOAT, "SourceSubsystem", "read", (), ()),
+    ("SourceSubsystem.opp_threshold_set", "SOUR:POW:OVER:PROT:LEV", ResultKind.QUALIFIED, "SourceSubsystem", "write", ("value:finite_number","qualification:ProtectionThresholdQualification",), ()),
+    ("SourceSubsystem.opp_threshold_query", "SOUR:POW:OVER:PROT:LEV?", ResultKind.FLOAT, "SourceSubsystem", "read", (), ()),
+    ("SourceSubsystem.uvp_set", "SOUR:VOLT:UND:PROT:LEV", ResultKind.QUALIFIED, "SourceSubsystem", "write", ("value:finite_number","qualification:ProtectionThresholdQualification",), ()),
+    ("SourceSubsystem.uvp_query", "SOUR:VOLT:UND:PROT:LEV?", ResultKind.FLOAT, "SourceSubsystem", "read", (), ()),
+    ("SourceSubsystem.ucp_set", "SOUR:CURR:UND:PROT:LEV", ResultKind.QUALIFIED, "SourceSubsystem", "write", ("value:finite_number","qualification:ProtectionThresholdQualification",), ()),
+    ("SourceSubsystem.ucp_query", "SOUR:CURR:UND:PROT:LEV?", ResultKind.FLOAT, "SourceSubsystem", "read", (), ()),
+    ("SourceSubsystem.ovp_enable_query", "SOUR:VOLT:OVER:PROT:STAT?", ResultKind.BOOL, "SourceSubsystem", "read", (), ()),
+    ("SourceSubsystem.ocp_enable_query", "SOUR:CURR:OVER:PROT:STAT?", ResultKind.BOOL, "SourceSubsystem", "read", (), ()),
+    ("SourceSubsystem.external_programming_set", "SOUR:EXT:PROG", ResultKind.COMPOUND, "SourceSubsystem", "write", ("enabled:bool",), ("OutputSubsystem.state_query",)),
+    ("SourceSubsystem.external_coefficient_set", "SOUR:EXT:PROG:CHAN:{coefficient}", ResultKind.COMPOUND, "SourceSubsystem", "write", ("channel:int","coefficient:MX|MB","value:finite_number",), ("OutputSubsystem.state_query","SourceSubsystem.external_programming_query",)),
+    ("SourceSubsystem.external_coefficient_query", "SOUR:EXT:PROG:CHAN:{coefficient}?", ResultKind.TEMPLATE, "SourceSubsystem", "read", ("channel:int","coefficient:MX|MB",), ()),
+    ("OutputSubsystem.watchdog_set", "", ResultKind.COMPOUND, "OutputSubsystem", "write", ("enable:bool","delay_s:int|None",), ("OutputSubsystem.watchdog_query","OutputSubsystem.watchdog_delay_query",)),
+    ("TriggerSubsystem.acquire_source_set", "TRIG:ACQ:SOUR", ResultKind.PARAM_WRITE, "TriggerSubsystem", "write", ("validated_payload",), ()),
+    ("TriggerSubsystem.acquire_source_query", "TRIG:ACQ:SOUR?", ResultKind.RAW, "TriggerSubsystem", "read", (), ()),
+    ("TriggerSubsystem.arb_source_set", "TRIG:ARB:SOUR", ResultKind.PARAM_WRITE, "TriggerSubsystem", "write", ("validated_payload",), ()),
+    ("TriggerSubsystem.arb_source_query", "TRIG:ARB:SOUR?", ResultKind.RAW, "TriggerSubsystem", "read", (), ()),
+    ("TriggerSubsystem.dlog_source_set", "TRIG:DLOG:SOUR", ResultKind.PARAM_WRITE, "TriggerSubsystem", "write", ("validated_payload",), ()),
+    ("TriggerSubsystem.dlog_source_query", "TRIG:DLOG:SOUR?", ResultKind.RAW, "TriggerSubsystem", "read", (), ()),
+    ("TriggerSubsystem.elog_source_set", "TRIG:ELOG:SOUR", ResultKind.PARAM_WRITE, "TriggerSubsystem", "write", ("validated_payload",), ()),
+    ("TriggerSubsystem.elog_source_query", "TRIG:ELOG:SOUR?", ResultKind.RAW, "TriggerSubsystem", "read", (), ()),
+    ("TriggerSubsystem.acquire_start", "", ResultKind.COMPOUND, "TriggerSubsystem", "write", ("source:enum",), ("TriggerSubsystem.acquire_source_set","TriggerSubsystem.acquire_arm",)),
+    ("TriggerSubsystem.hysteresis_threshold_query", "TRIG:{subsystem}:{quantity}:HYST:{bound}?", ResultKind.TEMPLATE, "TriggerSubsystem", "read", ("subsystem:ACQ|DLOG|ELOG","quantity:VOLT|CURR","bound:HIGH|LOW",), ()),
+    ("TriggerSubsystem.hysteresis_threshold_set", "TRIG:{subsystem}:{quantity}:HYST:{bound}", ResultKind.COMPOUND, "TriggerSubsystem", "write", ("subsystem:enum","quantity:enum","bound:enum","value:finite_number",), ("TriggerSubsystem.hysteresis_threshold_query",)),
+    ("TriggerSubsystem.elog_trigger_voltage_high_set", "", ResultKind.ALIAS, "TriggerSubsystem", "delegated", ("value:finite_number",), ("TriggerSubsystem.hysteresis_threshold_set",)),
+    ("TriggerSubsystem.elog_trigger_voltage_low_set", "", ResultKind.ALIAS, "TriggerSubsystem", "delegated", ("value:finite_number",), ("TriggerSubsystem.hysteresis_threshold_set",)),
+    ("LoggingSubsystem.commands", "", ResultKind.PLANNER, "LoggingSubsystem", "none", ("kind:ELOG|DLOG","min_period:finite_number","max_period:finite_number","max_duration:finite_number",), ()),
+    ("LoggingSubsystem.raw_data_query", "FETC:ELOG:ARR:DATA?", ResultKind.TEMPLATE, "LoggingSubsystem", "read", ("ascii_confirmed:bool",), ()),
+    ("LoggingSubsystem.state_query", "{kind}:STAT?", ResultKind.TEMPLATE, "LoggingSubsystem", "read", ("kind:ELOG|DLOG",), ()),
+)
+
+LOGGING_CONFIG_TEMPLATES = (
+    "SENS:{kind}:FUNC:VOLT {value}", "SENS:{kind}:FUNC:CURR {value}",
+    "SENS:{kind}:FUNC:PEAK {value}", "SENS:{kind}:PER {value}", "SENS:{kind}:TIME {value}",
+)
 COMMAND_SPECS = MappingProxyType({
     **{m: CommandSpec(m, h, k, f, effect="write" if k is ResultKind.BOOL_WRITE else "unknown_read") for m, h, k, f in _ROWS},
     **{m: CommandSpec(m, h, k, f, effect=e) for m, h, k, f, e in _ADDITIONAL_ROWS},
+    **{m: CommandSpec(m, h, k, f, effect=e, parameters=p) for m, h, k, f, e, p in _PARAMETERIZED_ROWS},
+    **{m: CommandSpec(m, h, k, f, effect=e, parameters=p, dependencies=d) for m, h, k, f, e, p, d in _FINAL_ROWS},
 })
 
 
@@ -147,6 +383,11 @@ def command_spec(method: str) -> CommandSpec:
 def execute(driver, method: str, *args):
     """Use the existing guarded driver I/O and shared core response parsers."""
     spec = command_spec(method)
+    with driver._qualified_method_scope(method):
+        return _execute(driver, spec, *args)
+
+
+def _execute(driver, spec, *args):
     if spec.kind is ResultKind.BOOL_WRITE:
         if len(args) != 1:
             raise ConfigurationError("one boolean argument required")
@@ -165,3 +406,22 @@ def execute(driver, method: str, *args):
         return raw
     parser = {ResultKind.FLOAT: parse_float, ResultKind.BOOL: parse_bool, ResultKind.INT: parse_int}[spec.kind]
     return parser(raw)
+
+
+def execute_parameterized(driver, method: str, payload: str):
+    """Execute a fixed registered header with one already validated payload.
+
+    Never accept multiple program messages or arbitrary headers. Per-command
+    numeric, enum and hardware-envelope validation remains in typed methods.
+    """
+    spec = command_spec(method)
+    if spec.kind not in (ResultKind.PARAM_WRITE, ResultKind.PARAM_QUERY):
+        raise ConfigurationError("registered parameterized command required")
+    if not isinstance(payload, str) or not payload or any(c in payload for c in ("\r", "\n", ";", "\x00")):
+        raise ConfigurationError("invalid single-command argument payload")
+    command = spec.header + " " + payload
+    with driver._qualified_method_scope(method):
+        if spec.kind is ResultKind.PARAM_WRITE:
+            driver.write_scpi(command)
+            return None
+        return driver.query_scpi(command)

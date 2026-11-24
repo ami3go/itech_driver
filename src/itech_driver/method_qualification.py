@@ -314,6 +314,13 @@ RESTRICTED = frozenset((
     "AbortSubsystem.dlog", "AbortSubsystem.elog",
     "ArbSubsystem.terminate_last_set", "ArbSubsystem.terminate_last_query",
     "SourceSubsystem.remote_sense_query", "SystemSubsystem.preset",
+    "BatterySubsystem.state_set", "BatterySubsystem.state_query",
+    "SenseSubsystem.acquisition_points_query", "SenseSubsystem.acquisition_offset_query",
+    "SenseSubsystem.acquisition_interval_query", "LoggingSubsystem.DLOG.raw_data_query",
+    "TriggerSubsystem.source_set", "TriggerSubsystem.source_query",
+    "TriggerSubsystem.level_set", "TriggerSubsystem.level_query",
+    "TriggerSubsystem.delay_set", "TriggerSubsystem.delay_query",
+    "TriggerSubsystem.hysteresis_set", "TriggerSubsystem.hysteresis_query",
 ))
 
 
@@ -365,26 +372,37 @@ class MethodQualification:
             raise UnsupportedOperationError(f"{key} is {state.value} for {self.model}/{self.firmware}/{self.interface}")
 
 
-def bind_subsystem_guards(driver, subsystems):
-    """Wrap public bound methods without replacing subsystem objects or signatures."""
-    def guard(method, key):
+def install_subsystem_guards(classes):
+    """Install guards on the actual subsystem classes, including direct instances.
+
+    No per-instance closure or reflection-based replacement is needed during
+    instrument construction. This preserves signatures and isinstance checks.
+    """
+    def guard(method, prefix):
         @wraps(method)
-        def wrapped(*args, **kwargs):
-            with driver._qualified_method_scope(key):
-                return method(*args, **kwargs)
+        def wrapped(self, *args, **kwargs):
+            key = prefix
+            if prefix.startswith("LoggingSubsystem."):
+                key = "LoggingSubsystem." + self._kind + "." + method.__name__
+            scope = getattr(self._p, "_qualified_method_scope", None)
+            if scope is None:
+                # Compatibility for non-ITECH parents and standalone mocks.
+                return method(self, *args, **kwargs)
+            with scope(key):
+                return method(self, *args, **kwargs)
         return wrapped
     found = set()
-    for obj in subsystems:
-        prefix = type(obj).__name__
-        if prefix == "LoggingSubsystem":
-            prefix += "." + obj._kind
-        for name, method in inspect.getmembers(obj, inspect.ismethod):
+    for cls in classes:
+        prefix = cls.__name__
+        for name, method in inspect.getmembers(cls, inspect.isfunction):
             if name.startswith("_") or (prefix == "IEEE488" and name == "idn"):
                 continue
             key = prefix + "." + name
-            if key not in METHOD_KEYS:
+            keys = ({"LoggingSubsystem.ELOG." + name, "LoggingSubsystem.DLOG." + name}
+                    if prefix == "LoggingSubsystem" else {key})
+            if not keys <= METHOD_KEYS:
                 raise ConfigurationError(f"missing subsystem qualification key {key}")
-            setattr(obj, name, guard(method, key))
-            found.add(key)
+            setattr(cls, name, guard(method, key))
+            found.update(keys)
     if found != METHOD_KEYS:
         raise ConfigurationError("subsystem qualification inventory mismatch")

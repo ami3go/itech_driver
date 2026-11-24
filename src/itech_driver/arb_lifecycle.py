@@ -78,6 +78,9 @@ class ArbLifecycle:
             if self._live() and self._state in (ArbState.ARMED,ArbState.RUNNING,ArbState.UNKNOWN):
                 raise SafetyGuardError("existing execution not resolved")
             self.driver._assert_write_authorized()
+            self.driver._require_methods("TriggerSubsystem.arb_source_set",
+                "ArbSubsystem.count_set", "ArbSubsystem.init", "InitiateSubsystem.arb",
+                "ArbSubsystem.state_query")
             self._generation=self.driver.session.generation
             self._trigger_source=source
             self._trigger_attempted=False
@@ -96,6 +99,7 @@ class ArbLifecycle:
             if (not self._live() or self._trigger_source!="BUS" or self._state!=ArbState.ARMED
                     or self._trigger_attempted or self._abort_attempted):
                 raise SafetyGuardError("confirmed BUS-armed state in same session required")
+            self.driver._require_methods("IEEE488.trigger", "ArbSubsystem.state_query")
             self._trigger_attempted=True
             self._state=ArbState.UNKNOWN
             try:
@@ -110,6 +114,7 @@ class ArbLifecycle:
                 return ArbEvidence(ArbState.UNKNOWN,None,"session changed; abort not transmitted")
             if self._abort_attempted:
                 return ArbEvidence(ArbState.UNKNOWN,None,"abort already attempted; no replay")
+            self.driver._require_methods("ArbSubsystem.abort", "AbortSubsystem.arb")
             self._abort_attempted=True
             self._state=ArbState.UNKNOWN
             try:

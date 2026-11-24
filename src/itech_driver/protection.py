@@ -3,15 +3,16 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from scpi_driver_core import ConfigurationError, UnsupportedOperationError
 from .capabilities import MODEL_DESCRIPTORS, Range
+from .command_specs import command_spec
 
 # IT-M3900D Programming Guide V1.4/09,2024 pp.46–47,51–52,
 # 65–66,70–71,80: threshold queries have no MIN/MAX argument.
 PROTECTION_THRESHOLDS = MappingProxyType({
-    "ovp": ("SOUR:VOLT:OVER:PROT:LEV", "voltage", "65–66"),
-    "ocp": ("SOUR:CURR:OVER:PROT:LEV", "current", "46–47"),
-    "opp": ("SOUR:POW:OVER:PROT:LEV", "power", "80"),
-    "uvp": ("SOUR:VOLT:UND:PROT:LEV", "voltage", "70–71"),
-    "ucp": ("SOUR:CURR:UND:PROT:LEV", "current", "51–52"),
+    "ovp": (command_spec("SourceSubsystem.ovp_set").header, "voltage", "65–66"),
+    "ocp": (command_spec("SourceSubsystem.ocp_set").header, "current", "46–47"),
+    "opp": (command_spec("SourceSubsystem.opp_threshold_set").header, "power", "80"),
+    "uvp": (command_spec("SourceSubsystem.uvp_set").header, "voltage", "70–71"),
+    "ucp": (command_spec("SourceSubsystem.ucp_set").header, "current", "51–52"),
 })
 
 
@@ -50,6 +51,8 @@ def set_protection_threshold(driver, protection, value, qualification):
     if application is not None and value > application.maximum:
         raise ConfigurationError("protection threshold exceeds application ceiling")
     with driver.session.operation_lock():
+        method = "SourceSubsystem." + ("opp_threshold" if protection == "opp" else protection) + "_set"
+        driver._require_methods(method)
         driver._assert_write_authorized()
         identity = driver.identity_snapshot()
         if (identity.manufacturer.strip().upper() != "ITECH"

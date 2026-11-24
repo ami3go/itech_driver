@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 import math
 from scpi_driver_core import ConfigurationError, ResponseParseError
+from ..command_specs import command_spec, LOGGING_CONFIG_TEMPLATES
 
 
 @dataclass(frozen=True)
@@ -24,11 +25,8 @@ class LoggingConfig:
             raise ConfigurationError("explicit finite positive timing bounds required")
         if not min_period <= self.period <= max_period or not self.period <= self.duration <= max_duration:
             raise ConfigurationError("logging timing outside caller envelope")
-        prefix = f"SENS:{kind}"
-        return (f"{prefix}:FUNC:VOLT {int(self.voltage)}",
-                f"{prefix}:FUNC:CURR {int(self.current)}",
-                f"{prefix}:FUNC:PEAK {int(self.peak)}",
-                f"{prefix}:PER {self.period}",f"{prefix}:TIME {self.duration}")
+        return tuple(template.format(kind=kind, value=value) for template, value in
+                     zip(LOGGING_CONFIG_TEMPLATES, (int(self.voltage), int(self.current), int(self.peak), self.period, self.duration)))
 
 
 class LoggingSubsystem:
@@ -40,7 +38,7 @@ class LoggingSubsystem:
 
     def state_query(self):
         """Raw status only; do not infer readiness, completion, or stop."""
-        raw = self._p.query_scpi(f"{self._kind}:STAT?").strip()
+        raw = self._p.query_scpi(command_spec("LoggingSubsystem.state_query").header.format(kind=self._kind)).strip()
         if not raw:
             raise ResponseParseError("empty logging state",raw=raw)
         return raw
@@ -49,7 +47,7 @@ class LoggingSubsystem:
         """Unparsed ELOG data; exact record layout is not qualified."""
         if self._kind != "ELOG" or ascii_confirmed is not True:
             raise ConfigurationError("ELOG ASCII response format must be confirmed")
-        raw = self._p.query_scpi("FETC:ELOG:ARR:DATA?")
+        raw = self._p.query_scpi(command_spec("LoggingSubsystem.raw_data_query").header)
         if not raw.strip():
             raise ResponseParseError("empty ELOG data",raw=raw)
         return raw

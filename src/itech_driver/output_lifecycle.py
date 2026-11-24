@@ -25,17 +25,34 @@ def _finite(value):
     return type(value) in (int,float) and math.isfinite(value)
 
 
+_OBSERVATION_METHODS = (
+    "OutputSubsystem.state_query", "StatusSubsystem.ques_condition_query",
+    "MeasurementSubsystem.voltage_query", "MeasurementSubsystem.current_query",
+)
+_ON_METHODS = _OBSERVATION_METHODS + (
+    "OutputSubsystem.state_set",
+    "SourceSubsystem.ovp_enable_query", "SourceSubsystem.ovp_query",
+    "SourceSubsystem.ocp_enable_query", "SourceSubsystem.ocp_query",
+    "SourceSubsystem.opp_enable_query", "SourceSubsystem.opp_threshold_query",
+    "SourceSubsystem.voltage_limit_query", "SourceSubsystem.current_limit_query",
+    "SourceSubsystem.programmed_power_limit_query", "SourceSubsystem.voltage_query",
+    "SourceSubsystem.current_query", "SourceSubsystem.function_mode_query",
+    "SourceSubsystem.external_programming_query",
+)
+
+
 def observe_output(driver, *, requested=None):
     """Read separate evidence; no physical safe-state assertion."""
     programmed = questionable = voltage = current = None
     try:
         with driver.session.operation_lock():
-            programmed = parse_bool(driver.query_scpi("OUTP:STAT?"))
-            questionable = parse_int(driver.query_scpi("STAT:QUES:COND?"))
+            driver._require_methods(*_OBSERVATION_METHODS)
+            programmed = driver.output.state_query()
+            questionable = driver.status.ques_condition_query()
             if not 0 <= questionable <= 65535:
                 raise ConfigurationError("invalid questionable register")
-            voltage = parse_float(driver.query_scpi("MEAS:VOLT?"))
-            current = parse_float(driver.query_scpi("MEAS:CURR?"))
+            voltage = driver.measurement.voltage_query()
+            current = driver.measurement.current_query()
         return OutputEvidence(requested,programmed,questionable,voltage,current,"observed")
     except ScpiDriverError as exc:
         return OutputEvidence(requested,programmed,questionable,voltage,current,"unknown",str(exc))
@@ -53,25 +70,30 @@ def request_output_on(driver, *, authorized=False, max_voltage_v, max_current_a,
     if any(not _finite(v) or v <= 0 for v in bounds):
         raise ConfigurationError("finite positive caller limits required")
     with driver.session.operation_lock():
+        driver._require_methods(*_ON_METHODS)
         before = observe_output(driver)
         if before.outcome != "observed" or before.programmed is not False or before.questionable != 0:
             raise SafetyGuardError("output preflight not clear")
-        for quantity, ceiling in zip(("VOLT","CURR","POW"),bounds):
-            enabled = parse_bool(driver.query_scpi(f"SOUR:{quantity}:OVER:PROT:STAT?"))
-            threshold = parse_float(driver.query_scpi(f"SOUR:{quantity}:OVER:PROT:LEV?"))
-            limit = parse_float(driver.query_scpi(f"SOUR:{quantity}:LIM?"))
+        source = driver.source
+        checks = (("VOLT", source.ovp_enable_query, source.ovp_query, source.voltage_limit_query),
+                  ("CURR", source.ocp_enable_query, source.ocp_query, source.current_limit_query),
+                  ("POW", source.opp_enable_query, source.opp_threshold_query, source.programmed_power_limit_query))
+        for (quantity, enabled_query, threshold_query, limit_query), ceiling in zip(checks,bounds):
+            enabled = enabled_query()
+            threshold = threshold_query()
+            limit = limit_query()
             if not enabled or not 0 < threshold <= ceiling or not 0 < limit <= ceiling:
                 raise SafetyGuardError(f"{quantity} protection/limit not inside caller envelope")
-        for quantity, ceiling in zip(("VOLT","CURR"),bounds):
-            value = parse_float(driver.query_scpi(f"SOUR:{quantity}?"))
+        for (quantity, query), ceiling in zip((("VOLT", source.voltage_query), ("CURR", source.current_query)),bounds):
+            value = query()
             if not 0 <= value <= ceiling:
                 raise SafetyGuardError(f"{quantity} setpoint outside caller envelope")
-        if driver.query_scpi("SOUR:FUNC:MODE?").strip().upper() not in ("FIX","FIXED"):
+        if source.function_mode_query() not in ("FIX","FIXED"):
             raise SafetyGuardError("supervised enable supports fixed mode only")
-        if parse_bool(driver.query_scpi("SOUR:EXT:PROG?")):
+        if source.external_programming_query():
             raise SafetyGuardError("external analog control not disabled")
         try:
-            driver.write_scpi("OUTP:STAT ON")
+            driver.output.state_set(True)
         except ScpiDriverError as exc:
             return OutputEvidence(True,None,None,None,None,"unknown",str(exc))
         observed = observe_output(driver,requested=True)
@@ -96,8 +118,9 @@ def request_output_off(driver, *, max_residual_v, max_residual_a, max_samples=3)
     if type(max_samples) is not int or not 1 <= max_samples <= 100:
         raise ConfigurationError("sample budget must be 1..100")
     with driver.session.operation_lock():
+        driver._require_methods("OutputSubsystem.state_set")
         try:
-            driver.write_scpi("OUTP:STAT OFF")
+            driver.output.state_set(False)
         except ScpiDriverError as exc:
             return OutputEvidence(False,None,None,None,None,"unknown",str(exc))
         for _ in range(max_samples):

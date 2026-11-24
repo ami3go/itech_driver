@@ -115,29 +115,35 @@ class ItechSimulator:
         t.on("*CLS",lambda _: self._clear_errors())
         t.on(command_spec("OutputSubsystem.state_query").header,lambda _:str(int(self.state.output)))
         t.on_regex("^" + re.escape(command_spec("OutputSubsystem.state_set").header) + r" (ON|OFF|0|1)$",self._output)
-        t.on("STAT:QUES:COND?",lambda _:str(int(self.state.tripped)))
-        t.on("SOUR:FUNC:MODE?","FIX")
-        t.on("SOUR:EXT:PROG?","0")
+        t.on(command_spec("StatusSubsystem.ques_condition_query").header,lambda _:str(int(self.state.tripped)))
+        t.on(command_spec("SourceSubsystem.function_mode_query").header + "?","FIX")
+        t.on(command_spec("SourceSubsystem.external_programming_query").header,"0")
         for q in ("VOLT","CURR"):
-            t.on(f"SOUR:{q}?",lambda _,q=q:str(getattr(self.state,{"VOLT":"voltage","CURR":"current"}[q])))
-            t.on_regex(fr"^SOUR:{q} [^ ]+$",lambda cmd,q=q:self._setpoint(cmd,q))
-            t.on(f"SOUR:{q}? MIN","0").on(f"SOUR:{q}? MAX",str(self.limits[q]))
+            name = {"VOLT": "voltage", "CURR": "current"}[q]
+            query = command_spec("SourceSubsystem." + name + "_query").header
+            header = command_spec("SourceSubsystem." + name + "_set").header
+            t.on(query,lambda _,q=q:str(getattr(self.state,{"VOLT":"voltage","CURR":"current"}[q])))
+            t.on_regex("^" + re.escape(header) + r" [^ ]+$",lambda cmd,q=q:self._setpoint(cmd,q))
+            t.on(query + " MIN","0").on(query + " MAX",str(self.limits[q]))
         for q in self.limits:
-            t.on(f"SOUR:{q}:LIM?",lambda _,q=q:str(self.limits[q]))
-            t.on(f"SOUR:{q}:OVER:PROT:STAT?",lambda _,q=q:str(int(self.protection[q])))
-            t.on(f"SOUR:{q}:OVER:PROT:LEV?",lambda _,q=q:str(self.thresholds[q]))
-            t.on_regex(fr"^SOUR:{q}:OVER:PROT:LEV [^ ]+$",lambda cmd,q=q:self._set_threshold(cmd,q))
+            name = {"VOLT": "voltage", "CURR": "current", "POW": "programmed_power"}[q]
+            protection = {"VOLT": "ovp", "CURR": "ocp", "POW": "opp"}[q]
+            threshold = "opp_threshold" if protection == "opp" else protection
+            t.on(command_spec("SourceSubsystem." + name + "_limit_query").header + "?",lambda _,q=q:str(self.limits[q]))
+            t.on(command_spec("SourceSubsystem." + protection + "_enable_query").header,lambda _,q=q:str(int(self.protection[q])))
+            t.on(command_spec("SourceSubsystem." + threshold + "_query").header,lambda _,q=q:str(self.thresholds[q]))
+            t.on_regex("^" + re.escape(command_spec("SourceSubsystem." + threshold + "_set").header) + r" [^ ]+$",lambda cmd,q=q:self._set_threshold(cmd,q))
             method = {"VOLT":"voltage_query","CURR":"current_query","POW":"power_query"}[q]
             t.on(command_spec("MeasurementSubsystem." + method).header,lambda _,q=q:str(self._measured(q)))
-        t.on_regex(r"^ARB:COUNT [^ ]+$",self._repeat)
-        t.on_regex(r"^TRIG:ARB:SOUR (BUS|EXT)$",lambda cmd:setattr(self.state,"trigger_source",cmd.split()[-1].upper()))
-        t.on("TRIG:ARB:SOUR?",lambda _:self.state.trigger_source)
-        t.on("INIT:ARB",lambda _:self._arm()).on("INITiate:ARB",lambda _:self._arm())
+        t.on_regex("^" + re.escape(command_spec("ArbSubsystem.count_set").header) + r" [^ ]+$",self._repeat)
+        t.on_regex("^" + re.escape(command_spec("TriggerSubsystem.arb_source_set").header) + r" (BUS|EXT)$",lambda cmd:setattr(self.state,"trigger_source",cmd.split()[-1].upper()))
+        t.on(command_spec("TriggerSubsystem.arb_source_query").header,lambda _:self.state.trigger_source)
+        t.on("INIT:ARB",lambda _:self._arm()).on(command_spec("InitiateSubsystem.arb").header,lambda _:self._arm())
         t.on("*TRG",lambda _:self._trigger("BUS"))
         t.on("ABOR:ARB",lambda _:setattr(self.state,"arb","ABORTED"))
-        t.on("ABORt:ARB",lambda _:setattr(self.state,"arb","ABORTED"))
-        t.on("ARB:EXE:STAT?",lambda _:self.state.arb)
-        t.on("INIT:ACQ",lambda _:self._arm_acq())
+        t.on(command_spec("AbortSubsystem.arb").header,lambda _:setattr(self.state,"arb","ABORTED"))
+        t.on(command_spec("ArbSubsystem.state_query").header,lambda _:self.state.arb)
+        t.on(command_spec("TriggerSubsystem.acquire_arm").header,lambda _:self._arm_acq())
 
     def _clear_errors(self):
         # Core queue is drained explicitly via SYST:ERR?; no simulated reset.
