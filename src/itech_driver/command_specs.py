@@ -147,6 +147,11 @@ def command_spec(method: str) -> CommandSpec:
 def execute(driver, method: str, *args):
     """Use the existing guarded driver I/O and shared core response parsers."""
     spec = command_spec(method)
+    with driver._qualified_method_scope(method):
+        return _execute(driver, spec, *args)
+
+
+def _execute(driver, spec, *args):
     if spec.kind is ResultKind.BOOL_WRITE:
         if len(args) != 1:
             raise ConfigurationError("one boolean argument required")

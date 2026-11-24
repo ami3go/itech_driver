@@ -26,6 +26,7 @@ class TriggerSubsystem:
         """Configure and arm only. Call the appropriate trigger separately."""
         token = self._normalize_source("ACQ", source)
         with self._p.session.operation_lock():
+            self._p._require_methods("TriggerSubsystem.acquire_source_set", "TriggerSubsystem.acquire_arm")
             self.acquire_source_set(token)
             self.acquire_arm()
 

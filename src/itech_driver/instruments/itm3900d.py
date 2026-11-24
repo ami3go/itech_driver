@@ -148,14 +148,20 @@ class ITM3900D(BaseInstrument):
             self._method_qualification = profile
             self._qualification_generation = self.session.generation
 
+    def _require_methods(self, *keys):
+        """Check the entire compound operation under its caller's operation lock."""
+        if not self._require_qualified_capabilities:
+            return
+        if (self._method_qualification is None or not self.session.is_connected
+                or self._qualification_generation != self.session.generation):
+            raise UnsupportedOperationError("bind current-session method qualification before subsystem use")
+        for key in keys:
+            self._method_qualification.require(key)
+
     @contextmanager
     def _qualified_method_scope(self, key):
         with self.session.operation_lock():
-            if self._require_qualified_capabilities:
-                if (self._method_qualification is None or not self.session.is_connected
-                        or self._qualification_generation != self.session.generation):
-                    raise UnsupportedOperationError("bind current-session method qualification before subsystem use")
-                self._method_qualification.require(key)
+            self._require_methods(key)
             yield
 
     def model_descriptor(self, *, refresh=True):
