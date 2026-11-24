@@ -73,3 +73,6 @@ __all__.append('discover_instruments')
 
 from .connection import ConnectionConfig
 __all__.append("ConnectionConfig")
+
+from .method_qualification import MethodQualification, MethodEvidence
+__all__.extend(["MethodQualification", "MethodEvidence"])

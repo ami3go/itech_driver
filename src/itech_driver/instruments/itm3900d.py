@@ -1,7 +1,8 @@
 """ITECH IT-M3900D series power supply driver."""
 
 from contextlib import contextmanager
-from scpi_driver_core import ScpiDriverError, SafetyGuardError, ConfigurationError
+from scpi_driver_core import ScpiDriverError, SafetyGuardError, ConfigurationError, UnsupportedOperationError
+from ..method_qualification import MethodQualification, bind_subsystem_guards
 from ..base import BaseInstrument
 from ..capabilities import ApplicationLimits, discover_capabilities, descriptor_for
 from ..subsystems.LoggingSubsystem import LoggingSubsystem
@@ -25,8 +26,8 @@ class ITM3900D(BaseInstrument):
     """ITECH IT-M3900D series power supply."""
     
     def __init__(self, resource_name: str, timeout: int = 5000, 
-                 termination: str = '\n', interface_kwargs: dict = None, *, require_remote: bool = False, application_limits: ApplicationLimits | None = None, **kwargs):
-        self._initialize_policy(require_remote, application_limits)
+                 termination: str = '\n', interface_kwargs: dict = None, *, require_remote: bool = False, application_limits: ApplicationLimits | None = None, require_qualified_capabilities: bool = False, **kwargs):
+        self._initialize_policy(require_remote, application_limits, require_qualified_capabilities)
         super().__init__(resource_name, timeout, termination, interface_kwargs, **kwargs)
         try:
             self._initialize_subsystems()
@@ -41,24 +42,29 @@ class ITM3900D(BaseInstrument):
             raise
 
     @staticmethod
-    def _validate_policy(require_remote, application_limits):
+    def _validate_policy(require_remote, application_limits, require_qualified_capabilities=False):
+        if type(require_qualified_capabilities) is not bool:
+            raise ConfigurationError("require_qualified_capabilities must be bool")
         if type(require_remote) is not bool:
             raise ConfigurationError("require_remote must be bool")
         if application_limits is not None and not isinstance(application_limits, ApplicationLimits):
             raise ConfigurationError("application_limits must be ApplicationLimits")
 
-    def _initialize_policy(self, require_remote, application_limits):
-        self._validate_policy(require_remote, application_limits)
+    def _initialize_policy(self, require_remote, application_limits, require_qualified_capabilities=False):
+        self._validate_policy(require_remote, application_limits, require_qualified_capabilities)
+        self._require_qualified_capabilities = require_qualified_capabilities
+        self._method_qualification = None
+        self._qualification_generation = None
         self._application_limits = application_limits or ApplicationLimits()
         self.require_remote = require_remote
         self._mode_request = None
         self._mode_generation = None
 
     @classmethod
-    def _from_live_session(cls, session, *, require_remote, application_limits):
+    def _from_live_session(cls, session, *, require_remote, application_limits, require_qualified_capabilities=False):
         """Internal factory adoption; caller owns cleanup until successful return."""
         driver = cls.__new__(cls)
-        driver._initialize_policy(require_remote, application_limits)
+        driver._initialize_policy(require_remote, application_limits, require_qualified_capabilities)
         driver._bind_session(session)
         driver._initialize_subsystems()
         return driver
@@ -83,15 +89,53 @@ class ITM3900D(BaseInstrument):
         self.fetch = FetchSubsystem(self)
         self.elog = LoggingSubsystem(self, 'ELOG')
         self.dlog = LoggingSubsystem(self, 'DLOG')
+        bind_subsystem_guards(self, (self.system,self.source,self.output,self.status,self.trigger,
+            self.arb,self.battery,self.initiate,self.abort,self.io,self.ieee,self.measurement,
+            self.sense,self.fetch,self.elog,self.dlog))
 
 
     def identity_snapshot(self, *, refresh=False):
         with self.session.operation_lock():
             try:
-                return super().identity_snapshot(refresh=refresh)
+                identity = super().identity_snapshot(refresh=refresh)
+                profile = self._method_qualification
+                if profile is not None and (descriptor_for(identity) is None or identity.model.strip().upper() != profile.model or identity.firmware_version != profile.firmware):
+                    self._method_qualification = None
+                    self._qualification_generation = None
+                return identity
             except ScpiDriverError:
                 self._invalidate_mode()
+                self._method_qualification = None
+                self._qualification_generation = None
                 raise
+
+    def bind_method_qualification(self, profile: MethodQualification):
+        """Explicit identity read; a failed bind leaves strict mode closed."""
+        with self.session.operation_lock():
+            self._require_qualified_capabilities = True
+            self._method_qualification = None
+            self._qualification_generation = None
+            if not isinstance(profile, MethodQualification):
+                raise ConfigurationError("MethodQualification required")
+            identity = self.identity_snapshot(refresh=True)
+            if (descriptor_for(identity) is None or identity.model.strip().upper() != profile.model
+                    or identity.firmware_version != profile.firmware
+                    or self.session.transport.descriptor.kind != profile.interface):
+                raise UnsupportedOperationError("method qualification identity or interface mismatch")
+            self._method_qualification = profile
+            self._qualification_generation = self.session.generation
+
+    @contextmanager
+    def _qualified_method_scope(self, key):
+        if not self._require_qualified_capabilities:
+            yield
+            return
+        with self.session.operation_lock():
+            if (self._method_qualification is None or not self.session.is_connected
+                    or self._qualification_generation != self.session.generation):
+                raise UnsupportedOperationError("bind current-session method qualification before subsystem use")
+            self._method_qualification.require(key)
+            yield
 
     def model_descriptor(self, *, refresh=True):
         """Return nominal descriptor, or None for an unknown identity."""

@@ -1,0 +1,19 @@
+# Explicit subsystem method qualification (increment 1)
+
+Use require_qualified_capabilities=True to require explicit exact model,
+firmware and core transport kind evidence for each attached typed subsystem
+operation. bind_method_qualification(profile) refreshes identity once,
+binds to the session generation and enables strict mode even if binding fails.
+Unknown, unsupported or unqualified methods are rejected without command I/O.
+A reconnect or changed identity invalidates the binding. Logging instance
+keys distinguish ELOG and DLOG. Compound methods may require evidence for
+each nested typed operation. Common identity remains available.
+
+The evidence reference is an external caller attestation, not manufacturer
+certification or HIL authorization. No built-in firmware support matrix is
+asserted. Legacy constructors retain permissive behavior for compatibility;
+strict mode is opt-in. Raw SCPI/client/session, directly instantiated
+subsystems and separate lifecycle helpers are explicit low-level paths not
+covered by the attached subsystem guard. Existing remote mode and parameter
+validation still apply. This is not a hardware safety boundary or complete
+#173 acceptance.

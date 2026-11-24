@@ -8,7 +8,7 @@ from .connection import ConnectionConfig
 def connect_vcp(port: str, *, baudrate: int = 9600, bytesize: int = 8,
                 parity: str = "N", stopbits: float = 1, timeout: int = 5000,
                 termination: str = "\n", dtr: bool | None = None, rts: bool | None = None,
-                require_remote: bool = False, application_limits: ApplicationLimits | None = None,
+                require_remote: bool = False, application_limits: ApplicationLimits | None = None, require_qualified_capabilities: bool = False,
                 command_termination: str | None = None, response_termination: str | None = None) -> ITM3900D:
     if not isinstance(port, str) or not port.strip():
         raise ConfigurationError("serial port is required")
@@ -19,4 +19,4 @@ def connect_vcp(port: str, *, baudrate: int = 9600, bytesize: int = 8,
         termination if command_termination is None else command_termination,
         termination if response_termination is None else response_termination,
         baudrate=baudrate, bytesize=bytesize, parity=parity, stopbits=stopbits, dtr=dtr, rts=rts)
-    return ITM3900D(config.resource, connection=config, require_remote=require_remote, application_limits=application_limits)
+    return ITM3900D(config.resource, connection=config, require_remote=require_remote, application_limits=application_limits, require_qualified_capabilities=require_qualified_capabilities)
