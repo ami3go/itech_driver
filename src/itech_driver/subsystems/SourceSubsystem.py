@@ -1,6 +1,6 @@
 import math
 import warnings
-from scpi_driver_core import ConfigurationError
+from scpi_driver_core import ConfigurationError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
@@ -148,10 +148,20 @@ class SourceSubsystem:
 
     # Remote sense enable
     def remote_sense_set(self, enable: BoolLike, channel: int = 1):
-        self._p.write_scpi(f'SOUR{channel}:REM:SENS {1 if enable else 0}')
+        """Select remote sense only after independently verifying safe wiring.
+
+        Do not use this operation as evidence that the physical wiring is valid.
+        """
+        self._check_channel(channel)
+        if type(enable) not in (bool, int) or enable not in (0, 1):
+            raise ConfigurationError("remote sense state must be bool or 0/1")
+        self._p.write_scpi(f'SOUR:REM:SENS:STAT {1 if enable else 0}')
 
     def remote_sense_query(self, channel: int = 1) -> bool:
-        return parse_bool(self._p.query_scpi(f'SOUR{channel}:REM:SENS?'))
+        self._check_channel(channel)
+        # The available IT-M3900D guide index establishes the setter only.
+        # Do not send an unverified readback header or infer state from a write.
+        raise UnsupportedOperationError("IT-M3900D remote sense query not yet guide-qualified")
 
     # Advanced: transient / dynamic function interface
     def transient_mode_set(self, mode: str):
