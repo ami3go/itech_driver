@@ -4,7 +4,7 @@ Baseline d0174d457d208d0e9ce84f7463c080c7b7582994; pinned core 1e03b6837f96f200d
 
 ## Delivered
 
-#192 merged: 74 existing primary PR heads, 139 changed files, four integrated regressions fixed. #187, #188, #189 verified and closed. #186 exact registry inventory test passing but separate added-method regression remains. #191 and #193 implementation submitted; integrated CI pending at recording time. No HIL.
+#192 merged: 74 existing primary PR heads, 139 changed files, four integrated regressions fixed. #187, #188, #189 verified and closed. #186 exact registry inventory test passing but separate added-method regression remains. #191 submitted; #193 subsequently merged, see configuration update below. No HIL.
 
 ## All 40 issue dispositions
 
@@ -20,8 +20,8 @@ Baseline d0174d457d208d0e9ce84f7463c080c7b7582994; pinned core 1e03b6837f96f200d
 | [#172](https://github.com/ami3go/itech_driver/issues/172) | Identity cache | PARTIALLY IMPLEMENTED | #129 #130 | Core parser and generation-aware immutable cache audit |
 | [#173](https://github.com/ami3go/itech_driver/issues/173) | Model descriptors | PARTIALLY IMPLEMENTED | #106 #130 #131 | Bind capabilities to subsystem guards |
 | [#150](https://github.com/ami3go/itech_driver/issues/150) | Electrical limits | PARTIALLY IMPLEMENTED | #106 #107 #134 #193 | Remove fallback configuration; intersect ranges |
-| [#153](https://github.com/ami3go/itech_driver/issues/153) | Nested defaults | IMPLEMENTED IN OPEN PR | #193 | Independent config isolation |
-| [#154](https://github.com/ami3go/itech_driver/issues/154) | Configuration persistence | IMPLEMENTED IN OPEN PR | #193 | Path/schema/atomic save |
+| [#153](https://github.com/ami3go/itech_driver/issues/153) | Nested defaults | VERIFIED AND MERGED | #193 | Independent config isolation |
+| [#154](https://github.com/ami3go/itech_driver/issues/154) | Configuration persistence | VERIFIED AND MERGED | #193 | Path/schema/atomic save |
 | [#151](https://github.com/ami3go/itech_driver/issues/151) | Range/channel validation | PARTIALLY IMPLEMENTED | #80 #81 #106 #107 #134 | Remove legacy defaults; centralize |
 | [#152](https://github.com/ami3go/itech_driver/issues/152) | Source validation | PARTIALLY IMPLEMENTED | #80 #82 #85 #106 #107 #134 | Protection and application constraints |
 | [#155](https://github.com/ami3go/itech_driver/issues/155) | Strict output enable | IMPLEMENTED BUT UNVERIFIED | #81 #142 | Verify all acceptance cases and zero writes |
@@ -58,3 +58,7 @@ Before: fragmented PRs, 4 integrated failures, mandatory VISA dependency on old 
 ## Release readiness
 
 Software baseline: PASS for documented offline regression and wheel matrix. Full campaign: NOT COMPLETE. Hardware release qualification: NOT VERIFIED. No physical authorization or measurements. Remaining software issue status must be updated after individual evidence review; no claim of full programming-guide compliance or full release readiness.
+
+## Configuration update
+
+PR #193 merged at a16b25c946acd3bece1ed10fc1a71e45f612710b after reconciled head f24e112de57049e7dbb86d6daa70e0d5dced2a37 passed [offline CI](https://github.com/ami3go/itech_driver/actions/runs/45377662064), [clean wheel](https://github.com/ami3go/itech_driver/actions/runs/45377662096) and native TCP without VISA (run 45377662210). #153 and #154 verified and closed; #150 partial (effective-limit intersection remains). #191 previously passed integrated offline and minimal wheel runs 45377644599/45377644827; reconciled again with #193 at d49ebd1c09c2a0426673763ff32f00541648631b; current CI 45378132484/45378132554 pending at time of recording.

@@ -17,3 +17,7 @@ The session lock must span authorization preflight, live range queries, and fina
 - Config and logging candidates #193/#191 remove shared defaults and improve resource ownership. Effective-limit enforcement remains open.
 
 See progress tracker for issue-level gaps. No physical authorization assumed.
+
+## Configuration update
+
+PR #193 merged at a16b25c946acd3bece1ed10fc1a71e45f612710b after reconciled head f24e112de57049e7dbb86d6daa70e0d5dced2a37 passed [offline CI](https://github.com/ami3go/itech_driver/actions/runs/45377662064), [clean wheel](https://github.com/ami3go/itech_driver/actions/runs/45377662096) and native TCP without VISA (run 45377662210). #153 and #154 verified and closed; #150 partial (effective-limit intersection remains). #191 previously passed integrated offline and minimal wheel runs 45377644599/45377644827; reconciled again with #193 at d49ebd1c09c2a0426673763ff32f00541648631b; current CI 45378132484/45378132554 pending at time of recording.
