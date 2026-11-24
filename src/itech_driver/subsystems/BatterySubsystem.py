@@ -1,12 +1,17 @@
 import math
 from scpi_driver_core import ConfigurationError, ResponseParseError, UnsupportedOperationError
-from scpi_driver_core.scpi.parsers import parse_bool, parse_float, parse_int
+from scpi_driver_core.scpi.parsers import parse_float
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
 # Battery Subsystem (BATTery)
 # -------------------------
 class BatterySubsystem:
-    """Battery simulation/test commands (charge, shutdown thresholds, etc.)."""
+    """Battery-test configuration and mode selection; not a battery emulator.
+
+    Execution, state and physical cutoff behavior are not qualified.
+    """
+    simulation_supported = False
+    execution_supported = False
     def __init__(self, parent: BaseInstrument):
         self._p = parent
 
