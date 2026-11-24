@@ -65,3 +65,12 @@ def test_registry_executor_cannot_bypass_typed_guard():
         with pytest.raises(UnsupportedOperationError):
             execute(d,"OutputSubsystem.state_set",True)
     assert t.history == []
+
+
+def test_generic_base_retains_direct_subsystem_compatibility():
+    from itech_driver import BaseInstrument
+    from itech_driver.subsystems.MeasurementSubsystem import MeasurementSubsystem
+    t = ScriptedScpiTransport().on("MEAS:VOLT?", "1.25")
+    with BaseInstrument("sim", transport=t) as base:
+        assert MeasurementSubsystem(base).voltage_query() == 1.25
+    assert t.history == ["MEAS:VOLT?"]
