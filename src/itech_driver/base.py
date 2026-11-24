@@ -1,7 +1,6 @@
 """ITECH compatibility API backed by the shared SCPI core."""
 from __future__ import annotations
 
-import logging
 import math
 import struct
 import time
@@ -20,7 +19,6 @@ from .exceptions import CommandError, InstrumentNotFoundError, TimeoutError
 
 Number = Union[int, float]
 BoolLike = Union[bool, int]
-_LOG = logging.getLogger(__name__)
 _BINARY_TYPES = frozenset("bBhHiIlLqQfd")
 
 
@@ -83,7 +81,6 @@ class BaseInstrument:
             raise TimeoutError(str(exc)) from exc
         except TransportError as exc:
             raise CommandError(str(exc)) from exc
-        _LOG.debug("SCPI write: %s", cmd)
 
     def query_scpi(self, cmd: str, delay: float = 0.0) -> str:
         if not math.isfinite(delay) or delay < 0:
