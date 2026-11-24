@@ -1,9 +1,9 @@
 """Rated single-unit envelopes; not firmware qualification or parallel ratings."""
 from dataclasses import dataclass
 from enum import Enum
-import math
 from types import MappingProxyType
 from typing import Mapping
+from .utils.validation import validate_bounds, validate_range
 from scpi_driver_core import ConfigurationError, IdentityError, ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_float
 
@@ -103,14 +103,10 @@ class Range:
     maximum: float
 
     def __post_init__(self):
-        if (any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v)
-                for v in (self.minimum, self.maximum))
-                or self.minimum > self.maximum):
-            raise ConfigurationError("range must contain ordered finite real bounds")
+        validate_bounds(self.minimum, self.maximum)
 
     def validate(self, value):
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not self.minimum <= value <= self.maximum:
-            raise ConfigurationError(f"value outside permitted range {self.minimum}..{self.maximum}: {value!r}")
+        validate_range(value, (self.minimum, self.maximum), "value")
 
 
 @dataclass(frozen=True)
