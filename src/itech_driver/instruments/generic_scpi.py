@@ -1,6 +1,7 @@
 """Generic SCPI identification; unknown instruments have no qualified controls."""
 from typing import Dict, Any
 from ..base import BaseInstrument
+from ..capabilities import unknown_feature_states
 from scpi_driver_core.scpi.parsers import parse_identity
 from ..subsystems.IEEE488 import IEEE488
 
@@ -11,6 +12,10 @@ class GenericSCPIInstrument(BaseInstrument):
     def __init__(self, resource_name: str, **kwargs):
         super().__init__(resource_name, **kwargs)
         self.ieee = IEEE488(self)
+
+    def capability_states(self):
+        """Explicit immutable unknown states; performs no speculative I/O."""
+        return unknown_feature_states()
 
     def detect_capabilities(self) -> Dict[str, bool | None]:
         """None denotes unknown, not proof of support or lack of support.
