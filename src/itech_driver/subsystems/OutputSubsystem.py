@@ -46,13 +46,16 @@ class OutputSubsystem:
         self._p.write_scpi('OUTP:PROTection:CLEar')
 
     def watchdog_set(self, enable: BoolLike, delay_s: Optional[int] = None):
-        """Set delay and verify readback before enabling; never infer physical output state."""
+        """Verify configuration and final watchdog state; never infer physical output state."""
         enable = strict_bool(enable, "watchdog state")
         if delay_s is not None and (type(delay_s) is not int or not 1 <= delay_s <= 3600):
             raise ConfigurationError("watchdog delay must be an integer in 1..3600 seconds")
         with self._p.session.operation_lock():
+            self._p._assert_write_authorized()
             if not enable:
                 self._p.write_scpi("OUTP:PROT:WDOG:STAT 0")
+                if self.watchdog_query() is not False:
+                    raise ResponseParseError("watchdog disable readback mismatch", raw="ON")
             if delay_s is not None:
                 self._p.write_scpi(f"OUTP:PROT:WDOG:DEL {delay_s}")
                 actual = self.watchdog_delay_query()
@@ -62,6 +65,10 @@ class OutputSubsystem:
                 self.watchdog_delay_query()
             if enable:
                 self._p.write_scpi("OUTP:PROT:WDOG:STAT 1")
+                if self.watchdog_query() is not True:
+                    raise ResponseParseError("watchdog enable readback mismatch", raw="OFF")
+            elif delay_s is not None and self.watchdog_query() is not False:
+                raise ResponseParseError("watchdog changed state during delay configuration", raw="ON")
 
     def watchdog_query(self) -> bool:
         return parse_bool(self._p.query_scpi('OUTP:PROT:WDOG:STAT?'))
