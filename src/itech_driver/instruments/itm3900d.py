@@ -5,6 +5,7 @@ from scpi_driver_core import ScpiDriverError, SafetyGuardError
 from typing import Any, List, Optional, Union
 from ..base import BaseInstrument, Number, BoolLike
 from ..capabilities import discover_capabilities
+from ..subsystems.SenseSubsystem import SenseSubsystem
 from ..subsystems.MeasurementSubsystem import MeasurementSubsystem
 from ..subsystems.ArbSubsystem import ArbSubsystem
 from ..subsystems.AbortSubsystem import AbortSubsystem
@@ -45,6 +46,7 @@ class ITM3900D(BaseInstrument):
         self.io = IOConfigSubsystem(self)
         self.ieee = IEEE488(self)
         self.measurement = MeasurementSubsystem(self)
+        self.sense = SenseSubsystem(self)
 
 
     def discover_capabilities(self):
