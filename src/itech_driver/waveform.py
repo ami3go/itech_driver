@@ -128,3 +128,29 @@ class Sweep:
                 sine[1].replace("ARB:SIN:","ARB:SWE:"),
                 f"ARB:SWE:STAR {start}",f"ARB:SWE:END {end}",
                 f"ARB:SWE:STEP:LEV {step}",f"ARB:SWE:STEP:WIDT {width}")
+
+
+@dataclass(frozen=True)
+class ConstantDwell:
+    levels: tuple[float,...]
+    dwell_s: float
+
+    def pairs(self, envelope: Envelope, *, max_points: int) -> tuple[tuple[float,float],...]:
+        """Validate complete pair payloads; odd tails are not silently padded."""
+        if not isinstance(envelope, Envelope):
+            raise ConfigurationError("explicit envelope required")
+        if type(max_points) is not int or max_points < 2:
+            raise ConfigurationError("explicit point budget required")
+        if not isinstance(self.levels, tuple) or not 2 <= len(self.levels) <= max_points:
+            raise ConfigurationError("invalid CDW point count")
+        if len(self.levels) % 2:
+            raise ConfigurationError("odd CDW point tail not yet qualified")
+        envelope.duration(self.dwell_s)
+        number(self.dwell_s,"dwell",positive=True)
+        values = tuple(envelope.level(value) for value in self.levels)
+        return tuple(zip(values[::2],values[1::2]))
+
+    def setup_commands(self, envelope: Envelope, *, max_points: int) -> tuple[str,...]:
+        """Candidate count/dwell setters only; no upload until index semantics verified."""
+        self.pairs(envelope,max_points=max_points)
+        return (f"ARB:CDW:POIN {len(self.levels)}",f"ARB:CDW:DWEL {self.dwell_s}")
