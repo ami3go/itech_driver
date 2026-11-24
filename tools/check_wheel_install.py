@@ -29,16 +29,19 @@ assert metadata("itech-itm3900d-driver")["Requires-Python"] == ">=3.10"
 
     subprocess.run([str(python), "-c", """
 import importlib
-import pkgutil
 import itech_driver
 from itech_driver import ITM3900D
 from itech_driver.simulator import ItechSimulator
-for module in pkgutil.walk_packages(itech_driver.__path__, itech_driver.__name__ + "."):
-    importlib.import_module(module.name)
+from pathlib import Path
+root = Path(itech_driver.__file__).parent
+for file in sorted(root.rglob("*.py")):
+    parts = file.relative_to(root).with_suffix("").parts
+    name = ".".join(("itech_driver", *parts[:-1])) if parts[-1] == "__init__" else ".".join(("itech_driver", *parts))
+    importlib.import_module(name)
 sim = ItechSimulator()
 with ITM3900D("sim", transport=sim.transport) as driver:
     assert "SIMULATED" in driver.identify()
-    assert driver.measurement.voltage() == 0
+    assert driver.measurement.voltage_query() == 0
 assert sim.transport.history == ["*IDN?", "MEAS:VOLT?"]
 """], check=True, cwd=tmp)
     for name in ("itech-control", "itech-discover"):

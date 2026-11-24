@@ -1,8 +1,10 @@
-"""Import every installed driver module without discovery or device access."""
+"""Import every installed driver module, including namespace utility modules."""
 import importlib
-import pkgutil
 import itech_driver
-
-for module in pkgutil.walk_packages(itech_driver.__path__, itech_driver.__name__ + "."):
-    importlib.import_module(module.name)
-    print(module.name)
+from pathlib import Path
+root = Path(itech_driver.__file__).parent
+for file in sorted(root.rglob("*.py")):
+    parts = file.relative_to(root).with_suffix("").parts
+    name = ".".join(("itech_driver", *parts[:-1])) if parts[-1] == "__init__" else ".".join(("itech_driver", *parts))
+    importlib.import_module(name)
+    print(name)
