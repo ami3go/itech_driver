@@ -1,9 +1,9 @@
 """ITECH IT-M3900D series power supply driver."""
 
 from contextlib import contextmanager
-from scpi_driver_core import ScpiDriverError, SafetyGuardError
+from scpi_driver_core import ScpiDriverError, SafetyGuardError, ConfigurationError
 from ..base import BaseInstrument
-from ..capabilities import discover_capabilities, descriptor_for
+from ..capabilities import ApplicationLimits, discover_capabilities, descriptor_for
 from ..subsystems.LoggingSubsystem import LoggingSubsystem
 from ..subsystems.FetchSubsystem import FetchSubsystem
 from ..subsystems.SenseSubsystem import SenseSubsystem
@@ -25,7 +25,10 @@ class ITM3900D(BaseInstrument):
     """ITECH IT-M3900D series power supply."""
     
     def __init__(self, resource_name: str, timeout: int = 5000, 
-                 termination: str = '\n', interface_kwargs: dict = None, *, require_remote: bool = False, **kwargs):
+                 termination: str = '\n', interface_kwargs: dict = None, *, require_remote: bool = False, application_limits: ApplicationLimits | None = None, **kwargs):
+        if application_limits is not None and not isinstance(application_limits, ApplicationLimits):
+            raise ConfigurationError("application_limits must be ApplicationLimits")
+        self._application_limits = application_limits or ApplicationLimits()
         self.require_remote = require_remote
         self._mode_request = None
         self._mode_generation = None
@@ -64,7 +67,14 @@ class ITM3900D(BaseInstrument):
         """Return nominal descriptor, or None for an unknown identity."""
         return descriptor_for(self.identity_snapshot(refresh=refresh))
 
+    @property
+    def application_limits(self):
+        """Immutable application bounds for this driver instance."""
+        return self._application_limits
+
     def discover_capabilities(self, *, application_limits=None):
+        if application_limits is None:
+            application_limits = self.application_limits
         return discover_capabilities(self, application_limits=application_limits)
 
     @property
