@@ -1,3 +1,4 @@
+import math
 from scpi_driver_core import ConfigurationError, ResponseParseError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_int
 from ..base import  BaseInstrument, BoolLike, Number
@@ -10,10 +11,14 @@ class IOConfigSubsystem:
         self._p = parent
 
     def select(self, idx: int):
-        self._p.write_scpi(f'IO:SELect {int(idx)}')
+        self._p.write_scpi(f'IO:SELect {self._pin_index(idx)}')
 
     def select_query(self) -> int:
-        return parse_int(self._p.query_scpi('IO:SELect?'))
+        raw = self._p.query_scpi('IO:SELect?')
+        value = parse_int(raw)
+        if not 0 <= value <= 6:
+            raise ResponseParseError('invalid selected pin index', raw=raw)
+        return value
 
     @staticmethod
     def _pin_index(pin) -> int:
@@ -45,10 +50,19 @@ class IOConfigSubsystem:
         raise ResponseParseError("invalid digital direction reply", raw=raw)
 
     def pwm_enable(self, ch: int, enable: BoolLike):
-        self._p.write_scpi(f'IO:PWM:ENABle {int(ch)},{1 if enable else 0}')
+        pin = self._pin_index(ch)
+        if type(enable) not in (bool, int) or enable not in (0, 1):
+            raise ConfigurationError("PWM enable must be bool or 0/1")
+        self._p.write_scpi(f'IO:PWM:ENABle {pin},{int(enable)}')
 
     def pwm_freq_set(self, ch: int, freq: Number):
-        self._p.write_scpi(f'IO:PWM:FREQuency {int(ch)},{float(freq)}')
+        pin = self._pin_index(ch)
+        if isinstance(freq, bool) or not isinstance(freq, (int, float)) or not math.isfinite(freq) or not 2 <= freq <= 21000:
+            raise ConfigurationError("PWM frequency must be in 2..21000 Hz")
+        self._p.write_scpi(f'IO:PWM:FREQuency {pin},{freq}')
 
     def pwm_duty_set(self, ch: int, duty_percent: int):
-        self._p.write_scpi(f'IO:PWM:DUTY {int(ch)},{int(duty_percent)}')
+        pin = self._pin_index(ch)
+        if type(duty_percent) is not int or not 1 <= duty_percent <= 100:
+            raise ConfigurationError("PWM duty must be an integer in 1..100 percent")
+        self._p.write_scpi(f'IO:PWM:DUTY {pin},{duty_percent}')
