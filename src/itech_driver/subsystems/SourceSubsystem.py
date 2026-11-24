@@ -318,3 +318,57 @@ class SourceSubsystem:
     def ucp_enable_query(self, channel: int = 1) -> bool:
         self._check_channel(channel)
         return parse_bool(self._p.query_scpi("SOUR:CURR:UND:PROT:STAT?"))
+
+    def voltage_rise_time_set(self, seconds: Number, channel: int = 1):
+        """Set duration in seconds, not a slew rate in units/s."""
+        self._check_channel(channel)
+        self._limit_set("SOUR:VOLT:SLEW:POS", seconds)
+
+    def voltage_rise_time_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:VOLT:SLEW:POS", bound)
+
+    def voltage_fall_time_set(self, seconds: Number, channel: int = 1):
+        """Set duration in seconds, not a slew rate in units/s."""
+        self._check_channel(channel)
+        self._limit_set("SOUR:VOLT:SLEW:NEG", seconds)
+
+    def voltage_fall_time_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:VOLT:SLEW:NEG", bound)
+
+    def voltage_both_time_set(self, seconds: Number, channel: int = 1):
+        """Set duration in seconds, not a slew rate in units/s."""
+        self._check_channel(channel)
+        self._limit_set("SOUR:VOLT:SLEW:BOTH", seconds)
+
+    def voltage_both_time_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:VOLT:SLEW:BOTH", bound)
+
+    def current_rise_time_set(self, seconds: Number, channel: int = 1):
+        """Set duration in seconds, not a slew rate in units/s."""
+        self._check_channel(channel)
+        self._limit_set("SOUR:CURR:SLEW:POS", seconds)
+
+    def current_rise_time_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:CURR:SLEW:POS", bound)
+
+    def current_fall_time_set(self, seconds: Number, channel: int = 1):
+        """Set duration in seconds, not a slew rate in units/s."""
+        self._check_channel(channel)
+        self._limit_set("SOUR:CURR:SLEW:NEG", seconds)
+
+    def current_fall_time_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:CURR:SLEW:NEG", bound)
+
+    def current_both_time_set(self, seconds: Number, channel: int = 1):
+        """Set duration in seconds, not a slew rate in units/s."""
+        self._check_channel(channel)
+        self._limit_set("SOUR:CURR:SLEW:BOTH", seconds)
+
+    def current_both_time_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:CURR:SLEW:BOTH", bound)
