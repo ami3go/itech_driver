@@ -15,6 +15,7 @@ from scpi_driver_core.exceptions import (
 from scpi_driver_core.scpi.errors import ScpiErrorQueue, ScpiExecutionPolicy
 from scpi_driver_core.transport.base import Transport
 from .connection import ConnectionConfig
+from .utils.validation import nonnegative_number
 
 from .exceptions import CommandError, InstrumentNotFoundError, TimeoutError
 
@@ -85,17 +86,32 @@ class BaseInstrument:
             raise CommandError(str(exc)) from exc
 
     def query_scpi(self, cmd: str, delay: float = 0.0) -> str:
-        if not math.isfinite(delay) or delay < 0:
-            raise ConfigurationError("delay must be finite and nonnegative")
-        if delay:
-            time.sleep(delay)
-        # Even queries may have side effects (e.g. event register reads).
-        try:
-            return self.client.query(cmd).strip()
-        except ScpiTimeoutError as exc:
-            raise TimeoutError(str(exc)) from exc
-        except TransportError as exc:
-            raise CommandError(str(exc)) from exc
+        """Legacy pre-query delay shares a bounded transaction budget.
+
+        The budget begins after acquisition of the operation lock. It does not
+        preempt other operations already holding that lock. No OPC is implied.
+        """
+        nonnegative_number(delay, "delay")
+        with self.session.operation_lock():
+            try:
+                if not delay:
+                    return self.client.query(cmd).strip()
+                budget = self.client.timeout_s
+                if budget is None or delay >= budget:
+                    raise ConfigurationError("delay must be shorter than the finite communication timeout")
+                deadline = time.monotonic() + budget
+                time.sleep(delay)
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise TimeoutError("query deadline exhausted before transmission")
+                return self.client.query(cmd, timeout_s=remaining).strip()
+            except ScpiTimeoutError as exc:
+                # A locally exhausted budget is already the public timeout type.
+                if isinstance(exc, TimeoutError):
+                    raise
+                raise TimeoutError(str(exc)) from exc
+            except TransportError as exc:
+                raise CommandError(str(exc)) from exc
 
     def query_binary(self, cmd: str, datatype: str = "f", container=list,
                      *, is_big_endian: bool = False, consume_terminator: bool = True):
