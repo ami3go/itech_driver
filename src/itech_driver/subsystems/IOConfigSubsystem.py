@@ -1,3 +1,4 @@
+from ..command_specs import execute, execute_parameterized, command_spec
 import math
 from scpi_driver_core import ConfigurationError, ResponseParseError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_int, parse_float
@@ -11,10 +12,10 @@ class IOConfigSubsystem:
         self._p = parent
 
     def select(self, idx: int):
-        self._p.write_scpi(f'IO:SELect {self._pin_index(idx)}')
+        execute_parameterized(self._p, "IOConfigSubsystem.select", f'{self._pin_index(idx)}')
 
     def select_query(self) -> int:
-        raw = self._p.query_scpi('IO:SELect?')
+        raw = execute(self._p, "IOConfigSubsystem.select_query")
         value = parse_int(raw)
         if not 0 <= value <= 6:
             raise ResponseParseError('invalid selected pin index', raw=raw)
@@ -37,12 +38,12 @@ class IOConfigSubsystem:
             direction = int(dir_mask)
         else:
             raise ConfigurationError("direction must be OUT/0 or IN/1")
-        self._p.write_scpi(f"IO:DIRE {pin},{direction}")
+        execute_parameterized(self._p, "IOConfigSubsystem.direction_set", f"{pin},{direction}")
 
     def direction_query(self, pin_list: int | str) -> bool:
         """Return True for input and False for output; reject unknown replies."""
         pin = self._pin_index(pin_list)
-        raw = self._p.query_scpi(f"IO:DIRE? {pin}").strip().upper()
+        raw = execute_parameterized(self._p, "IOConfigSubsystem.direction_query", f"{pin}").strip().upper()
         if raw in ("0", "OUT"):
             return False
         if raw in ("1", "IN"):
@@ -53,19 +54,19 @@ class IOConfigSubsystem:
         pin = self._pin_index(ch)
         if type(enable) not in (bool, int) or enable not in (0, 1):
             raise ConfigurationError("PWM enable must be bool or 0/1")
-        self._p.write_scpi(f'IO:PWM:ENABle {pin},{int(enable)}')
+        execute_parameterized(self._p, "IOConfigSubsystem.pwm_enable", f'{pin},{int(enable)}')
 
     def pwm_freq_set(self, ch: int, freq: Number):
         pin = self._pin_index(ch)
         if isinstance(freq, bool) or not isinstance(freq, (int, float)) or not math.isfinite(freq) or not 2 <= freq <= 21000:
             raise ConfigurationError("PWM frequency must be in 2..21000 Hz")
-        self._p.write_scpi(f'IO:PWM:FREQuency {pin},{freq}')
+        execute_parameterized(self._p, "IOConfigSubsystem.pwm_freq_set", f'{pin},{freq}')
 
     def pwm_duty_set(self, ch: int, duty_percent: int):
         pin = self._pin_index(ch)
         if type(duty_percent) is not int or not 1 <= duty_percent <= 100:
             raise ConfigurationError("PWM duty must be an integer in 1..100 percent")
-        self._p.write_scpi(f'IO:PWM:DUTY {pin},{duty_percent}')
+        execute_parameterized(self._p, "IOConfigSubsystem.pwm_duty_set", f'{pin},{duty_percent}')
 
     _PIN_FUNCTIONS = (
         ("PSCL",), ("PSST",), ("OFFS",), ("EXTT", "TOUT"),
@@ -83,13 +84,13 @@ class IOConfigSubsystem:
         pin = self._pin_index(pin)
         if type(enabled) not in (bool,int) or enabled not in (0,1):
             raise ConfigurationError("reverse state must be bool or 0/1")
-        self._p.write_scpi(f"IO:REVE {pin},{int(enabled)}")
+        execute_parameterized(self._p, "IOConfigSubsystem.reverse_set", f"{pin},{int(enabled)}")
 
     def reverse_query(self, pin):
-        return parse_bool(self._p.query_scpi(f"IO:REVE? {self._pin_index(pin)}"))
+        return parse_bool(execute_parameterized(self._p, "IOConfigSubsystem.reverse_query", f"{self._pin_index(pin)}"))
 
     def pwm_enable_query(self, pin):
-        return parse_bool(self._p.query_scpi(f"IO:PWM? {self._pin_index(pin)}"))
+        return parse_bool(execute_parameterized(self._p, "IOConfigSubsystem.pwm_enable_query", f"{self._pin_index(pin)}"))
 
     def _pin_numeric_query(self, header, pin, bound=None):
         pin = self._pin_index(pin)
@@ -99,17 +100,17 @@ class IOConfigSubsystem:
         return parse_float(self._p.query_scpi(f"{header}? {pin}{suffix}"))
 
     def pwm_freq_query(self,pin,*,bound=None):
-        return self._pin_numeric_query("IO:PWM:FREQ",pin,bound)
+        return self._pin_numeric_query(command_spec("IOConfigSubsystem.pwm_freq_query").header,pin,bound)
 
     def pwm_duty_query(self,pin):
-        raw = self._p.query_scpi(f"IO:PWM:DUTY? {self._pin_index(pin)}")
+        raw = execute_parameterized(self._p, "IOConfigSubsystem.pwm_duty_query", f"{self._pin_index(pin)}")
         duty = parse_int(raw)
         if not 0 <= duty <= 100:
             raise ResponseParseError("invalid duty cycle",raw=raw)
         return duty
 
     def pulse_width_query(self,pin,*,bound=None):
-        return self._pin_numeric_query("IO:PULS:WIDT",pin,bound)
+        return self._pin_numeric_query(command_spec("IOConfigSubsystem.pulse_width_query").header,pin,bound)
 
     def pulse_width_set(self,pin,seconds):
         pin = self._pin_index(pin)
@@ -120,7 +121,7 @@ class IOConfigSubsystem:
             hi = self.pulse_width_query(pin,bound="MAX")
             if not 0 <= lo <= seconds <= hi:
                 raise ConfigurationError("pulse width outside reported range")
-            self._p.write_scpi(f"IO:PULS:WIDT {pin},{seconds}")
+            execute_parameterized(self._p, "IOConfigSubsystem.pulse_width_set", f"{pin},{seconds}")
 
     def _function_token(self,pin,function):
         token = self._FUNCTION_ALIASES.get(function.upper()) if isinstance(function,str) else None
@@ -133,11 +134,11 @@ class IOConfigSubsystem:
         token = self._function_token(pin,function)
         # Use guide long forms for pin-specific tokens.
         wire = {"PSCL":"PSClear","PSST":"PSSTa","OFFS":"OFFSta","EXTT":"EXTTrig"}.get(token,token)
-        self._p.write_scpi(f"IO:TYPE {pin},{wire}")
+        execute_parameterized(self._p, "IOConfigSubsystem.pin_function_set", f"{pin},{wire}")
 
     def pin_function_query(self,pin):
         pin = self._pin_index(pin)
-        raw = self._p.query_scpi(f"IO:TYPE? {pin}")
+        raw = execute_parameterized(self._p, "IOConfigSubsystem.pin_function_query", f"{pin}")
         try:
             return self._function_token(pin,raw.strip())
         except ConfigurationError as exc:
@@ -156,22 +157,22 @@ class IOConfigSubsystem:
         return raw
 
     def trigger_type_set(self,value):
-        self._trigger_enum("IO:TRIG:TYPE",value,("TIN","TOUT"))
+        self._trigger_enum(command_spec("IOConfigSubsystem.trigger_type_set").header,value,("TIN","TOUT"))
 
     def trigger_type_query(self):
-        return self._trigger_query("IO:TRIG:TYPE",("TIN","TOUT"))
+        return self._trigger_query(command_spec("IOConfigSubsystem.trigger_type_query").header,("TIN","TOUT"))
 
     def trigger_source_set(self,value):
-        self._trigger_enum("IO:TRIG:SOUR",value,("METER","DLOG","LIST"))
+        self._trigger_enum(command_spec("IOConfigSubsystem.trigger_source_set").header,value,("METER","DLOG","LIST"))
 
     def trigger_source_query(self):
-        return self._trigger_query("IO:TRIG:SOUR",("METER","DLOG","LIST"))
+        return self._trigger_query(command_spec("IOConfigSubsystem.trigger_source_query").header,("METER","DLOG","LIST"))
 
     def output_level_set(self,pin,high):
         pin = self._pin_index(pin)
         if type(high) not in (bool,int) or high not in (0,1):
             raise ConfigurationError("output level must be bool or 0/1")
-        self._p.write_scpi(f"IO:OUTP:LEV {pin},{int(high)}")
+        execute_parameterized(self._p, "IOConfigSubsystem.output_level_set", f"{pin},{int(high)}")
 
     def _level_query(self,header,pin):
         raw = self._p.query_scpi(f"{header}? {self._pin_index(pin)}").strip().upper()
@@ -182,7 +183,7 @@ class IOConfigSubsystem:
         raise ResponseParseError("invalid digital level response",raw=raw)
 
     def output_level_query(self,pin):
-        return self._level_query("IO:OUTP:LEV",pin)
+        return self._level_query(command_spec("IOConfigSubsystem.output_level_query").header,pin)
 
     def input_level_query(self,pin):
-        return self._level_query("IO:INP:LEV",pin)
+        return self._level_query(command_spec("IOConfigSubsystem.input_level_query").header,pin)
