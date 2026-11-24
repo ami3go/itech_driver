@@ -25,6 +25,18 @@ from importlib.metadata import metadata, version
 from itech_driver import __version__
 assert __version__ == version("itech-itm3900d-driver")
 assert metadata("itech-itm3900d-driver")["Requires-Python"] == ">=3.10"
+from itech_driver import connect_vcp
+from scpi_driver_core import ConfigurationError
+# No backend is installed (asserted above), so neither path can open hardware.
+for operation, expected in ((lambda: ITM3900D("GPIB0::1::INSTR"), "PyVISA"),
+                            (lambda: connect_vcp("loop://"), "pyserial")):
+    try:
+        operation()
+    except ConfigurationError as exc:
+        assert expected in str(exc) and "install" in str(exc)
+    else:
+        raise AssertionError("missing optional backend was not reported")
+
 """], check=True, cwd=tmp)
 
     subprocess.run([str(python), "-c", """

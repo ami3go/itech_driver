@@ -5,7 +5,13 @@ ITECH IT-M3900D high-power DC supply command wrappers using
 
 Python 3.10+. Install with `python -m pip install -e '.[test]'` from a clone.
 The dependency is pinned to a reviewed core commit; Git and GitHub access are required.
-A VISA backend is needed for real instruments (e.g. vendor VISA); tests use only local simulators.
+VISA is optional: install `.[visa]` for VISA resources, `.[serial]` for VCP,
+or `.[discovery]` for discovery extras. Native TCP and the injected simulator
+require neither PyVISA nor pyserial. Tests use only local simulators/loopback.
+The installed distribution metadata is the sole release version source;
+a bare source tree with dependencies available but no installed driver
+metadata reports `0+unknown` rather than an invented release number.
+Install the project (editable or wheel) to obtain the authoritative version.
 
 ## Public API
 

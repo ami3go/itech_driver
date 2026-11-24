@@ -26,9 +26,13 @@ from .subsystems.InitiateSubsystem import InitiateSubsystem
 from .subsystems.AbortSubsystem import AbortSubsystem
 
 
-from importlib.metadata import version as _distribution_version
+from importlib.metadata import PackageNotFoundError, version as _distribution_version
 
-__version__ = _distribution_version("itech-itm3900d-driver")
+try:
+    __version__ = _distribution_version("itech-itm3900d-driver")
+except PackageNotFoundError:
+    # A bare source tree has no authoritative installed release metadata.
+    __version__ = "0+unknown"
 __all__ = [
     # Base classes
     'BaseInstrument',
