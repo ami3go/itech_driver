@@ -65,20 +65,29 @@ def control_instrument(args) -> None:
         with instr:
             print(f"Connected to: {instr.identify()}")
 
-            if args.voltage is not None:
-                instr.source.voltage_set(args.voltage)
-                print(f"Set voltage to {args.voltage}V")
+            if args.voltage is not None or args.current is not None or args.output is not None:
+                from .instruments import ITM3900D
+                if not isinstance(instr, ITM3900D):
+                    raise ValueError("setting changes require an identified IT-M3900D")
+                from .identity import is_itm3900d
+                from scpi_driver_core.scpi.parsers import parse_identity
+                if not is_itm3900d(parse_identity(instr.identify())):
+                    raise ValueError("instrument identity does not match IT-M3900D")
+                with instr.remote_mode():
+                    if args.voltage is not None:
+                        instr.source.voltage_set(args.voltage)
+                        print(f"Set voltage to {args.voltage}V")
 
-            if args.current is not None:
-                instr.source.current_set(args.current)
-                print(f"Set current to {args.current}A")
+                    if args.current is not None:
+                        instr.source.current_set(args.current)
+                        print(f"Set current to {args.current}A")
 
-            if args.output == 'on':
-                instr.output.state_set(True)
-                print("Output enabled")
-            elif args.output == 'off':
-                instr.output.state_set(False)
-                print("Output disabled")
+                    if args.output == 'on':
+                        instr.output.state_set(True)
+                        print("Output enabled")
+                    elif args.output == 'off':
+                        instr.output.state_set(False)
+                        print("Output disabled")
 
             # Read back values
             voltage = instr.source.voltage_query()
