@@ -26,7 +26,9 @@ from .subsystems.InitiateSubsystem import InitiateSubsystem
 from .subsystems.AbortSubsystem import AbortSubsystem
 
 
-__version__ = "0.2.0"
+from importlib.metadata import version as _distribution_version
+
+__version__ = _distribution_version("itech-itm3900d-driver")
 __all__ = [
     # Base classes
     'BaseInstrument',
@@ -55,3 +57,12 @@ __all__ = [
     'IOConfigSubsystem',
     'IEEE488',
 ]
+
+from .tcp import connect_tcp
+__all__.append('connect_tcp')
+
+from .vcp import connect_vcp
+__all__.append('connect_vcp')
+
+from .discovery import discover_instruments
+__all__.append('discover_instruments')

@@ -1,0 +1,3 @@
+# Command registry — initial inventory (#71)
+
+`command_registry.json` records the existing 11 subsystem APIs at the baseline commit, including command expressions, reference status and separate offline/HIL status. Indexed text establishes candidate syntax only, not physical compliance; the exact guide revision and page images remain unconfirmed. Do not interpret an unverified entry as supported. Raw transport methods and unimplemented guide commands are outside this initial inventory. Update the registry in each command-correction PR. The AST test enforces method coverage, not correctness. Remaining work: full guide command catalogue, revision, arguments/ranges, responses, model applicability, side effects and per-command test evidence.
