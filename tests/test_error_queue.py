@@ -5,7 +5,7 @@ from itech_driver import ITM3900D
 
 
 def test_error_checking_is_opt_in_and_never_replays_write():
-    t = ScriptedScpiTransport().on("*TRG")
+    t = ScriptedScpiTransport(error_query="SYST:SIMERR?").on("*TRG")
     replies = iter(['-113,"Undefined header"', '0,"No error"'])
     t.on("SYST:ERR?", lambda _: next(replies))
     with ITM3900D("sim", transport=t) as d:
@@ -22,7 +22,7 @@ def test_error_checking_is_opt_in_and_never_replays_write():
 
 
 def test_explicit_drain_and_limit():
-    t = ScriptedScpiTransport().on("SYST:ERR?", '-222,"Data out of range"')
+    t = ScriptedScpiTransport(error_query="SYST:SIMERR?").on("SYST:ERR?", '-222,"Data out of range"')
     with ITM3900D("sim", transport=t) as d:
         with pytest.raises(ConfigurationError):
             d.drain_scpi_errors(max_entries=0)
@@ -34,13 +34,13 @@ def test_explicit_drain_and_limit():
 
 
 def test_malformed_queue_reply():
-    t = ScriptedScpiTransport().on("SYST:ERR?", "invalid")
+    t = ScriptedScpiTransport(error_query="SYST:SIMERR?").on("SYST:ERR?", "invalid")
     with ITM3900D("sim", transport=t) as d, pytest.raises(ScpiErrorQueueError):
         d.drain_scpi_errors()
 
 
 def test_clean_queue():
-    t = ScriptedScpiTransport().on("SYST:ERR?", '0,"No error"')
+    t = ScriptedScpiTransport(error_query="SYST:SIMERR?").on("SYST:ERR?", '0,"No error"')
     with ITM3900D("sim", transport=t) as d:
         assert d.drain_scpi_errors() == []
         assert t.history == ["SYST:ERR?"]
