@@ -58,3 +58,6 @@ __all__ = [
 
 from .tcp import connect_tcp
 __all__.append('connect_tcp')
+
+from .vcp import connect_vcp
+__all__.append('connect_vcp')
