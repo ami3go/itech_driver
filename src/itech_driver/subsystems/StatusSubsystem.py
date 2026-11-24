@@ -41,16 +41,16 @@ class StatusSubsystem:
 
     # Standard event - Corrected: SETR should be ESET
     def std_event_enable_set(self, mask: int):
-        self._p.write_scpi(f'*ESE {int(mask)}')  # Standard IEEE command
+        return self._p._invoke_ieee(self._p.session.ieee488.set_event_status_enable, mask, write=True)
 
     def std_event_enable_query(self) -> int:  # Added: Missing query method
-        return parse_int(self._p.query_scpi('*ESE?'))
+        return self._p._invoke_ieee(self._p.session.ieee488.query_event_status_enable)
 
     def std_event_register_query(self) -> int:  # Added: Standard event register query
-        return parse_int(self._p.query_scpi('*ESR?'))
+        return self._p._invoke_ieee(self._p.session.ieee488.read_event_status)
 
     def status_byte(self) -> int:
-        return parse_int(self._p.query_scpi('*STB?'))
+        return self._p._invoke_ieee(self._p.session.ieee488.query_status_byte)
 
 
     def _mask_set(self, header: str, mask: int):

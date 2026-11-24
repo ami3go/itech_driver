@@ -135,6 +135,19 @@ class ITM3900D(BaseInstrument):
         if self.require_remote and self.requested_mode != "remote":
             raise SafetyGuardError("explicit enter_remote() required before writes")
 
+    def _invoke_ieee(self, operation, *args, write=False, invalidate=False):
+        with self.session.operation_lock():
+            if write:
+                self._assert_write_authorized()
+            try:
+                result = super()._invoke_ieee(operation, *args, write=write, invalidate=invalidate)
+            except ScpiDriverError:
+                self._invalidate_mode()
+                raise
+            if invalidate:
+                self._invalidate_mode()
+            return result
+
     def write_scpi(self, cmd):
         with self.session.operation_lock():
             normalized = cmd.strip().upper().lstrip(":")

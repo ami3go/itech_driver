@@ -158,8 +158,20 @@ class BaseInstrument:
         except TransportError as exc:
             raise CommandError(str(exc)) from exc
 
+    def _invoke_ieee(self, operation, *args, write=False, invalidate=False):
+        """Delegate common commands while preserving driver policy and errors."""
+        with self.session.operation_lock():
+            if write:
+                self._assert_write_authorized()
+            try:
+                return operation(*args)
+            except ScpiTimeoutError as exc:
+                raise TimeoutError(str(exc)) from exc
+            except TransportError as exc:
+                raise CommandError(str(exc)) from exc
+
     def identify(self) -> str:
-        return self.query_scpi("*IDN?")
+        return self._invoke_ieee(self.session.ieee488.identify_raw).strip()
 
     def close(self) -> None:
         self.session.close()
