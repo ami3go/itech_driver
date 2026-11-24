@@ -34,7 +34,7 @@ def test_exact_command_coverage():
     commands = [
         "SOUR1:VOLT 12.5", "OUTP1:STAT OFF", "ARB:FUNCTION:SHAPE UDEF",
         "BATT:CHAR:VOLT 3.5", "IO:SELect 1", "TRIG:ACQ:SOUR EXT",
-        "TRIG:ACQ", "INITiate:ARB", "ABORt:ARB", "*CLS",
+        "INIT:ACQ", "INITiate:ARB", "ABORt:ARB", "*CLS",
     ]
     for command in commands:
         t.on(command)
