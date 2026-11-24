@@ -1,36 +1,35 @@
-from scpi_driver_core.scpi.parsers import parse_int
+"""Legacy IEEE common-command API; the shared core owns commands and parsers."""
 from typing import Optional
-from ..base import  BaseInstrument, BoolLike, Number
-# -------------------------
-# IEEE-488 Common Commands
-# -------------------------
+from ..base import BaseInstrument
+
+
 class IEEE488:
-    """Common IEEE commands: *IDN?, *RST, *OPC, *TST? etc."""
     def __init__(self, parent: BaseInstrument):
         self._p = parent
 
     def idn(self) -> str:
-        return self._p.query_scpi('*IDN?')
+        return self._p.identify()
 
     def reset(self):
-        self._p.write_scpi('*RST')
+        return self._p._invoke_ieee(self._p.session.ieee488.reset, write=True, invalidate=True)
 
     def clear_status(self):
-        self._p.write_scpi('*CLS')
+        return self._p._invoke_ieee(self._p.session.ieee488.clear_status, write=True)
 
     def opc(self, wait: bool = False) -> Optional[str]:
+        ieee = self._p.session.ieee488
         if wait:
-            return self._p.query_scpi('*OPC?')
-        self._p.write_scpi('*OPC')
+            return self._p._invoke_ieee(ieee.operation_complete_raw).strip()
+        return self._p._invoke_ieee(ieee.set_operation_complete, write=True)
 
     def self_test(self) -> int:
-        return parse_int(self._p.query_scpi('*TST?'))
+        return self._p._invoke_ieee(self._p.session.ieee488.self_test).code
 
     def trigger(self):
-        self._p.write_scpi('*TRG')
+        return self._p._invoke_ieee(self._p.session.ieee488.trigger, write=True)
 
     def save(self, slot: int):
-        self._p.write_scpi(f'*SAV {int(slot)}')
+        return self._p._invoke_ieee(self._p.session.ieee488.save, slot, write=True)
 
     def recall(self, slot: int):
-        self._p.write_scpi(f'*RCL {int(slot)}')
+        return self._p._invoke_ieee(self._p.session.ieee488.recall, slot, write=True, invalidate=True)

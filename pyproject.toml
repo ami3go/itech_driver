@@ -9,7 +9,7 @@ description = "ITECH IT-M3900D SCPI driver built on scpi-driver-core"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "scpi-driver-core @ git+https://github.com/ami3go/scpi-driver-core.git@726c0b01b81c1dd1828e49cc8e531f58910538f5",
+    "scpi-driver-core @ git+https://github.com/ami3go/scpi-driver-core.git@34b0d750558de628349160150091f1fd45badf76",
 ]
 
 [project.urls]
