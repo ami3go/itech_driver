@@ -1,0 +1,28 @@
+name: Ordered offline integration audit
+on:
+  pull_request:
+    paths:
+      - 'tools/audit_integration.py'
+      - '.github/workflows/integration-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  merge-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Freeze and audit selected PR refs
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+        run: python tools/audit_integration.py --base "$BASE_SHA" --output integration-audit.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-audit
+          path: integration-audit.json
+          if-no-files-found: error
