@@ -90,7 +90,7 @@ class ArbSubsystem:
         self._p.write_scpi(f'ARB:RECall {_slot(index)}')
 
     def init(self):
-        self._p.write_scpi('INITiate:ARB')
+        return self._p.initiate.arb()
 
     def trigger(self):
         self._p.write_scpi('TRIGger:ARB')
@@ -102,7 +102,7 @@ class ArbSubsystem:
         return parse_bool(self._p.query_scpi('ARB:PAUSe:STATe?'))
 
     def abort(self):
-        self._p.write_scpi('ABORt:ARB')
+        return self._p.abort.arb()
 
     def state_query(self) -> str:
         """Return raw execution status; do not infer completion or output state.
