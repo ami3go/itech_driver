@@ -2,6 +2,7 @@ from scpi_driver_core import ConfigurationError, ResponseParseError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float, parse_int
 from typing import Optional
 from ..base import  BaseInstrument, BoolLike, Number
+from ..utils.validation import validate_channel, strict_bool
 # -------------------------
 # Output Subsystem (OUTPut)
 # -------------------------
@@ -12,13 +13,11 @@ class OutputSubsystem:
 
     @staticmethod
     def _check_channel(channel: int) -> None:
-        if type(channel) is not int or channel != 1:
-            raise ConfigurationError("IT-M3900D output is unnumbered; channel must be 1")
+        validate_channel(channel, 1)
 
     def state_set(self, on: BoolLike, channel: int = 1):
         self._check_channel(channel)
-        if type(on) not in (bool, int) or on not in (0, 1):
-            raise ConfigurationError("output state must be bool or 0/1")
+        on = strict_bool(on, "output state")
         self._p.write_scpi(f'OUTP:STAT {"ON" if on else "OFF"}')
 
     def state_query(self, channel: int = 1) -> bool:
@@ -48,8 +47,7 @@ class OutputSubsystem:
 
     def watchdog_set(self, enable: BoolLike, delay_s: Optional[int] = None):
         """Set delay and verify readback before enabling; never infer physical output state."""
-        if type(enable) not in (bool, int) or enable not in (0, 1):
-            raise ConfigurationError("watchdog state must be bool or 0/1")
+        enable = strict_bool(enable, "watchdog state")
         if delay_s is not None and (type(delay_s) is not int or not 1 <= delay_s <= 3600):
             raise ConfigurationError("watchdog delay must be an integer in 1..3600 seconds")
         with self._p.session.operation_lock():
