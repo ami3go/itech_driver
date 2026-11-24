@@ -7,7 +7,7 @@ from .instruments import ITM3900D
 DEFAULT_TCP_PORT = 30000
 
 
-def connect_tcp(host: str, port: int = DEFAULT_TCP_PORT, *, timeout: int = 5000) -> ITM3900D:
+def connect_tcp(host: str, port: int = DEFAULT_TCP_PORT, *, timeout: int = 5000, require_remote: bool = False) -> ITM3900D:
     """Open an explicit endpoint, with no identification or output command."""
     if not isinstance(host, str) or not host.strip():
         raise ConfigurationError("host is required")
@@ -16,4 +16,4 @@ def connect_tcp(host: str, port: int = DEFAULT_TCP_PORT, *, timeout: int = 5000)
     if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or timeout <= 0:
         raise ConfigurationError("timeout must be positive finite milliseconds")
     transport = TcpTransport(host, port, connect_timeout_s=timeout / 1000, timeout_s=timeout / 1000)
-    return ITM3900D(f"tcp://{host}:{port}", timeout=timeout, transport=transport)
+    return ITM3900D(f"tcp://{host}:{port}", timeout=timeout, transport=transport, require_remote=require_remote)
