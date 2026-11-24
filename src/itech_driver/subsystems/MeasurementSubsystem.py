@@ -1,5 +1,5 @@
 """Fresh DC measurements, independent of programmed setpoints."""
-from ._arrays import ascii_array_query
+from ._arrays import ascii_array_query, binary_array_query
 from scpi_driver_core.scpi.parsers import parse_float
 
 
@@ -54,3 +54,21 @@ class MeasurementSubsystem:
 
     def power_array_query(self, *, ascii_confirmed: bool = False, expected_points: int | None = None) -> list[float]:
         return ascii_array_query(self._p, "MEAS:ARR:POW?", ascii_confirmed=ascii_confirmed, expected_points=expected_points)
+
+    def voltage_binary_array_query(self, *, datatype: str, byte_order: str, expected_points: int,
+                                   binary_confirmed: bool = False, consume_terminator: bool):
+        return binary_array_query(self._p, "MEAS:ARR:VOLT?", datatype=datatype,
+                                  byte_order=byte_order, expected_points=expected_points,
+                                  binary_confirmed=binary_confirmed, consume_terminator=consume_terminator)
+
+    def current_binary_array_query(self, *, datatype: str, byte_order: str, expected_points: int,
+                                   binary_confirmed: bool = False, consume_terminator: bool):
+        return binary_array_query(self._p, "MEAS:ARR:CURR?", datatype=datatype,
+                                  byte_order=byte_order, expected_points=expected_points,
+                                  binary_confirmed=binary_confirmed, consume_terminator=consume_terminator)
+
+    def power_binary_array_query(self, *, datatype: str, byte_order: str, expected_points: int,
+                                   binary_confirmed: bool = False, consume_terminator: bool):
+        return binary_array_query(self._p, "MEAS:ARR:POW?", datatype=datatype,
+                                  byte_order=byte_order, expected_points=expected_points,
+                                  binary_confirmed=binary_confirmed, consume_terminator=consume_terminator)
