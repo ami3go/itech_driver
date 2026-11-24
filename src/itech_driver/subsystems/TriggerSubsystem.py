@@ -1,3 +1,4 @@
+import math
 from scpi_driver_core import ConfigurationError, ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_float
 from ..base import  BaseInstrument, BoolLike, Number
@@ -84,11 +85,31 @@ class TriggerSubsystem:
     def source_query(self) -> str:
         raise UnsupportedOperationError("select an explicit ACQ, ARB, DLOG or ELOG trigger source")
 
+    @staticmethod
+    def _numeric_arg(value: Number) -> str:
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+            raise ConfigurationError("trigger level must be a finite real number")
+        if value < 0:
+            raise ConfigurationError("trigger level must be nonnegative")
+        return str(value)
+
+    def acquire_voltage_level_set(self, value: Number):
+        self._p.write_scpi(f"TRIG:ACQ:VOLT:LEV {self._numeric_arg(value)}")
+
+    def acquire_voltage_level_query(self) -> float:
+        return parse_float(self._p.query_scpi("TRIG:ACQ:VOLT:LEV?"))
+
+    def acquire_current_level_set(self, value: Number):
+        self._p.write_scpi(f"TRIG:ACQ:CURR:LEV {self._numeric_arg(value)}")
+
+    def acquire_current_level_query(self) -> float:
+        return parse_float(self._p.query_scpi("TRIG:ACQ:CURR:LEV?"))
+
     def level_set(self, val: Number):
-        self._p.write_scpi(f'TRIG:LEV {val}')
+        raise UnsupportedOperationError("select explicit acquisition voltage or current level")
 
     def level_query(self) -> float:
-        return parse_float(self._p.query_scpi('TRIG:LEV?'))
+        raise UnsupportedOperationError("select explicit acquisition voltage or current level")
 
     def delay_set(self, seconds: Number):
         self._p.write_scpi(f'TRIG:DEL {seconds}')
