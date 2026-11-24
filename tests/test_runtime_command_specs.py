@@ -45,7 +45,12 @@ def test_runtime_specs_are_subset_of_complete_inventory():
     registry = Path(__file__).resolve().parents[1] / "docs" / "command_registry.json"
     methods = {e["method"] for e in json.loads(registry.read_text(encoding="utf-8"))["entries"]}
     assert set(COMMAND_SPECS) <= methods
-    assert all(s.replay == "never" and s.guide_status == "unverified" for s in COMMAND_SPECS.values())
+    assert all(s.replay == "never" for s in COMMAND_SPECS.values())
+    # Guide evidence may be indexed, but must never imply firmware qualification.
+    assert all(s.guide_status in ("unverified", "indexed_text_reference")
+               for s in COMMAND_SPECS.values())
+    assert all((s.guide_page is not None) == (s.guide_status == "indexed_text_reference")
+               for s in COMMAND_SPECS.values())
 
 
 def test_destructive_queries_and_void_writes_registry_preserve_wire():
