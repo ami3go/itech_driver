@@ -1,34 +1,39 @@
-"""Logging configuration."""
+"""Logging configuration without taking ownership of caller handlers."""
 
 import logging
 import sys
 from pathlib import Path
+from threading import RLock
+
+_LOCK = RLock()
+_OWNER = "_itech_driver_setup_owned"
 
 
-def setup_logging(level: int = logging.INFO, log_file: Optional[str] = None) -> None:
-    """Setup logging configuration."""
-    logger = logging.getLogger('itech_driver')
-    logger.setLevel(level)
+def setup_logging(level: int = logging.INFO, log_file: str | Path | None = None) -> None:
+    """Replace only handlers installed by this helper; caller handlers are retained.
 
-    # Remove existing handlers
-    for handler in logger.handlers[:]:
-        logger.removeHandler(handler)
-
-    # Create formatter
-    formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-
-    # Console handler
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
-    # File handler
-    if log_file:
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-
-    # Prevent propagation to root logger
-    logger.propagate = False
+    If opening a new file fails, preserve the existing configuration.
+    """
+    logger = logging.getLogger("itech_driver")
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    with _LOCK:
+        handlers: list[logging.Handler] = []
+        try:
+            handlers.append(logging.StreamHandler(sys.stdout))
+            if log_file is not None:
+                handlers.append(logging.FileHandler(log_file))
+            for handler in handlers:
+                handler.setFormatter(formatter)
+                setattr(handler, _OWNER, True)
+            logger.setLevel(level)
+        except BaseException:
+            for handler in handlers:
+                handler.close()
+            raise
+        for handler in logger.handlers[:]:
+            if getattr(handler, _OWNER, False) is True:
+                logger.removeHandler(handler)
+                handler.close()
+        for handler in handlers:
+            logger.addHandler(handler)
+        logger.propagate = False
