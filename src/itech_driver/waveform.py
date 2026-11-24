@@ -91,3 +91,40 @@ class Sine:
         amplitude = pp if amplitude_convention == "peak_to_peak" else pp / 2
         return (f"ARB:SIN:AMPL {amplitude}", f"ARB:SIN:OFFS {offset}",
                 f"ARB:SIN:FREQ {freq}")
+
+
+@dataclass(frozen=True)
+class Sweep:
+    peak_to_peak: float
+    offset: float
+    start_hz: float
+    end_hz: float
+    step_hz: float
+    step_width_s: float
+
+    def commands(self, envelope: Envelope, *, min_frequency_hz: float,
+                 max_frequency_hz: float, amplitude_convention: str,
+                 max_steps: int) -> tuple[str,...]:
+        """Candidate setter plan, no implicit execution or cycle conversion."""
+        if type(max_steps) is not int or max_steps < 2:
+            raise ConfigurationError("explicit positive step budget required")
+        start = number(self.start_hz,"start frequency",positive=True)
+        end = number(self.end_hz,"end frequency",positive=True)
+        step = number(self.step_hz,"frequency increment",positive=True)
+        if end <= start or step > end-start:
+            raise ConfigurationError("require increasing sweep and bounded step")
+        ratio = (end-start)/step
+        if not math.isfinite(ratio) or ratio > max_steps-1:
+            raise ConfigurationError("sweep exceeds step budget")
+        sine = Sine(self.peak_to_peak,self.offset,start).commands(
+            envelope,min_frequency_hz=min_frequency_hz,
+            max_frequency_hz=max_frequency_hz,amplitude_convention=amplitude_convention)
+        Sine(self.peak_to_peak,self.offset,end).commands(
+            envelope,min_frequency_hz=min_frequency_hz,
+            max_frequency_hz=max_frequency_hz,amplitude_convention=amplitude_convention)
+        width = envelope.duration(self.step_width_s)
+        number(width,"step width",positive=True)
+        return (sine[0].replace("ARB:SIN:","ARB:SWE:"),
+                sine[1].replace("ARB:SIN:","ARB:SWE:"),
+                f"ARB:SWE:STAR {start}",f"ARB:SWE:END {end}",
+                f"ARB:SWE:STEP:LEV {step}",f"ARB:SWE:STEP:WIDT {width}")
