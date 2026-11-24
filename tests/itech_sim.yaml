@@ -5,6 +5,12 @@ devices:
       GPIB INSTR:
         q: "\n"
         r: "\n"
+      USB INSTR:
+        q: "\n"
+        r: "\n"
+      TCPIP INSTR:
+        q: "\n"
+        r: "\n"
     dialogues:
       - q: "*IDN?"
         r: "ITECH,IT-M3900D,SIM001,1.0"
@@ -25,4 +31,8 @@ devices:
           type: float
 resources:
   GPIB::9::INSTR:
+    device: itech
+  USB::0x1234::0x5678::SIM001::INSTR:
+    device: itech
+  TCPIP::127.0.0.1::inst0::INSTR:
     device: itech
