@@ -1,6 +1,6 @@
 import math
 import warnings
-from scpi_driver_core import ConfigurationError, UnsupportedOperationError
+from scpi_driver_core import ConfigurationError, ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
@@ -11,19 +11,36 @@ class SourceSubsystem:
     def __init__(self, parent: BaseInstrument):
         self._p = parent
 
+    _FUNCTIONS = {"VOLT": "VOLT", "VOLTAGE": "VOLT", "CURR": "CURR", "CURRENT": "CURR"}
+    _MODES = {"FIX": "FIX", "FIXED": "FIX", "LIST": "LIST", "BATT": "BATT", "BATTERY": "BATT"}
+
+    @staticmethod
+    def _enum_arg(value, allowed):
+        token = allowed.get(value.upper()) if isinstance(value, str) else None
+        if token is None:
+            raise ConfigurationError(f"unsupported source mode: {value!r}")
+        return token
+
+    def _enum_query(self, header, allowed):
+        raw = self._p.query_scpi(f"{header}?")
+        try:
+            return self._enum_arg(raw.strip(), allowed)
+        except ConfigurationError as exc:
+            raise ResponseParseError("invalid source mode response", raw=raw) from exc
+
     def function_set(self, mode: str):
-        """SOUR:FUNCtion VOLTage|CURRent"""
-        self._p.write_scpi(f'SOUR:FUNC {mode}')
+        """Select CV or CC priority, not a measurement of actual regulation mode."""
+        self._p.write_scpi(f"SOUR:FUNC {self._enum_arg(mode, self._FUNCTIONS)}")
 
     def function_query(self) -> str:
-        return self._p.query_scpi('SOUR:FUNC?')
+        return self._enum_query("SOUR:FUNC", self._FUNCTIONS)
 
     def function_mode_set(self, mode: str):
-        """SOUR:FUNCtion:MODE FIXed|TRANsient etc."""
-        self._p.write_scpi(f'SOUR:FUNC:MODE {mode}')
+        """Select fixed, list, or battery operation. Does not initiate or trigger."""
+        self._p.write_scpi(f"SOUR:FUNC:MODE {self._enum_arg(mode, self._MODES)}")
 
     def function_mode_query(self) -> str:
-        return self._p.query_scpi('SOUR:FUNC:MODE?')
+        return self._enum_query("SOUR:FUNC:MODE", self._MODES)
 
     @staticmethod
     def _check_channel(channel: int) -> None:
@@ -165,7 +182,7 @@ class SourceSubsystem:
 
     # Advanced: transient / dynamic function interface
     def transient_mode_set(self, mode: str):
-        self._p.write_scpi(f'SOUR:FUNC:MODE {mode}')
+        self.function_mode_set(mode)
 
     def transient_mode_query(self) -> str:
-        return self._p.query_scpi('SOUR:FUNC:MODE?')
+        return self.function_mode_query()
