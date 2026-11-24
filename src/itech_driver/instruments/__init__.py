@@ -77,8 +77,14 @@ def auto_detect_instrument(resource_name: str, **kwargs) -> BaseInstrument:
         identity = parse_identity(temp.identify())
         if not is_itm3900d(identity):
             return temp
-    except BaseException:
-        temp.close()
+    except BaseException as primary:
+        try:
+            temp.close()
+        except BaseException as cleanup:
+            # Preserve identification failure on Python 3.10 as well as 3.11+.
+            primary.cleanup_error = cleanup
+            if hasattr(primary, 'add_note'):
+                primary.add_note(f'temporary identification session close failed: {cleanup!r}')
         raise
     temp.close()
     return ITM3900D(resource_name, **kwargs)
