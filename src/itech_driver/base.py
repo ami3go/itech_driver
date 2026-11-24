@@ -71,6 +71,10 @@ class BaseInstrument:
     def client(self) -> ScpiClient:
         return self.session.client
 
+    def _assert_write_authorized(self) -> None:
+        """Policy hook for compound operations; base has no remote policy."""
+        return None
+
     def write_scpi(self, cmd: str) -> None:
         # An ambiguous write must never be replayed automatically.
         try:

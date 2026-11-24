@@ -149,6 +149,7 @@ class SourceSubsystem:
     def _limit_set(self, header, value):
         self._check_setpoint(value)
         with self._p.session.operation_lock():
+            self._p._assert_write_authorized()
             minimum = self._limit_query(header, "MIN")
             maximum = self._limit_query(header, "MAX")
             if not 0 <= minimum <= maximum or not minimum <= value <= maximum:

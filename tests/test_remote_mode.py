@@ -7,7 +7,8 @@ from itech_driver.exceptions import TimeoutError
 
 def fixture():
     return (ScriptedScpiTransport().on("SYST:REM").on("SYST:LOC")
-            .on("SOUR1:VOLT 1").on("*IDN?", "ITECH,IT-M3900D,SIM,1")
+            .on("SOUR:VOLT? MIN", "0").on("SOUR:VOLT? MAX", "10")
+            .on("SOUR:VOLT 1").on("*IDN?", "ITECH,IT-M3900D,SIM,1")
             .on("*RST"))
 
 
@@ -22,7 +23,7 @@ def test_remote_guard_and_context_order():
             assert d.requested_mode == "remote"
             d.source.voltage_set(1)
         assert d.requested_mode == "local"
-    assert t.history == ["*IDN?", "SYST:REM", "SOUR1:VOLT 1", "SYST:LOC"]
+    assert t.history == ["*IDN?", "SYST:REM", "SOUR:VOLT? MIN", "SOUR:VOLT? MAX", "SOUR:VOLT 1", "SYST:LOC"]
 
 
 def test_system_methods_and_generation():
@@ -35,6 +36,7 @@ def test_system_methods_and_generation():
         assert d.requested_mode is None
         with pytest.raises(SafetyGuardError):
             d.source.voltage_set(1)
+        assert t.history == ["SYST:REM"]
         d.system.remote()
         d.ieee.reset()
         assert d.requested_mode is None
@@ -60,6 +62,41 @@ def test_failed_remote_never_enables_guard():
         with pytest.raises(TimeoutError):
             d.enter_remote()
         assert d.requested_mode is None
+        assert t.state.name == "FAULTED"
         with pytest.raises(SafetyGuardError):
             d.source.voltage_set(1)
+        with pytest.raises(SafetyGuardError):
+            d.output.state_set(True)
+        assert t.state.name == "FAULTED"
+        assert t.history == ["SYST:REM"]
+        d.session.close()
+        d.session.open()
+        assert d.requested_mode is None
+        with pytest.raises(SafetyGuardError):
+            d.output.state_set(True)
     assert t.history == ["SYST:REM"]
+
+
+def test_missing_range_terminator_invalidates_remote_authorization():
+    t = fixture().on("SOUR:VOLT? MIN", b"0")
+    with ITM3900D("sim", transport=t, require_remote=True) as d:
+        d.enter_remote()
+        with pytest.raises(TimeoutError):
+            d.source.voltage_set(1)
+        assert d.requested_mode is None
+        assert t.state.name == "FAULTED"
+        with pytest.raises(SafetyGuardError):
+            d.output.state_set(True)
+        assert t.history == ["SYST:REM", "SOUR:VOLT? MIN"]
+
+
+def test_fragmented_range_reply_preserves_exact_order():
+    t = fixture()
+    def fragmented(_):
+        t.inner.feed(b"0")
+        return b"\n"
+    t.on("SOUR:VOLT? MIN", fragmented)
+    with ITM3900D("sim", transport=t, require_remote=True) as d:
+        d.enter_remote()
+        d.source.voltage_set(1)
+    assert t.history == ["SYST:REM", "SOUR:VOLT? MIN", "SOUR:VOLT? MAX", "SOUR:VOLT 1"]

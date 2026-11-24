@@ -7,7 +7,7 @@
     "revision": "unconfirmed",
     "page_image_status": "unavailable; indexed text only"
   },
-  "scope": "All public methods declared in the 11 existing subsystem modules. Base transport/raw API and unimplemented guide commands are not yet inventoried.",
+  "scope": "Public subsystem method inventory at phase-1 integration; not guide or capability qualification.",
   "entries": [
     {
       "method": "AbortSubsystem.acquire",
@@ -2918,6 +2918,2991 @@
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
       "hil": "not_run"
+    },
+    {
+      "method": "FetchSubsystem.current_array_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 56,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.current_binary_array_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 68,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.current_high_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 32,
+      "source_expressions": [
+        "self._p.query_scpi(\"FETC:CURR:HIGH?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.current_low_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 35,
+      "source_expressions": [
+        "self._p.query_scpi(\"FETC:CURR:LOW?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.current_max_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 38,
+      "source_expressions": [
+        "self._p.query_scpi(\"FETC:CURR:MAX?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.current_min_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 41,
+      "source_expressions": [
+        "self._p.query_scpi(\"FETC:CURR:MIN?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.current_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 29,
+      "source_expressions": [
+        "self._p.query_scpi(\"FETC:CURR?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.power_array_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 59,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.power_binary_array_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 74,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.power_max_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 47,
+      "source_expressions": [
+        "self._p.query_scpi(\"FETC:POW:MAX?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.power_min_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 50,
+      "source_expressions": [
+        "self._p.query_scpi(\"FETC:POW:MIN?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.power_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 44,
+      "source_expressions": [
+        "self._p.query_scpi(\"FETC:POW?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.voltage_array_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 53,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.voltage_binary_array_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 62,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.voltage_high_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 17,
+      "source_expressions": [
+        "self._p.query_scpi(\"FETC:VOLT:HIGH?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.voltage_low_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 20,
+      "source_expressions": [
+        "self._p.query_scpi(\"FETC:VOLT:LOW?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.voltage_max_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 23,
+      "source_expressions": [
+        "self._p.query_scpi(\"FETC:VOLT:MAX?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.voltage_min_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 26,
+      "source_expressions": [
+        "self._p.query_scpi(\"FETC:VOLT:MIN?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "FetchSubsystem.voltage_query",
+      "source": "src/itech_driver/subsystems/FetchSubsystem.py",
+      "baseline_line": 14,
+      "source_expressions": [
+        "self._p.query_scpi(\"FETC:VOLT?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.input_level_query",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 187,
+      "source_expressions": [
+        "self._level_query(\"IO:INP:LEV\",pin)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.output_level_query",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 184,
+      "source_expressions": [
+        "self._level_query(\"IO:OUTP:LEV\",pin)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.output_level_set",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 170,
+      "source_expressions": [
+        "self._pin_index(pin)",
+        "self._p.write_scpi(f\"IO:OUTP:LEV {pin},{int(high)}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.pin_function_query",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 138,
+      "source_expressions": [
+        "self._pin_index(pin)",
+        "self._p.query_scpi(f\"IO:TYPE? {pin}\")",
+        "self._function_token(pin,raw.strip())"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.pin_function_set",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 131,
+      "source_expressions": [
+        "self._pin_index(pin)",
+        "self._function_token(pin,function)",
+        "self._p.write_scpi(f\"IO:TYPE {pin},{wire}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.pulse_width_query",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 111,
+      "source_expressions": [
+        "self._pin_numeric_query(\"IO:PULS:WIDT\",pin,bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.pulse_width_set",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 114,
+      "source_expressions": [
+        "self._pin_index(pin)",
+        "self.pulse_width_query(pin,bound=\"MIN\")",
+        "self.pulse_width_query(pin,bound=\"MAX\")",
+        "self._p.write_scpi(f\"IO:PULS:WIDT {pin},{seconds}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.pwm_duty_query",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 104,
+      "source_expressions": [
+        "self._p.query_scpi(f\"IO:PWM:DUTY? {self._pin_index(pin)}\")",
+        "self._pin_index(pin)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.pwm_enable_query",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 91,
+      "source_expressions": [
+        "self._p.query_scpi(f\"IO:PWM? {self._pin_index(pin)}\")",
+        "self._pin_index(pin)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.pwm_freq_query",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 101,
+      "source_expressions": [
+        "self._pin_numeric_query(\"IO:PWM:FREQ\",pin,bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.reverse_query",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 88,
+      "source_expressions": [
+        "self._p.query_scpi(f\"IO:REVE? {self._pin_index(pin)}\")",
+        "self._pin_index(pin)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.reverse_set",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 82,
+      "source_expressions": [
+        "self._pin_index(pin)",
+        "self._p.write_scpi(f\"IO:REVE {pin},{int(enabled)}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.trigger_source_query",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 167,
+      "source_expressions": [
+        "self._trigger_query(\"IO:TRIG:SOUR\",(\"METER\",\"DLOG\",\"LIST\"))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.trigger_source_set",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 164,
+      "source_expressions": [
+        "self._trigger_enum(\"IO:TRIG:SOUR\",value,(\"METER\",\"DLOG\",\"LIST\"))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.trigger_type_query",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 161,
+      "source_expressions": [
+        "self._trigger_query(\"IO:TRIG:TYPE\",(\"TIN\",\"TOUT\"))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "IOConfigSubsystem.trigger_type_set",
+      "source": "src/itech_driver/subsystems/IOConfigSubsystem.py",
+      "baseline_line": 158,
+      "source_expressions": [
+        "self._trigger_enum(\"IO:TRIG:TYPE\",value,(\"TIN\",\"TOUT\"))"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "LoggingSubsystem.commands",
+      "source": "src/itech_driver/subsystems/LoggingSubsystem.py",
+      "baseline_line": 15,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "LoggingSubsystem.raw_data_query",
+      "source": "src/itech_driver/subsystems/LoggingSubsystem.py",
+      "baseline_line": 48,
+      "source_expressions": [
+        "self._p.query_scpi(\"FETC:ELOG:ARR:DATA?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "LoggingSubsystem.state_query",
+      "source": "src/itech_driver/subsystems/LoggingSubsystem.py",
+      "baseline_line": 41,
+      "source_expressions": [
+        "self._p.query_scpi(f\"{self._kind}:STAT?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.current_array_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 52,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.current_binary_array_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 64,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.current_high_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 28,
+      "source_expressions": [
+        "self._p.query_scpi(\"MEAS:CURR:HIGH?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.current_low_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 31,
+      "source_expressions": [
+        "self._p.query_scpi(\"MEAS:CURR:LOW?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.current_max_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 34,
+      "source_expressions": [
+        "self._p.query_scpi(\"MEAS:CURR:MAX?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.current_min_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 37,
+      "source_expressions": [
+        "self._p.query_scpi(\"MEAS:CURR:MIN?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.current_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 25,
+      "source_expressions": [
+        "self._p.query_scpi(\"MEAS:CURR?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.power_array_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 55,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.power_binary_array_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 70,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.power_max_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 43,
+      "source_expressions": [
+        "self._p.query_scpi(\"MEAS:POW:MAX?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.power_min_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 46,
+      "source_expressions": [
+        "self._p.query_scpi(\"MEAS:POW:MIN?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.power_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 40,
+      "source_expressions": [
+        "self._p.query_scpi(\"MEAS:POW?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.voltage_array_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 49,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.voltage_binary_array_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 58,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.voltage_high_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 13,
+      "source_expressions": [
+        "self._p.query_scpi(\"MEAS:VOLT:HIGH?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.voltage_low_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 16,
+      "source_expressions": [
+        "self._p.query_scpi(\"MEAS:VOLT:LOW?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.voltage_max_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 19,
+      "source_expressions": [
+        "self._p.query_scpi(\"MEAS:VOLT:MAX?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.voltage_min_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 22,
+      "source_expressions": [
+        "self._p.query_scpi(\"MEAS:VOLT:MIN?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "MeasurementSubsystem.voltage_query",
+      "source": "src/itech_driver/subsystems/MeasurementSubsystem.py",
+      "baseline_line": 10,
+      "source_expressions": [
+        "self._p.query_scpi(\"MEAS:VOLT?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "OutputSubsystem.power_on_mode_query",
+      "source": "src/itech_driver/subsystems/OutputSubsystem.py",
+      "baseline_line": 92,
+      "source_expressions": [
+        "self._p.query_scpi(\"OUTP:PON:STAT?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "OutputSubsystem.power_on_mode_set",
+      "source": "src/itech_driver/subsystems/OutputSubsystem.py",
+      "baseline_line": 78,
+      "source_expressions": [
+        "self._p.write_scpi(f\"OUTP:PON:STAT {token}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SenseSubsystem.acquisition_interval_query",
+      "source": "src/itech_driver/subsystems/SenseSubsystem.py",
+      "baseline_line": 35,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SenseSubsystem.acquisition_interval_set",
+      "source": "src/itech_driver/subsystems/SenseSubsystem.py",
+      "baseline_line": 24,
+      "source_expressions": [
+        "self._p.write_scpi(f\"SENS:ACQ:TINT {interval}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SenseSubsystem.acquisition_offset_query",
+      "source": "src/itech_driver/subsystems/SenseSubsystem.py",
+      "baseline_line": 32,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SenseSubsystem.acquisition_offset_set",
+      "source": "src/itech_driver/subsystems/SenseSubsystem.py",
+      "baseline_line": 19,
+      "source_expressions": [
+        "self._p.write_scpi(f\"SENS:ACQ:OFFS:POIN {points}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SenseSubsystem.acquisition_points_query",
+      "source": "src/itech_driver/subsystems/SenseSubsystem.py",
+      "baseline_line": 29,
+      "source_expressions": [],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SenseSubsystem.acquisition_points_set",
+      "source": "src/itech_driver/subsystems/SenseSubsystem.py",
+      "baseline_line": 14,
+      "source_expressions": [
+        "self._p.write_scpi(f\"SENS:ACQ:POIN {points}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.cc_loop_speed_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 386,
+      "source_expressions": [
+        "self._enum_query(\"SOUR:CC:PRI\", {\"HIGH\": \"HIGH\", \"LOW\": \"LOW\"})"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.cc_loop_speed_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 383,
+      "source_expressions": [
+        "self._p.write_scpi(f\"SOUR:CC:PRI {self._enum_arg(speed, {'HIGH': 'HIGH', 'LOW': 'LOW'})}\")",
+        "self._enum_arg(speed, {'HIGH': 'HIGH', 'LOW': 'LOW'})"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.current_both_time_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 373,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:CURR:SLEW:BOTH\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.current_both_time_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 368,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:CURR:SLEW:BOTH\", seconds)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.current_fall_time_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 364,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:CURR:SLEW:NEG\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.current_fall_time_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 359,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:CURR:SLEW:NEG\", seconds)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.current_limit_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 171,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:CURR:LIM\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.current_limit_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 167,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:CURR:LIM\", value)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.current_rise_time_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 355,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:CURR:SLEW:POS\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.current_rise_time_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 350,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:CURR:SLEW:POS\", seconds)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.cv_loop_speed_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 380,
+      "source_expressions": [
+        "self._enum_query(\"SOUR:CV:PRI\", {\"HIGH\": \"HIGH\", \"LOW\": \"LOW\"})"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.cv_loop_speed_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 377,
+      "source_expressions": [
+        "self._p.write_scpi(f\"SOUR:CV:PRI {self._enum_arg(speed, {'HIGH': 'HIGH', 'LOW': 'LOW'})}\")",
+        "self._enum_arg(speed, {'HIGH': 'HIGH', 'LOW': 'LOW'})"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.external_coefficient_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 410,
+      "source_expressions": [
+        "self._analog_channel(channel)",
+        "self._p.query_scpi(f\"SOUR:EXT:PROG:CHAN:{coefficient}? {channel}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.external_coefficient_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 420,
+      "source_expressions": [
+        "self._analog_channel(channel)",
+        "self._p.write_scpi(f\"SOUR:EXT:PROG:CHAN:{coefficient} {channel},{value}\")",
+        "self.external_programming_query()",
+        "self._p.query_scpi(\"OUTP:STAT?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.external_programming_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 389,
+      "source_expressions": [
+        "self._p.query_scpi(\"SOUR:EXT:PROG?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.external_programming_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 392,
+      "source_expressions": [
+        "self._p.write_scpi(f\"SOUR:EXT:PROG {int(enabled)}\")",
+        "self._p.query_scpi(\"OUTP:STAT?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.ocp_delay_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 241,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:CURR:OVER:PROT:DEL\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.ocp_delay_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 237,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:CURR:OVER:PROT:DEL\", seconds)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.opp_delay_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 249,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:POW:OVER:PROT:DEL\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.opp_delay_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 245,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:POW:OVER:PROT:DEL\", seconds)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.opp_enable",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 124,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._p.write_scpi(f'SOUR:POW:OVER:PROT:STAT {1 if enable else 0}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.opp_enable_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 130,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._p.query_scpi('SOUR:POW:OVER:PROT:STAT?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.opp_threshold_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 120,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._p.query_scpi('SOUR:POW:OVER:PROT:LEV?')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.opp_threshold_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 115,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._check_setpoint(value)",
+        "self._p.write_scpi(f'SOUR:POW:OVER:PROT:LEV {value}')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.output_power_limit_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 139,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query('SOUR:POW:LIM')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.output_power_limit_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 134,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set('SOUR:POW:LIM', value)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.ovp_delay_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 233,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:VOLT:OVER:PROT:DEL\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.ovp_delay_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 229,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:VOLT:OVER:PROT:DEL\", seconds)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.programmed_power_limit_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 179,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:POW:LIM\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.programmed_power_limit_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 175,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:POW:LIM\", value)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.resistance_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 434,
+      "source_expressions": [
+        "self._limit_query(\"SOUR:RES\",bound)",
+        "self.function_query()"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.resistance_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 441,
+      "source_expressions": [
+        "self._check_setpoint(ohms)",
+        "self._limit_set(\"SOUR:RES\",ohms)",
+        "self.function_query()"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.ucp_delay_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 265,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:CURR:UND:PROT:DEL\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.ucp_delay_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 261,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:CURR:UND:PROT:DEL\", seconds)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.ucp_enable",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 313,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._p.write_scpi(f\"SOUR:CURR:UND:PROT:STAT {int(enable)}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.ucp_enable_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 319,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._p.query_scpi(\"SOUR:CURR:UND:PROT:STAT?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.ucp_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 309,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._p.query_scpi(\"SOUR:CURR:UND:PROT:LEV?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.ucp_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 304,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._check_setpoint(value)",
+        "self._p.write_scpi(f\"SOUR:CURR:UND:PROT:LEV {value}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.ucp_warmup_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 281,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:CURR:UND:PROT:WARM\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.ucp_warmup_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 277,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:CURR:UND:PROT:WARM\", seconds)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.uvp_delay_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 257,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:VOLT:UND:PROT:DEL\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.uvp_delay_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 253,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:VOLT:UND:PROT:DEL\", seconds)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.uvp_enable",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 294,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._p.write_scpi(f\"SOUR:VOLT:UND:PROT:STAT {int(enable)}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.uvp_enable_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 300,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._p.query_scpi(\"SOUR:VOLT:UND:PROT:STAT?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.uvp_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 290,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._p.query_scpi(\"SOUR:VOLT:UND:PROT:LEV?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.uvp_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 285,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._check_setpoint(value)",
+        "self._p.write_scpi(f\"SOUR:VOLT:UND:PROT:LEV {value}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.uvp_warmup_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 273,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:VOLT:UND:PROT:WARM\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.uvp_warmup_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 269,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:VOLT:UND:PROT:WARM\", seconds)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.voltage_both_time_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 346,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:VOLT:SLEW:BOTH\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.voltage_both_time_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 341,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:VOLT:SLEW:BOTH\", seconds)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.voltage_fall_time_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 337,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:VOLT:SLEW:NEG\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.voltage_fall_time_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 332,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:VOLT:SLEW:NEG\", seconds)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.voltage_limit_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 163,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:VOLT:LIM\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.voltage_limit_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 159,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:VOLT:LIM\", value)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.voltage_rise_time_query",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 328,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_query(\"SOUR:VOLT:SLEW:POS\", bound)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SourceSubsystem.voltage_rise_time_set",
+      "source": "src/itech_driver/subsystems/SourceSubsystem.py",
+      "baseline_line": 323,
+      "source_expressions": [
+        "self._check_channel(channel)",
+        "self._limit_set(\"SOUR:VOLT:SLEW:POS\", seconds)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "StatusSubsystem.oper_negative_transition_query",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 77,
+      "source_expressions": [
+        "self._mask_query(\"STAT:OPER:NTR\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "StatusSubsystem.oper_negative_transition_set",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 74,
+      "source_expressions": [
+        "self._mask_set(\"STAT:OPER:NTR\", mask)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "StatusSubsystem.oper_positive_transition_query",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 71,
+      "source_expressions": [
+        "self._mask_query(\"STAT:OPER:PTR\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "StatusSubsystem.oper_positive_transition_set",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 68,
+      "source_expressions": [
+        "self._mask_set(\"STAT:OPER:PTR\", mask)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "StatusSubsystem.preset",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 12,
+      "source_expressions": [
+        "self._p.write_scpi('STAT:PRES')"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "StatusSubsystem.ques_negative_transition_query",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 89,
+      "source_expressions": [
+        "self._mask_query(\"STAT:QUES:NTR\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "StatusSubsystem.ques_negative_transition_set",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 86,
+      "source_expressions": [
+        "self._mask_set(\"STAT:QUES:NTR\", mask)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "StatusSubsystem.ques_positive_transition_query",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 83,
+      "source_expressions": [
+        "self._mask_query(\"STAT:QUES:PTR\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "StatusSubsystem.ques_positive_transition_set",
+      "source": "src/itech_driver/subsystems/StatusSubsystem.py",
+      "baseline_line": 80,
+      "source_expressions": [
+        "self._mask_set(\"STAT:QUES:PTR\", mask)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SystemSubsystem.lan_ip_mode_query",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 120,
+      "source_expressions": [
+        "self._p.query_scpi(\"SYST:COMM:LAN:IP:MODE?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "SystemSubsystem.lan_ip_mode_set",
+      "source": "src/itech_driver/subsystems/SystemSubsystem.py",
+      "baseline_line": 113,
+      "source_expressions": [
+        "self._p.write_scpi(f\"SYST:COMM:LAN:IP:MODE {token}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.acquire_arm",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 16,
+      "source_expressions": [
+        "self._p.write_scpi(\"INIT:ACQ\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.acquire_current_level_query",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 116,
+      "source_expressions": [
+        "self._p.query_scpi(\"TRIG:ACQ:CURR:LEV?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.acquire_current_level_set",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 113,
+      "source_expressions": [
+        "self._p.write_scpi(f\"TRIG:ACQ:CURR:LEV {self._numeric_arg(value)}\")",
+        "self._numeric_arg(value)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.acquire_source_query",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 72,
+      "source_expressions": [
+        "self._source_query(\"ACQ\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.acquire_source_set",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 69,
+      "source_expressions": [
+        "self._source_set(\"ACQ\", source)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.acquire_voltage_level_query",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 110,
+      "source_expressions": [
+        "self._p.query_scpi(\"TRIG:ACQ:VOLT:LEV?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.acquire_voltage_level_set",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 107,
+      "source_expressions": [
+        "self._p.write_scpi(f\"TRIG:ACQ:VOLT:LEV {self._numeric_arg(value)}\")",
+        "self._numeric_arg(value)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.arb_source_query",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 78,
+      "source_expressions": [
+        "self._source_query(\"ARB\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.arb_source_set",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 75,
+      "source_expressions": [
+        "self._source_set(\"ARB\", source)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.dlog_source_query",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 84,
+      "source_expressions": [
+        "self._source_query(\"DLOG\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.dlog_source_set",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 81,
+      "source_expressions": [
+        "self._source_set(\"DLOG\", source)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.elog_source_query",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 90,
+      "source_expressions": [
+        "self._source_query(\"ELOG\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.elog_source_set",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 87,
+      "source_expressions": [
+        "self._source_set(\"ELOG\", source)"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.hysteresis_threshold_query",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 141,
+      "source_expressions": [
+        "self._hysteresis_header(subsystem, quantity, bound)",
+        "self._p.query_scpi(f\"{header}?\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
+    },
+    {
+      "method": "TriggerSubsystem.hysteresis_threshold_set",
+      "source": "src/itech_driver/subsystems/TriggerSubsystem.py",
+      "baseline_line": 145,
+      "source_expressions": [
+        "self._hysteresis_header(subsystem, quantity, bound)",
+        "self._numeric_arg(value)",
+        "self.hysteresis_threshold_query(subsystem, quantity, other)",
+        "self._p.write_scpi(f\"{header} {arg}\")"
+      ],
+      "guide": {
+        "page": null,
+        "syntax": null,
+        "arguments": null,
+        "response": null,
+        "models": null,
+        "status": "unverified"
+      },
+      "retry": "no_automatic_replay",
+      "offline_test": "not_assessed",
+      "hil": "not_run",
+      "qualification_note": "Inventory only; guide mapping and capability review pending."
     }
   ]
 }

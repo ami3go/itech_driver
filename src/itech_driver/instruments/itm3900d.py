@@ -79,6 +79,10 @@ class ITM3900D(BaseInstrument):
     def return_local(self):
         self._request_mode("SYST:LOC", "local")
 
+    def _assert_write_authorized(self) -> None:
+        if self.require_remote and self.requested_mode != "remote":
+            raise SafetyGuardError("explicit enter_remote() required before writes")
+
     def write_scpi(self, cmd):
         with self.session.operation_lock():
             normalized = cmd.strip().upper().lstrip(":")
@@ -86,8 +90,7 @@ class ITM3900D(BaseInstrument):
                 return self.enter_remote()
             if normalized in ("SYST:LOC", "SYSTEM:LOCAL", "SYST:LOCAL", "SYSTEM:LOC"):
                 return self.return_local()
-            if self.require_remote and self.requested_mode != "remote":
-                raise SafetyGuardError("explicit enter_remote() required before writes")
+            self._assert_write_authorized()
             try:
                 super().write_scpi(cmd)
             except ScpiDriverError:
