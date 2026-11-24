@@ -27,6 +27,7 @@ jobs:
           path: |
             integration-audit.json
             integrated-source.zip
+            integrated-source.bundle
           if-no-files-found: error
 
   integrated-regression:
@@ -69,3 +70,38 @@ jobs:
           path: |
             integrated/integrated-results.xml
             integrated/dist/
+
+  publish-verified-candidate:
+    needs: [merge-audit, integrated-regression]
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'refactor/itech-ref-auto-01-phase1' && github.event.pull_request.base.ref == 'master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: integration-audit
+          path: candidate
+      - name: Publish exact matrix-tested commit to new candidate branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -c "import hashlib,json,pathlib; p=pathlib.Path('candidate/integrated-source.bundle'); r=json.loads(pathlib.Path('candidate/integration-audit.json').read_text()); assert r['status']=='CLEAN_MERGE_AUDIT'; assert hashlib.sha256(p.read_bytes()).hexdigest()==r['bundle_sha256']"
+          expected_base=$(python -c "import json; print(json.load(open('candidate/integration-audit.json'))['base_sha'])")
+          expected_commit=$(python -c "import json; print(json.load(open('candidate/integration-audit.json'))['audit_commit'])")
+          expected_tree=$(python -c "import json; print(json.load(open('candidate/integration-audit.json'))['audit_tree'])")
+          test "$(git ls-remote origin refs/heads/master | cut -f1)" = "$expected_base"
+          git bundle verify candidate/integrated-source.bundle
+          git fetch candidate/integrated-source.bundle HEAD
+          test "$(git rev-parse FETCH_HEAD)" = "$expected_commit"
+          test "$(git rev-parse FETCH_HEAD^{tree})" = "$expected_tree"
+          git merge-base --is-ancestor "$expected_base" "$expected_commit"
+          branch="integration/itech-ref-auto-01-${GITHUB_RUN_ID}"
+          test -z "$(git ls-remote origin "refs/heads/$branch")"
+          git push origin "$expected_commit:refs/heads/$branch"
+          printf 'Published candidate %s at %s (tree %s)\n' "$branch" "$expected_commit" "$expected_tree"
