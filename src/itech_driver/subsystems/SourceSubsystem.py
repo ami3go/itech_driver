@@ -5,6 +5,7 @@ from scpi_driver_core.scpi.parsers import parse_bool, parse_float
 from ..base import  BaseInstrument, BoolLike, Number
 from ..capabilities import ELECTRICAL_COMMANDS, Range, effective_command_range
 from ..utils.validation import validate_channel, nonnegative_number, strict_bool
+from ..protection import PROTECTION_THRESHOLDS, ProtectionThresholdQualification, set_protection_threshold
 # -------------------------
 # Source Subsystem (SOURce)
 # -------------------------
@@ -72,14 +73,14 @@ class SourceSubsystem:
         return parse_float(self._p.query_scpi('SOUR:CURR?'))
 
     # Protections
-    def ovp_set(self, value: Number, channel: int = 1):
+    def ovp_set(self, value: Number, channel: int = 1, *, qualification: ProtectionThresholdQualification | None = None):
         self._check_channel(channel)
         self._check_setpoint(value)
-        self._p.write_scpi(f'SOUR:VOLT:OVER:PROT:LEV {value}')
+        set_protection_threshold(self._p, "ovp", value, qualification)
 
     def ovp_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi(f'SOUR:VOLT:OVER:PROT:LEV?'))
+        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["ovp"][0] + "?"))
 
     def ovp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
@@ -90,14 +91,14 @@ class SourceSubsystem:
         self._check_channel(channel)
         return parse_bool(self._p.query_scpi(f'SOUR:VOLT:OVER:PROT:STAT?'))
 
-    def ocp_set(self, value: Number, channel: int = 1):
+    def ocp_set(self, value: Number, channel: int = 1, *, qualification: ProtectionThresholdQualification | None = None):
         self._check_channel(channel)
         self._check_setpoint(value)
-        self._p.write_scpi(f'SOUR:CURR:OVER:PROT:LEV {value}')
+        set_protection_threshold(self._p, "ocp", value, qualification)
 
     def ocp_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi(f'SOUR:CURR:OVER:PROT:LEV?'))
+        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["ocp"][0] + "?"))
 
     def ocp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
@@ -108,14 +109,14 @@ class SourceSubsystem:
         self._check_channel(channel)
         return parse_bool(self._p.query_scpi(f'SOUR:CURR:OVER:PROT:STAT?'))
 
-    def opp_threshold_set(self, value: Number, channel: int = 1):
+    def opp_threshold_set(self, value: Number, channel: int = 1, *, qualification: ProtectionThresholdQualification | None = None):
         self._check_channel(channel)
         self._check_setpoint(value)
-        self._p.write_scpi(f'SOUR:POW:OVER:PROT:LEV {value}')
+        set_protection_threshold(self._p, "opp", value, qualification)
 
     def opp_threshold_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi('SOUR:POW:OVER:PROT:LEV?'))
+        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["opp"][0] + "?"))
 
     def opp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
@@ -188,10 +189,10 @@ class SourceSubsystem:
 
     # Retain historical behavior explicitly during migration; never silently
     # turn an existing OPP threshold operation into a different setting.
-    def power_limit_set(self, value: Number, channel: int = 1):
+    def power_limit_set(self, value: Number, channel: int = 1, *, qualification: ProtectionThresholdQualification | None = None):
         warnings.warn("power_limit_set historically sets OPP; use opp_threshold_set "
                       "or output_power_limit_set", DeprecationWarning, stacklevel=2)
-        return self.opp_threshold_set(value, channel)
+        return self.opp_threshold_set(value, channel, qualification=qualification)
 
     def power_limit_query(self, channel: int = 1) -> float:
         warnings.warn("power_limit_query historically reads OPP; use opp_threshold_query "
@@ -287,14 +288,14 @@ class SourceSubsystem:
         self._check_channel(channel)
         return self._limit_query("SOUR:CURR:UND:PROT:WARM", bound)
 
-    def uvp_set(self, value: Number, channel: int = 1):
+    def uvp_set(self, value: Number, channel: int = 1, *, qualification: ProtectionThresholdQualification | None = None):
         self._check_channel(channel)
         self._check_setpoint(value)
-        self._p.write_scpi(f"SOUR:VOLT:UND:PROT:LEV {value}")
+        set_protection_threshold(self._p, "uvp", value, qualification)
 
     def uvp_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi("SOUR:VOLT:UND:PROT:LEV?"))
+        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["uvp"][0] + "?"))
 
     def uvp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
@@ -305,14 +306,14 @@ class SourceSubsystem:
         self._check_channel(channel)
         return parse_bool(self._p.query_scpi("SOUR:VOLT:UND:PROT:STAT?"))
 
-    def ucp_set(self, value: Number, channel: int = 1):
+    def ucp_set(self, value: Number, channel: int = 1, *, qualification: ProtectionThresholdQualification | None = None):
         self._check_channel(channel)
         self._check_setpoint(value)
-        self._p.write_scpi(f"SOUR:CURR:UND:PROT:LEV {value}")
+        set_protection_threshold(self._p, "ucp", value, qualification)
 
     def ucp_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi("SOUR:CURR:UND:PROT:LEV?"))
+        return parse_float(self._p.query_scpi(PROTECTION_THRESHOLDS["ucp"][0] + "?"))
 
     def ucp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)

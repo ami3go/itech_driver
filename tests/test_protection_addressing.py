@@ -2,19 +2,21 @@ import pytest
 from scpi_driver_core import ConfigurationError
 from scpi_driver_core.simulation import ScriptedScpiTransport
 from itech_driver import ITM3900D
+from itech_driver.protection import ProtectionThresholdQualification
+from itech_driver.capabilities import Range
 
 
 @pytest.mark.parametrize("name,quantity", [("ovp", "VOLT"), ("ocp", "CURR"), ("power_limit", "POW")])
 def test_protection_threshold_and_state(name, quantity):
     header = f"SOUR:{quantity}:OVER:PROT"
-    t = ScriptedScpiTransport().on(f"{header}:LEV 5.0").on(f"{header}:LEV?", "5.0")
+    t = ScriptedScpiTransport().on("*IDN?", "ITECH,IT-M3902D-80-40,SIM,1").on(f"{header}:LEV 5.0").on(f"{header}:LEV?", "5.0")
     t.on(f"{header}:STAT 1").on(f"{header}:STAT?", "1")
     with ITM3900D("sim", transport=t) as d:
-        getattr(d.source, name + "_set")(5.0)
+        getattr(d.source, name + "_set")(5.0, qualification=ProtectionThresholdQualification("IT-M3902D-80-40", "1", "opp" if name == "power_limit" else name, Range(0, 10), "synthetic test only"))
         assert getattr(d.source, name + "_query")() == 5.0
         getattr(d.source, name + "_enable")(True)
         assert getattr(d.source, name + "_enable_query")() is True
-        assert t.history == [f"{header}:LEV 5.0", f"{header}:LEV?", f"{header}:STAT 1", f"{header}:STAT?"]
+        assert t.history == ["*IDN?", f"{header}:LEV 5.0", f"{header}:LEV?", f"{header}:STAT 1", f"{header}:STAT?"]
 
 
 @pytest.mark.parametrize("name", ["ovp", "ocp", "power_limit"])

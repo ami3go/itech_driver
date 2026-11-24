@@ -1,6 +1,10 @@
 import pytest
 from scpi_driver_core.simulation import ScriptedScpiTransport
 from itech_driver import ITM3900D
+from itech_driver.protection import ProtectionThresholdQualification
+from itech_driver.capabilities import Range
+
+QUAL = ProtectionThresholdQualification("IT-M3902D-80-40", "1", "opp", Range(0, 100), "synthetic test only")
 
 
 def test_limit_and_opp_are_distinct():
@@ -11,7 +15,7 @@ def test_limit_and_opp_are_distinct():
     t.on("SOUR:POW:OVER:PROT:STAT 1").on("SOUR:POW:OVER:PROT:STAT?", "1")
     with ITM3900D("sim", transport=t) as d:
         d.source.output_power_limit_set(20)
-        d.source.opp_threshold_set(25)
+        d.source.opp_threshold_set(25, qualification=QUAL)
         assert d.source.output_power_limit_query() == 20
         assert d.source.opp_threshold_query() == 25
         d.source.opp_enable(True)
@@ -22,8 +26,8 @@ def test_limit_and_opp_are_distinct():
 
 
 def test_legacy_power_limit_warns_without_silent_semantic_change():
-    t = ScriptedScpiTransport().on("SOUR:POW:OVER:PROT:LEV 25")
+    t = ScriptedScpiTransport().on("*IDN?", "ITECH,IT-M3902D-80-40,SIM,1").on("SOUR:POW:OVER:PROT:LEV 25")
     with ITM3900D("sim", transport=t) as d:
         with pytest.warns(DeprecationWarning):
-            d.source.power_limit_set(25)
-        assert t.history == ["SOUR:POW:OVER:PROT:LEV 25"]
+            d.source.power_limit_set(25, qualification=QUAL)
+        assert t.history == ["*IDN?", "SOUR:POW:OVER:PROT:LEV 25"]
