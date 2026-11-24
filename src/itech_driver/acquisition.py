@@ -33,6 +33,9 @@ def configure_and_arm(driver, config: AcquisitionConfig) -> None:
         raise ConfigurationError("validated AcquisitionConfig required")
     with driver.session.operation_lock():
         driver._assert_write_authorized()
+        driver._require_methods("SenseSubsystem.acquisition_points_set",
+            "SenseSubsystem.acquisition_offset_set", "SenseSubsystem.acquisition_interval_set",
+            "TriggerSubsystem.acquire_start", "TriggerSubsystem.acquire_source_set", "TriggerSubsystem.acquire_arm")
         driver.sense.acquisition_points_set(config.points)
         driver.sense.acquisition_offset_set(config.offset)
         driver.sense.acquisition_interval_set(config.interval)

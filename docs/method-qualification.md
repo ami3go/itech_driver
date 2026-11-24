@@ -17,3 +17,7 @@ subsystems and separate lifecycle helpers are explicit low-level paths not
 covered by the attached subsystem guard. Existing remote mode and parameter
 validation still apply. This is not a hardware safety boundary or complete
 #173 acceptance.
+
+
+## Compound operations
+Acquisition and ARB arm preflight all nested required capabilities before the first configuration write. Supervised ON checks the full observation/protection/setpoint/enable capability list before any query or write. OFF is allowed with qualified state-set capability even if observation is not qualified; the result is UNKNOWN, never a safe-state assertion. Registry scalar execution cannot bypass the typed guard. Other compound operations and direct raw/client access still need separate review. No HIL authorization is implied.

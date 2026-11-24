@@ -25,11 +25,28 @@ def _finite(value):
     return type(value) in (int,float) and math.isfinite(value)
 
 
+_OBSERVATION_METHODS = (
+    "OutputSubsystem.state_query", "StatusSubsystem.ques_condition_query",
+    "MeasurementSubsystem.voltage_query", "MeasurementSubsystem.current_query",
+)
+_ON_METHODS = _OBSERVATION_METHODS + (
+    "OutputSubsystem.state_set",
+    "SourceSubsystem.ovp_enable_query", "SourceSubsystem.ovp_query",
+    "SourceSubsystem.ocp_enable_query", "SourceSubsystem.ocp_query",
+    "SourceSubsystem.opp_enable_query", "SourceSubsystem.opp_threshold_query",
+    "SourceSubsystem.voltage_limit_query", "SourceSubsystem.current_limit_query",
+    "SourceSubsystem.programmed_power_limit_query", "SourceSubsystem.voltage_query",
+    "SourceSubsystem.current_query", "SourceSubsystem.function_mode_query",
+    "SourceSubsystem.external_programming_query",
+)
+
+
 def observe_output(driver, *, requested=None):
     """Read separate evidence; no physical safe-state assertion."""
     programmed = questionable = voltage = current = None
     try:
         with driver.session.operation_lock():
+            driver._require_methods(*_OBSERVATION_METHODS)
             programmed = parse_bool(driver.query_scpi("OUTP:STAT?"))
             questionable = parse_int(driver.query_scpi("STAT:QUES:COND?"))
             if not 0 <= questionable <= 65535:
@@ -53,6 +70,7 @@ def request_output_on(driver, *, authorized=False, max_voltage_v, max_current_a,
     if any(not _finite(v) or v <= 0 for v in bounds):
         raise ConfigurationError("finite positive caller limits required")
     with driver.session.operation_lock():
+        driver._require_methods(*_ON_METHODS)
         before = observe_output(driver)
         if before.outcome != "observed" or before.programmed is not False or before.questionable != 0:
             raise SafetyGuardError("output preflight not clear")
@@ -96,6 +114,7 @@ def request_output_off(driver, *, max_residual_v, max_residual_a, max_samples=3)
     if type(max_samples) is not int or not 1 <= max_samples <= 100:
         raise ConfigurationError("sample budget must be 1..100")
     with driver.session.operation_lock():
+        driver._require_methods("OutputSubsystem.state_set")
         try:
             driver.write_scpi("OUTP:STAT OFF")
         except ScpiDriverError as exc:

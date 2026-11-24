@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+from contextlib import contextmanager
 import struct
 import time
 from typing import Union
@@ -71,6 +72,16 @@ class BaseInstrument:
     @property
     def client(self) -> ScpiClient:
         return self.session.client
+
+    def _require_methods(self, *keys) -> None:
+        """Generic/legacy base has no vendor capability policy."""
+        return None
+
+    @contextmanager
+    def _qualified_method_scope(self, key):
+        with self.session.operation_lock():
+            self._require_methods(key)
+            yield
 
     def _assert_write_authorized(self) -> None:
         """Policy hook for compound operations; base has no remote policy."""
