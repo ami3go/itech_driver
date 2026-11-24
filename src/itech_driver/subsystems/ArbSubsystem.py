@@ -33,44 +33,44 @@ class ArbSubsystem:
         self._p = parent
 
     def function_shape_set(self, shape: str):
-        execute_parameterized(self._p, "ArbSubsystem.function_shape_set", f'{shape}')
+        execute_parameterized(self._p, "ArbSubsystem.function_shape_set", shape)
 
     def function_shape_query(self) -> str:  # Added: Missing query method
         return execute(self._p, "ArbSubsystem.function_shape_query")
 
     def function_type_set(self, typ: str):
-        execute_parameterized(self._p, "ArbSubsystem.function_type_set", f'{typ}')
+        execute_parameterized(self._p, "ArbSubsystem.function_type_set", typ)
 
     def function_type_query(self) -> str:  # Added: Missing query method
         return execute(self._p, "ArbSubsystem.function_type_query")
 
     # UDEFined list helpers
     def udef_count_set(self, steps: int):
-        execute_parameterized(self._p, "ArbSubsystem.udef_count_set", f'{validate_arb_integer(self._p, "udef_count_set", steps)}')
+        execute_parameterized(self._p, "ArbSubsystem.udef_count_set", validate_arb_integer(self._p, "udef_count_set", steps))
 
     def udef_count_query(self) -> int:  # Added: Missing query method
         return parse_int(execute(self._p, "ArbSubsystem.udef_count_query"))
 
     def udef_level_set(self, step: int, level: Number):
-        execute_parameterized(self._p, "ArbSubsystem.udef_level_set", f'{validate_arb_integer(self._p, "udef_level_set", step)},{float(finite_number(level))}')
+        execute_parameterized(self._p, "ArbSubsystem.udef_level_set", validate_arb_integer(self._p, "udef_level_set", step), float(finite_number(level)))
 
     def udef_level_query(self, step: int) -> float:  # Added: Missing query method
-        return parse_float(execute_parameterized(self._p, "ArbSubsystem.udef_level_query", f'{validate_arb_integer(self._p, "udef_level_query", step)}'))
+        return parse_float(execute_parameterized(self._p, "ArbSubsystem.udef_level_query", validate_arb_integer(self._p, "udef_level_query", step)))
 
     def udef_dwell_set(self, step: int, seconds: Number):
-        execute_parameterized(self._p, "ArbSubsystem.udef_dwell_set", f'{validate_arb_integer(self._p, "udef_dwell_set", step)},{float(finite_number(seconds))}')
+        execute_parameterized(self._p, "ArbSubsystem.udef_dwell_set", validate_arb_integer(self._p, "udef_dwell_set", step), float(finite_number(seconds)))
 
     def udef_dwell_query(self, step: int) -> float:  # Added: Missing query method
-        return parse_float(execute_parameterized(self._p, "ArbSubsystem.udef_dwell_query", f'{validate_arb_integer(self._p, "udef_dwell_query", step)}'))
+        return parse_float(execute_parameterized(self._p, "ArbSubsystem.udef_dwell_query", validate_arb_integer(self._p, "udef_dwell_query", step)))
 
     def udef_slew_set(self, step: int, slew_val: Number):
-        execute_parameterized(self._p, "ArbSubsystem.udef_slew_set", f'{validate_arb_integer(self._p, "udef_slew_set", step)},{float(finite_number(slew_val))}')
+        execute_parameterized(self._p, "ArbSubsystem.udef_slew_set", validate_arb_integer(self._p, "udef_slew_set", step), float(finite_number(slew_val)))
 
     def udef_slew_query(self, step: int) -> float:  # Added: Missing query method
-        return parse_float(execute_parameterized(self._p, "ArbSubsystem.udef_slew_query", f'{validate_arb_integer(self._p, "udef_slew_query", step)}'))
+        return parse_float(execute_parameterized(self._p, "ArbSubsystem.udef_slew_query", validate_arb_integer(self._p, "udef_slew_query", step)))
 
     def count_set(self, cnt: int):
-        execute_parameterized(self._p, "ArbSubsystem.count_set", f'{validate_arb_integer(self._p, "count_set", cnt)}')
+        execute_parameterized(self._p, "ArbSubsystem.count_set", validate_arb_integer(self._p, "count_set", cnt))
 
     def count_query(self) -> int:  # Added: Missing query method
         return parse_int(execute(self._p, "ArbSubsystem.count_query"))
@@ -86,10 +86,10 @@ class ArbSubsystem:
             "ARB termination response requires IT-M3900D guide qualification")
 
     def save(self, index: int):
-        execute_parameterized(self._p, "ArbSubsystem.save", f'{validate_arb_integer(self._p, "save", index)}')
+        execute_parameterized(self._p, "ArbSubsystem.save", validate_arb_integer(self._p, "save", index))
 
     def recall(self, index: int):
-        execute_parameterized(self._p, "ArbSubsystem.recall", f'{validate_arb_integer(self._p, "recall", index)}')
+        execute_parameterized(self._p, "ArbSubsystem.recall", validate_arb_integer(self._p, "recall", index))
 
     def init(self):
         return self._p.initiate.arb()
@@ -98,7 +98,7 @@ class ArbSubsystem:
         execute(self._p, "ArbSubsystem.trigger")
 
     def pause_set(self, enable: BoolLike):
-        execute_parameterized(self._p, "ArbSubsystem.pause_set", f'{1 if strict_bool(enable) else 0}')
+        execute_parameterized(self._p, "ArbSubsystem.pause_set", strict_bool(enable))
 
     def pause_query(self) -> bool:  # Added: Missing query method
         return parse_bool(execute(self._p, "ArbSubsystem.pause_query"))
