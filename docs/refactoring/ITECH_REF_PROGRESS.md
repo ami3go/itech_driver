@@ -14,14 +14,14 @@
 | [#170](https://github.com/ami3go/itech_driver/issues/170) | Generic controls | VERIFIED AND MERGED | #192 | Issue closed; see continuation evidence |
 | [#171](https://github.com/ami3go/itech_driver/issues/171) | Capability states | VERIFIED AND MERGED | #202 | Issue closed; continuation 2 evidence |
 | [#172](https://github.com/ami3go/itech_driver/issues/172) | Identity cache | VERIFIED AND MERGED | #197 | Issue closed; see continuation evidence |
-| [#173](https://github.com/ami3go/itech_driver/issues/173) | Model descriptors | PARTIALLY IMPLEMENTED | #106 #130 #131 | #195 #198: descriptors and five electrical setters; all subsystem/firmware gates pending |
+| [#173](https://github.com/ami3go/itech_driver/issues/173) | Model descriptors | PARTIALLY IMPLEMENTED | #220 #223 (pending) | 300 attached method keys; strict opt-in; complete firmware matrix missing |
 | [#150](https://github.com/ami3go/itech_driver/issues/150) | Electrical limits | VERIFIED AND MERGED | #193 #195 #198 | Issue closed; see continuation evidence |
 | [#153](https://github.com/ami3go/itech_driver/issues/153) | Nested defaults | VERIFIED AND MERGED | #193 | Issue closed; see continuation evidence |
 | [#154](https://github.com/ami3go/itech_driver/issues/154) | Configuration persistence | VERIFIED AND MERGED | #193 | Issue closed; see continuation evidence |
 | [#151](https://github.com/ami3go/itech_driver/issues/151) | Range/channel validation | VERIFIED AND MERGED | #200 | Issue closed; continuation 2 evidence |
-| [#152](https://github.com/ami3go/itech_driver/issues/152) | Source validation | PARTIALLY IMPLEMENTED | #198 #217 | Explicit threshold qualification merged; manufacturer bounds pending |
+| [#152](https://github.com/ami3go/itech_driver/issues/152) | Source validation | PARTIALLY IMPLEMENTED | #217 | Exact manufacturer programmable bounds missing |
 | [#155](https://github.com/ami3go/itech_driver/issues/155) | Strict output enable | VERIFIED AND MERGED | #196 | Issue closed; see continuation evidence |
-| [#167](https://github.com/ami3go/itech_driver/issues/167) | Exact ARB integers | PARTIALLY IMPLEMENTED | #205 | Exact integer validation merged; model/firmware command bounds pending |
+| [#167](https://github.com/ami3go/itech_driver/issues/167) | Exact ARB integers | PARTIALLY IMPLEMENTED | #205 #221 | Exact command-specific bounds policy merged; manufacturer data missing |
 | [#166](https://github.com/ami3go/itech_driver/issues/166) | Strict boolean parse | VERIFIED AND MERGED | #196 | Issue closed; see continuation evidence |
 | [#156](https://github.com/ami3go/itech_driver/issues/156) | Connection factory | VERIFIED AND MERGED | #209 | Issue closed; continuation 3 evidence |
 | [#157](https://github.com/ami3go/itech_driver/issues/157) | Optional VISA selection | VERIFIED AND MERGED | #209 | Issue closed; continuation 3 evidence |
@@ -29,7 +29,7 @@
 | [#159](https://github.com/ami3go/itech_driver/issues/159) | Detection ownership | VERIFIED AND MERGED | #199 | Issue closed; see continuation evidence |
 | [#160](https://github.com/ami3go/itech_driver/issues/160) | Cleanup exceptions | VERIFIED AND MERGED | #207 | Issue closed; continuation 2 evidence |
 | [#161](https://github.com/ami3go/itech_driver/issues/161) | Independent framing | VERIFIED AND MERGED | #211 | Issue closed; continuation 3 evidence |
-| [#168](https://github.com/ami3go/itech_driver/issues/168) | Command registry/executor | PARTIALLY IMPLEMENTED | #78 #190 | Typed semantics and runtime enforcement not complete |
+| [#168](https://github.com/ami3go/itech_driver/issues/168) | Command registry/executor | PARTIALLY IMPLEMENTED | #219 #222 | 88 typed operations migrated; remaining methods and guide metadata |
 | [#162](https://github.com/ami3go/itech_driver/issues/162) | Source mode aliases | VERIFIED AND MERGED | #196 | Issue closed; see continuation evidence |
 | [#163](https://github.com/ami3go/itech_driver/issues/163) | ARB command ownership | VERIFIED AND MERGED | #215 | Issue closed; continuation 3 evidence |
 | [#164](https://github.com/ami3go/itech_driver/issues/164) | Core IEEE delegation | VERIFIED AND MERGED | #214 | Issue closed; continuation 3 evidence |
@@ -121,3 +121,41 @@ Remaining:
 - #173: descriptor/rating and explicit qualification infrastructure exists; universal per-method capability enforcement and verified model/firmware feature matrix still incomplete.
 
 Software regression baseline PASS; full refactoring campaign NOT COMPLETE; programming-guide/firmware qualification and hardware release NOT VERIFIED. No HIL authorization assumed.
+
+
+## Continuation 4 — 2026-11-24
+
+Verified source master `93686ecf2cb75b6905b381917fdc54df3d566a38`; shared core pin unchanged `34b0d750558de628349160150091f1fd45badf76`. #218 merged. 36/40 issues closed; #152, #167, #168, #173 remain open. No physical I/O.
+
+| PR | Tested head | Merge commit | Offline | Wheel | Static | TCP | Disposition |
+|---|---|---|---|---|---|---|---|
+| #219 | 9342a01783042ea714875efa34da2168741aeb5d | d74017af3d12ad7a0d71e5071688ec9285dae15c | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45400672137) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45400672213) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45400672095) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45400672257) | #168 partial |
+| #220 | 93e9a6b5047308273192a25555750397825cad24 | 229f061115f592ec45f335b9857cd9ac38ab624e | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45401032324) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45401031926) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45401031939) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45401032152) | #173 partial |
+| #221 | e9b358760d265a04c36c2d6924cb6c5eb39df2d4 | 9bbb3d543fd05c58ae4e209eda437b3fe111d3a5 | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45401677380) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45401677357) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45401677379) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45401677589) | #167 partial |
+| #222 | 5d3ce917eab3770d29b5501de54e200f4584e10a | 93686ecf2cb75b6905b381917fdc54df3d566a38 | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45402026260) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45402026811) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45402026286) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45402025373) | #168 partial |
+
+Linux 3.13 exact source CI: 867 passed, 2 deselected, 8 warnings. All four CI gates green on the merged source. Runtime registry owns 88 migrated operations, including shared simulator measurement/output headers and explicit destructive-read metadata. Other parameterized and compound methods and authoritative guide metadata remain outstanding. Attached subsystem strict method policy supports 300 keys bound to exact model, firmware, transport kind and session generation; legacy remains permissive unless explicitly enabled. Direct raw/client/session access is not a capability safety boundary. ARB explicit integer bounds bound to exact model/firmware/generation, strict mode requires them; no manufacturer range invented. #223 compound method preflight submitted and refreshed to head `57839450c9ff30d8f77b1a92b65e85537db40c86`; CI on refreshed head pending at documentation snapshot. Do not count it as merged until verified.
+
+Protection and ARB guide recheck: Programming Guide V1.4/09,2024 pp.65–66 describes OVP default and unspecified MIN/MAX endpoints; query does not accept bound selectors. User-manual fixed output-protection technical specification is not a programmable range. Detailed ARB pages cannot be retrieved from public mirrors (PDF size rejection or 404); index is not proof of numeric limits. Record exact manufacturer/firmware evidence before claiming full qualification. No HIL authorization assumed, no independent local full-clone test.
+
+
+## Continuation 5 — verified source baseline
+
+Master source `b67e9636e1394661deb52a534191c72910c855ff`. 36/40 issues closed; remaining #152, #167, #168, #173. Earlier continuation-4 pending status for #223 superseded by verified merge.
+
+| PR | Tested head | Merge commit | Offline | Wheel | Static/import | TCP |
+|---|---|---|---|---|---|---|
+| #223 | 57839450c9ff30d8f77b1a92b65e85537db40c86 | f75a4caef53aa03f1091b63c1c6d08c790d857ab | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45402888414) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45402888412) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45402888440) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45402888480) |
+| #225 | dc105a19bae125c47b7d65a55cddc41a0a231a83 | 70e3fc4d7cb17b03d61007a47f17a223c9c3c285 | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45437753112) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45437753183) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45437752911) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45437753125) |
+| #226 | fcbb9db1aaffdaabd775b519ff927c50e85ef276 | f6c6d4088b7529adda71bd0a49e616b3e3e8472a | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45438148290) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45438148343) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45438148249) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45438148508) |
+| #227 | 9337069f6957c9c227533f9dcb80871238786220 | b67e9636e1394661deb52a534191c72910c855ff | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45438741100) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45438740517) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45438740687) | [PASS](https://github.com/ami3go/itech_driver/actions/runs/45438740647) |
+
+Latest verified Linux Python 3.13 offline job: **890 passed, 2 deselected, 8 warnings**. Four OS/Python offline jobs passed; wheel, static/public imports and no-VISA native TCP gates green. All testing offline, no independent local clone or HIL.
+
+Registry: 300/300 public inventory entries have runtime specification or explicit unsupported, alias, planner, core, dynamic, compound or qualified disposition. Simulator and supervised output lifecycle reuse registry headers/typed methods. Strict capability checks on classes now cover directly constructed subsystems. Watchdog, external analog and hysteresis compound operations preflight required capabilities. #228 proposes 65 typed parameterized field schemas; pending CI at this snapshot.
+
+Remaining acceptance: #152 vendor numeric protection threshold bounds; #167 exact model/firmware ARB command bounds; #168 complete field-level metadata for remaining helpers/compound methods and authoritative guide references; #173 universal strict enforcement and actual firmware feature evidence. Legacy default intentionally preserved; raw SCPI/client/session access is explicitly not a qualification safety boundary. No automatic hardware probes, no inferred manufacturer limits, no HIL authorization. Public mirror details still incomplete: https://ingun-hosted.rhodecode.com/Projects/Classes/raw/20/class_SQLite/Documentation/IT-M3900D%20Programming%20Guide-EN.pdf indexed pp.65–66 confirm symbolic limits, no numeric endpoints; full download or page images failed. The user manual's default protection settings do not prove configurable ranges. Guide pp.227,243–246,267–268 are needed for ARB. Record authoritative vendor revision, model and firmware applicability before claiming qualification.
+
+
+### Final verified continuation-5 source update
+#228 merged at `f37dbe354f4ff2b2e9e22329fec5a720fc884543`, tested head `7c6c9ad4da5752b4514cc63486dd37fa2a45c989`. [Offline](https://github.com/ami3go/itech_driver/actions/runs/45439583121), [wheel](https://github.com/ami3go/itech_driver/actions/runs/45439583046), [static](https://github.com/ami3go/itech_driver/actions/runs/45439583559), [TCP](https://github.com/ami3go/itech_driver/actions/runs/45439583011) all PASS. Linux 3.13: **902 passed, 2 deselected, 8 warnings**. All 65 parameterized registry operations use ordered named typed wire fields, no preformatted payloads. Invalid arity, coercion, nonfinite numbers and injected program messages reject before I/O. Remaining helper/compound metadata and authoritative guide references not fully qualified. Four original issues remain open; no physical I/O. This snapshot supersedes the pending #228 statement and 890-test count above.
