@@ -1,4 +1,4 @@
-from scpi_driver_core import ConfigurationError
+from scpi_driver_core import ConfigurationError, ResponseParseError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float, parse_int
 from typing import Optional
 from ..base import  BaseInstrument, BoolLike, Number
@@ -47,12 +47,30 @@ class OutputSubsystem:
         self._p.write_scpi('OUTP:PROTection:CLEar')
 
     def watchdog_set(self, enable: BoolLike, delay_s: Optional[int] = None):
-        self._p.write_scpi(f'OUTP:PROT:WDOG:STAT {1 if enable else 0}')
-        if delay_s is not None:
-            self._p.write_scpi(f'OUTP:PROT:WDOG:DEL {int(delay_s)}')
+        """Set delay and verify readback before enabling; never infer physical output state."""
+        if type(enable) not in (bool, int) or enable not in (0, 1):
+            raise ConfigurationError("watchdog state must be bool or 0/1")
+        if delay_s is not None and (type(delay_s) is not int or not 1 <= delay_s <= 3600):
+            raise ConfigurationError("watchdog delay must be an integer in 1..3600 seconds")
+        with self._p.session.operation_lock():
+            if not enable:
+                self._p.write_scpi("OUTP:PROT:WDOG:STAT 0")
+            if delay_s is not None:
+                self._p.write_scpi(f"OUTP:PROT:WDOG:DEL {delay_s}")
+                actual = self.watchdog_delay_query()
+                if actual != delay_s:
+                    raise ResponseParseError("watchdog delay readback mismatch", raw=str(actual))
+            elif enable:
+                self.watchdog_delay_query()
+            if enable:
+                self._p.write_scpi("OUTP:PROT:WDOG:STAT 1")
 
-    def watchdog_query(self) -> bool:  # Added: Missing query method
+    def watchdog_query(self) -> bool:
         return parse_bool(self._p.query_scpi('OUTP:PROT:WDOG:STAT?'))
 
-    def watchdog_delay_query(self) -> int:  # Added: Missing query method
-        return parse_int(self._p.query_scpi('OUTP:PROT:WDOG:DEL?'))
+    def watchdog_delay_query(self) -> int:
+        raw = self._p.query_scpi('OUTP:PROT:WDOG:DEL?')
+        value = parse_float(raw)
+        if not value.is_integer() or not 1 <= value <= 3600:
+            raise ResponseParseError("invalid watchdog delay response", raw=raw)
+        return int(value)
