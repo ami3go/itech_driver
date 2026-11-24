@@ -9,7 +9,7 @@ from scpi_driver_core.simulation import ScriptedReply, ScriptedScpiTransport
 from itech_driver import ITM3900D, GenericSCPIInstrument, auto_detect_instrument
 from itech_driver.exceptions import TimeoutError
 
-IDN = "ITECH,IT-M3900D,SIM001,1.0"
+IDN = "ITECH,IT-M3902D-80-40,SIM001,1.0"
 
 
 def make_driver(transport):
