@@ -1,3 +1,4 @@
+from scpi_driver_core import ConfigurationError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float, parse_int
 from typing import Optional
 from ..base import  BaseInstrument, BoolLike, Number
@@ -9,11 +10,20 @@ class OutputSubsystem:
     def __init__(self, parent: BaseInstrument):
         self._p = parent
 
+    @staticmethod
+    def _check_channel(channel: int) -> None:
+        if type(channel) is not int or channel != 1:
+            raise ConfigurationError("IT-M3900D output is unnumbered; channel must be 1")
+
     def state_set(self, on: BoolLike, channel: int = 1):
-        self._p.write_scpi(f'OUTP{channel}:STAT {"ON" if on else "OFF"}')
+        self._check_channel(channel)
+        if type(on) not in (bool, int) or on not in (0, 1):
+            raise ConfigurationError("output state must be bool or 0/1")
+        self._p.write_scpi(f'OUTP:STAT {"ON" if on else "OFF"}')
 
     def state_query(self, channel: int = 1) -> bool:
-        return parse_bool(self._p.query_scpi(f'OUTP{channel}:STAT?'))
+        self._check_channel(channel)
+        return parse_bool(self._p.query_scpi('OUTP:STAT?'))
 
     def delay_rise_set(self, seconds: Number):
         self._p.write_scpi(f'OUTP:DELay:RISE {seconds}')
