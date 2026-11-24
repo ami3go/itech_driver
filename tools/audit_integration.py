@@ -76,6 +76,9 @@ def audit(repo,base,prs,*,fetch=True,archive=None):
                 git(work,"archive","--format=zip","--output="+str(archive),"HEAD")
                 result["archive_sha256"]=hashlib.sha256(archive.read_bytes()).hexdigest()
                 result["audit_commit"]=sha(work,"HEAD")
+                bundle=archive.with_name("integrated-source.bundle")
+                git(work,"bundle","create",str(bundle),"HEAD")
+                result["bundle_sha256"]=hashlib.sha256(bundle.read_bytes()).hexdigest()
         finally:
             git(repo,"worktree","remove","--force",str(work))
     return result
