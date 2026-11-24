@@ -13,9 +13,20 @@ class TriggerSubsystem:
     def acquire_immediate(self):
         self._p.write_scpi('TRIG:ACQuire:IMMediate')
 
-    def acquire_start(self, source: str = 'EXT'):
-        self._p.write_scpi(f'TRIG:ACQ:SOUR {source}')
-        self._p.write_scpi('TRIG:ACQ')
+    def acquire_arm(self):
+        """Initiate the measurement trigger system, without generating a trigger.
+
+        Guide p.105: readiness takes a few milliseconds; a premature trigger
+        may be ignored. Successful transmission is not readiness confirmation.
+        """
+        self._p.write_scpi("INIT:ACQ")
+
+    def acquire_start(self, source: str = "EXT"):
+        """Configure and arm only. Call the appropriate trigger separately."""
+        token = self._normalize_source("ACQ", source)
+        with self._p.session.operation_lock():
+            self.acquire_source_set(token)
+            self.acquire_arm()
 
     def acquire_mode_set(self, mode: str):
         self._p.write_scpi(f'TRIG:ACQ:MODE {mode}')
