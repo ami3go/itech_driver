@@ -1,6 +1,6 @@
 import ipaddress
 from scpi_driver_core import ConfigurationError, ResponseParseError, UnsupportedOperationError
-from scpi_driver_core.scpi.parsers import parse_int, quote_scpi_string
+from scpi_driver_core.scpi.parsers import parse_bool, parse_int, quote_scpi_string
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
 # System Subsystem (SYSTem)
@@ -32,11 +32,12 @@ class SystemSubsystem:
         self._p.write_scpi('SYST:BEEPer:IMMediate')
 
     def beeper_state_set(self, on: BoolLike):
+        if type(on) not in (bool, int) or on not in (0, 1):
+            raise ConfigurationError("beeper state must be bool or 0/1")
         self._p.write_scpi(f'SYST:BEEPer:STATe {"ON" if on else "OFF"}')
 
     def beeper_state_query(self) -> bool:
-        response = self._p.query_scpi('SYST:BEEPer:STATe?').strip().upper()
-        return response.startswith('ON') or response == '1'
+        return parse_bool(self._p.query_scpi('SYST:BEEPer:STATe?'))
 
     def date_set(self, yyyy: int, mm: int, dd: int):
         self._p.write_scpi(f'SYST:DATE {yyyy},{mm},{dd}')
