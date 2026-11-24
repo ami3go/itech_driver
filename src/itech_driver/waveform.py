@@ -195,3 +195,32 @@ class Sequence:
             result.extend((f"ARB:SEQ:SEL {index}",f"ARB:SEQ:FUNC {shape}",f"ARB:SEQ:COUN {step.repeats}"))
             result.extend(command.replace("ARB:","ARB:SEQ:",1) for command in fields)
         return tuple(result)
+
+
+@dataclass(frozen=True)
+class Zoom:
+    coefficient: float
+    positive_limit: int
+    negative_limit: int
+
+    def commands(self, *, coefficient_min: float, coefficient_max: float,
+                 integer_min: int, integer_max: int) -> tuple[str,...]:
+        """Offline protocol plan only.
+
+        All bounds must come from separately verified device documentation.
+        No assumption is made about the physical units of the integer limits,
+        waveform compatibility, clipping, or whether a live update is safe.
+        """
+        coeffs = (self.coefficient,coefficient_min,coefficient_max)
+        if any(isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) for v in coeffs):
+            raise ConfigurationError("finite coefficient and explicit bounds required")
+        if not coefficient_min <= self.coefficient <= coefficient_max:
+            raise ConfigurationError("zoom coefficient outside supplied bounds")
+        ints = (self.negative_limit,self.positive_limit,integer_min,integer_max)
+        if any(type(v) is not int for v in ints):
+            raise ConfigurationError("zoom limits and bounds must be integers")
+        if not integer_min <= self.negative_limit <= self.positive_limit <= integer_max:
+            raise ConfigurationError("invalid zoom limit ordering or supplied bounds")
+        return (f"ARB:ZOOM:COF {self.coefficient}",
+                f"ARB:ZOOM:LIM:POS {self.positive_limit}",
+                f"ARB:ZOOM:LIM:NEG {self.negative_limit}")
