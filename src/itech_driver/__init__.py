@@ -55,3 +55,6 @@ __all__ = [
     'IOConfigSubsystem',
     'IEEE488',
 ]
+
+from .tcp import connect_tcp
+__all__.append('connect_tcp')
