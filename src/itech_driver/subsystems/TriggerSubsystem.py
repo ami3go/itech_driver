@@ -1,3 +1,4 @@
+from ..command_specs import execute
 import math
 from scpi_driver_core import ConfigurationError, ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_float
@@ -11,7 +12,7 @@ class TriggerSubsystem:
         self._p = parent
 
     def acquire_immediate(self):
-        self._p.write_scpi('TRIG:ACQuire:IMMediate')
+        execute(self._p, "TriggerSubsystem.acquire_immediate")
 
     def acquire_arm(self):
         """Initiate the measurement trigger system, without generating a trigger.
@@ -19,7 +20,7 @@ class TriggerSubsystem:
         Guide p.105: readiness takes a few milliseconds; a premature trigger
         may be ignored. Successful transmission is not readiness confirmation.
         """
-        self._p.write_scpi("INIT:ACQ")
+        execute(self._p, "TriggerSubsystem.acquire_arm")
 
     def acquire_start(self, source: str = "EXT"):
         """Configure and arm only. Call the appropriate trigger separately."""
@@ -32,7 +33,7 @@ class TriggerSubsystem:
         self._p.write_scpi(f'TRIG:ACQ:MODE {mode}')
 
     def acquire_mode_query(self) -> str:
-        return self._p.query_scpi('TRIG:ACQ:MODE?')
+        return execute(self._p, "TriggerSubsystem.acquire_mode_query")
 
     _SOURCE_ALIASES = {
         "VOLT": "VOLT", "VOLTAGE": "VOLT",
@@ -108,13 +109,13 @@ class TriggerSubsystem:
         self._p.write_scpi(f"TRIG:ACQ:VOLT:LEV {self._numeric_arg(value)}")
 
     def acquire_voltage_level_query(self) -> float:
-        return parse_float(self._p.query_scpi("TRIG:ACQ:VOLT:LEV?"))
+        return execute(self._p, "TriggerSubsystem.acquire_voltage_level_query")
 
     def acquire_current_level_set(self, value: Number):
         self._p.write_scpi(f"TRIG:ACQ:CURR:LEV {self._numeric_arg(value)}")
 
     def acquire_current_level_query(self) -> float:
-        return parse_float(self._p.query_scpi("TRIG:ACQ:CURR:LEV?"))
+        return execute(self._p, "TriggerSubsystem.acquire_current_level_query")
 
     def level_set(self, val: Number):
         raise UnsupportedOperationError("select explicit acquisition voltage or current level")
@@ -160,7 +161,7 @@ class TriggerSubsystem:
         self.hysteresis_threshold_set("ELOG", "VOLT", "LOW", val)
 
     def elog_status_query(self) -> str:
-        return self._p.query_scpi('ELOG:STAT?')  # Separate ELOG qualification required.
+        return execute(self._p, "TriggerSubsystem.elog_status_query")  # Separate ELOG qualification required.
 
     def hysteresis_set(self, val: Number):
         raise UnsupportedOperationError("specify subsystem, quantity and high/low threshold")

@@ -1,3 +1,4 @@
+from ..command_specs import execute
 import ipaddress
 from scpi_driver_core import ConfigurationError, ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_int, quote_scpi_string
@@ -14,22 +15,22 @@ class SystemSubsystem:
         raise UnsupportedOperationError("use status.preset() for register preset or ieee.reset() for explicit reset")
 
     def version(self) -> str:
-        return self._p.query_scpi('SYST:VERSion?')
+        return execute(self._p, "SystemSubsystem.version")
 
     def error(self) -> str:
-        return self._p.query_scpi('SYST:ERRor?')
+        return execute(self._p, "SystemSubsystem.error")
 
     def clear(self):
-        self._p.write_scpi('SYST:CLEar')
+        execute(self._p, "SystemSubsystem.clear")
 
     def remote(self):
-        self._p.write_scpi('SYST:REMote')
+        execute(self._p, "SystemSubsystem.remote")
 
     def local(self):
-        self._p.write_scpi('SYST:LOCal')
+        execute(self._p, "SystemSubsystem.local")
 
     def beeper_immediate(self):
-        self._p.write_scpi('SYST:BEEPer:IMMediate')
+        execute(self._p, "SystemSubsystem.beeper_immediate")
 
     def beeper_state_set(self, on: BoolLike):
         if type(on) not in (bool, int) or on not in (0, 1):
@@ -37,19 +38,19 @@ class SystemSubsystem:
         self._p.write_scpi(f'SYST:BEEPer:STATe {"ON" if on else "OFF"}')
 
     def beeper_state_query(self) -> bool:
-        return parse_bool(self._p.query_scpi('SYST:BEEPer:STATe?'))
+        return execute(self._p, "SystemSubsystem.beeper_state_query")
 
     def date_set(self, yyyy: int, mm: int, dd: int):
         self._p.write_scpi(f'SYST:DATE {yyyy},{mm},{dd}')
 
     def date_query(self) -> str:
-        return self._p.query_scpi('SYST:DATE?')
+        return execute(self._p, "SystemSubsystem.date_query")
 
     def time_set(self, hh: int, mm: int, ss: int):
         self._p.write_scpi(f'SYST:TIME {hh},{mm},{ss}')
 
     def time_query(self) -> str:
-        return self._p.query_scpi('SYST:TIME?')
+        return execute(self._p, "SystemSubsystem.time_query")
 
     # Communication helpers
     def comm_select(self, iface: str):
@@ -57,13 +58,13 @@ class SystemSubsystem:
         self._p.write_scpi(f'SYST:COMMunicate:SELect {iface}')
 
     def comm_select_query(self) -> str:
-        return self._p.query_scpi('SYST:COMMunicate:SELect?')
+        return execute(self._p, "SystemSubsystem.comm_select_query")
 
     def comm_gpib_addr_set(self, addr: int):  # Corrected: Fixed method name from gpiB to gpib
         self._p.write_scpi(f'SYST:COMMunicate:GPIB:ADDRess {int(addr)}')
 
     def comm_gpib_addr_query(self) -> int:  # Corrected: Fixed method name from gpiB to gpib
-        return parse_int(self._p.query_scpi('SYST:COMMunicate:GPIB:ADDRess?'))
+        return execute(self._p, "SystemSubsystem.comm_gpib_addr_query")
 
     @staticmethod
     def _ipv4(value: str, *, mask: bool = False) -> str:

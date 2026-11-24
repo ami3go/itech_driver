@@ -29,22 +29,22 @@ class OutputSubsystem:
         self._p.write_scpi(f'OUTP:DELay:RISE {seconds}')
 
     def delay_rise_query(self) -> float:
-        return parse_float(self._p.query_scpi('OUTP:DELay:RISE?'))
+        return execute(self._p, "OutputSubsystem.delay_rise_query")
 
     def delay_fall_set(self, seconds: Number):
         self._p.write_scpi(f'OUTP:DELay:FALL {seconds}')
 
     def delay_fall_query(self) -> float:
-        return parse_float(self._p.query_scpi('OUTP:DELay:FALL?'))
+        return execute(self._p, "OutputSubsystem.delay_fall_query")
 
     def inhibit_mode_set(self, mode: str):
         self._p.write_scpi(f'OUTP:INHibit:MODE {mode}')
 
     def inhibit_mode_query(self) -> str:  # Added: Missing query method
-        return self._p.query_scpi('OUTP:INHibit:MODE?')
+        return execute(self._p, "OutputSubsystem.inhibit_mode_query")
 
     def protection_clear(self):
-        self._p.write_scpi('OUTP:PROTection:CLEar')
+        execute(self._p, "OutputSubsystem.protection_clear")
 
     def watchdog_set(self, enable: BoolLike, delay_s: Optional[int] = None):
         """Verify configuration and final watchdog state; never infer physical output state."""
@@ -72,7 +72,7 @@ class OutputSubsystem:
                 raise ResponseParseError("watchdog changed state during delay configuration", raw="ON")
 
     def watchdog_query(self) -> bool:
-        return parse_bool(self._p.query_scpi('OUTP:PROT:WDOG:STAT?'))
+        return execute(self._p, "OutputSubsystem.watchdog_query")
 
     def watchdog_delay_query(self) -> int:
         raw = self._p.query_scpi('OUTP:PROT:WDOG:DEL?')

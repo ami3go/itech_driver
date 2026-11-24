@@ -1,3 +1,4 @@
+from ..command_specs import execute
 from scpi_driver_core import ConfigurationError, ResponseParseError
 from scpi_driver_core.scpi.parsers import parse_int
 from ..base import  BaseInstrument, BoolLike, Number
@@ -11,11 +12,11 @@ class StatusSubsystem:
 
     def preset(self):
         """Preset status register masks; not an instrument reset."""
-        self._p.write_scpi('STAT:PRES')
+        execute(self._p, "StatusSubsystem.preset")
 
     # Operation
     def oper_condition_query(self) -> int:
-        return parse_int(self._p.query_scpi('STAT:OPER:COND?'))
+        return execute(self._p, "StatusSubsystem.oper_condition_query")
 
     def oper_enable_set(self, mask: int):
         self._mask_set('STAT:OPER:ENAB', mask)
@@ -24,11 +25,11 @@ class StatusSubsystem:
         return self._mask_query('STAT:OPER:ENAB')
 
     def oper_event_query(self) -> int:
-        return parse_int(self._p.query_scpi('STAT:OPER:EVEN?'))
+        return execute(self._p, "StatusSubsystem.oper_event_query")
 
     # Questionable
     def ques_condition_query(self) -> int:
-        return parse_int(self._p.query_scpi('STAT:QUES:COND?'))
+        return execute(self._p, "StatusSubsystem.ques_condition_query")
 
     def ques_enable_set(self, mask: int):
         self._mask_set('STAT:QUES:ENAB', mask)
@@ -37,7 +38,7 @@ class StatusSubsystem:
         return self._mask_query('STAT:QUES:ENAB')
 
     def ques_event_query(self) -> int:
-        return parse_int(self._p.query_scpi('STAT:QUES:EVEN?'))
+        return execute(self._p, "StatusSubsystem.ques_event_query")
 
     # Standard event - Corrected: SETR should be ESET
     def std_event_enable_set(self, mask: int):

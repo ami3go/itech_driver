@@ -1,3 +1,4 @@
+from ..command_specs import execute
 import math
 from scpi_driver_core import ConfigurationError, ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_float
@@ -19,31 +20,31 @@ class BatterySubsystem:
         self._p.write_scpi(f'BATT:CHAR:VOLT {volts}')
 
     def charge_voltage_query(self) -> float:
-        return parse_float(self._p.query_scpi('BATT:CHAR:VOLT?'))
+        return execute(self._p, "BatterySubsystem.charge_voltage_query")
 
     def charge_current_set(self, amps: Number):
         self._p.write_scpi(f'BATT:CHAR:CURR {amps}')
 
     def charge_current_query(self) -> float:
-        return parse_float(self._p.query_scpi('BATT:CHAR:CURR?'))
+        return execute(self._p, "BatterySubsystem.charge_current_query")
 
     def shutdown_voltage_set(self, volts: Number):
         self._p.write_scpi(f'BATT:SHUT:VOLT {volts}')
 
     def shutdown_voltage_query(self) -> float:
-        return parse_float(self._p.query_scpi('BATT:SHUT:VOLT?'))
+        return execute(self._p, "BatterySubsystem.shutdown_voltage_query")
 
     def shutdown_current_set(self, amps: Number):
         self._p.write_scpi(f'BATT:SHUT:CURR {amps}')
 
     def shutdown_current_query(self) -> float:
-        return parse_float(self._p.query_scpi('BATT:SHUT:CURR?'))
+        return execute(self._p, "BatterySubsystem.shutdown_current_query")
 
     def shutdown_capacity_set(self, ah: Number):
         self._p.write_scpi(f'BATT:SHUT:CAP {ah}')
 
     def shutdown_capacity_query(self) -> float:
-        return parse_float(self._p.query_scpi('BATT:SHUT:CAP?'))
+        return execute(self._p, "BatterySubsystem.shutdown_capacity_query")
 
     def shutdown_time_set(self, seconds: Number):
         if isinstance(seconds, bool) or not isinstance(seconds, (int, float)) or not math.isfinite(seconds) or seconds < 0:
@@ -51,13 +52,13 @@ class BatterySubsystem:
         self._p.write_scpi(f'BATT:SHUT:TIME {seconds}')
 
     def shutdown_time_query(self) -> float:
-        return parse_float(self._p.query_scpi('BATT:SHUT:TIME?'))
+        return execute(self._p, "BatterySubsystem.shutdown_time_query")
 
     def mode_set(self, mode: str):
         """Select battery-test function mode without starting a battery test."""
         if not isinstance(mode, str) or mode.upper() not in ("BATT", "BATTERY"):
             raise ConfigurationError("battery mode must be BATT; use source.function_mode_set for other modes")
-        self._p.write_scpi("SOUR:FUNC:MODE BATT")
+        execute(self._p, "BatterySubsystem.mode_set")
 
     def mode_query(self) -> str:
         """Read the instrument's source function mode, not battery execution state."""

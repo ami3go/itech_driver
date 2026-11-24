@@ -1,3 +1,4 @@
+from ..command_specs import execute
 import math
 import warnings
 from scpi_driver_core import ConfigurationError, IdentityError, ResponseParseError, UnsupportedOperationError
@@ -61,7 +62,7 @@ class SourceSubsystem:
 
     def voltage_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi('SOUR:VOLT?'))
+        return execute(self._p, "SourceSubsystem.voltage_query")
 
     def current_set(self, value: Number, channel: int = 1):
         self._check_channel(channel)
@@ -70,7 +71,7 @@ class SourceSubsystem:
 
     def current_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi('SOUR:CURR?'))
+        return execute(self._p, "SourceSubsystem.current_query")
 
     # Protections
     def ovp_set(self, value: Number, channel: int = 1, *, qualification: ProtectionThresholdQualification | None = None):
@@ -125,7 +126,7 @@ class SourceSubsystem:
 
     def opp_enable_query(self, channel: int = 1) -> bool:
         self._check_channel(channel)
-        return parse_bool(self._p.query_scpi('SOUR:POW:OVER:PROT:STAT?'))
+        return execute(self._p, "SourceSubsystem.opp_enable_query")
 
     def output_power_limit_set(self, value: Number, channel: int = 1):
         """Set the programmed power limit, not the OPP trip threshold."""
@@ -304,7 +305,7 @@ class SourceSubsystem:
 
     def uvp_enable_query(self, channel: int = 1) -> bool:
         self._check_channel(channel)
-        return parse_bool(self._p.query_scpi("SOUR:VOLT:UND:PROT:STAT?"))
+        return execute(self._p, "SourceSubsystem.uvp_enable_query")
 
     def ucp_set(self, value: Number, channel: int = 1, *, qualification: ProtectionThresholdQualification | None = None):
         self._check_channel(channel)
@@ -322,7 +323,7 @@ class SourceSubsystem:
 
     def ucp_enable_query(self, channel: int = 1) -> bool:
         self._check_channel(channel)
-        return parse_bool(self._p.query_scpi("SOUR:CURR:UND:PROT:STAT?"))
+        return execute(self._p, "SourceSubsystem.ucp_enable_query")
 
     def voltage_rise_time_set(self, seconds: Number, channel: int = 1):
         """Set duration in seconds, not a slew rate in units/s."""
@@ -391,7 +392,7 @@ class SourceSubsystem:
         return self._enum_query("SOUR:CC:PRI", {"HIGH": "HIGH", "LOW": "LOW"})
 
     def external_programming_query(self) -> bool:
-        return parse_bool(self._p.query_scpi("SOUR:EXT:PROG?"))
+        return execute(self._p, "SourceSubsystem.external_programming_query")
 
     def external_programming_set(self, enabled: BoolLike, *, wiring_confirmed=False,
                                  deenergized_confirmed=False, option_confirmed=False):

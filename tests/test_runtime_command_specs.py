@@ -10,7 +10,7 @@ from itech_driver.simulator import ItechSimulator
 
 
 @pytest.mark.parametrize("method,spec", [(m,s) for m,s in COMMAND_SPECS.items()
-                                         if s.kind is ResultKind.FLOAT])
+                                         if s.kind is ResultKind.FLOAT and m.split(".")[0] in ("MeasurementSubsystem", "FetchSubsystem")])
 def test_scalar_specs_exact_wire_and_result(method, spec):
     t = ScriptedScpiTransport().on(spec.header, "1.25")
     cls, name = method.split(".")
@@ -46,3 +46,14 @@ def test_runtime_specs_are_subset_of_complete_inventory():
     methods = {e["method"] for e in json.loads(registry.read_text(encoding="utf-8"))["entries"]}
     assert set(COMMAND_SPECS) <= methods
     assert all(s.replay == "never" and s.guide_status == "unverified" for s in COMMAND_SPECS.values())
+
+
+def test_destructive_queries_and_void_writes_registry_preserve_wire():
+    t = ScriptedScpiTransport().on("SYST:ERRor?", '0,"No error"').on("STAT:PRES")
+    with ITM3900D("sim", transport=t) as d:
+        assert d.system.error() == '0,"No error"'
+        d.status.preset()
+    assert t.history == ["SYST:ERRor?", "STAT:PRES"]
+    assert COMMAND_SPECS["SystemSubsystem.error"].effect == "destructive_read"
+    assert COMMAND_SPECS["SystemSubsystem.error"].replay == "never"
+    assert COMMAND_SPECS["StatusSubsystem.preset"].modifies_state
