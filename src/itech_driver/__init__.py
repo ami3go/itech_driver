@@ -61,3 +61,6 @@ __all__.append('connect_tcp')
 
 from .vcp import connect_vcp
 __all__.append('connect_vcp')
+
+from .discovery import discover_instruments
+__all__.append('discover_instruments')
