@@ -1,3 +1,4 @@
+from scpi_driver_core.scpi.parsers import parse_float
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
 # Trigger Subsystem (TRIGger)
@@ -30,13 +31,13 @@ class TriggerSubsystem:
         self._p.write_scpi(f'TRIG:LEV {val}')
 
     def level_query(self) -> float:
-        return float(self._p.query_scpi('TRIG:LEV?'))
+        return parse_float(self._p.query_scpi('TRIG:LEV?'))
 
     def delay_set(self, seconds: Number):
         self._p.write_scpi(f'TRIG:DEL {seconds}')
 
     def delay_query(self) -> float:
-        return float(self._p.query_scpi('TRIG:DEL?'))
+        return parse_float(self._p.query_scpi('TRIG:DEL?'))
 
     # ELOG related
     def elog_trigger_voltage_high_set(self, val: Number):
@@ -52,4 +53,5 @@ class TriggerSubsystem:
         self._p.write_scpi(f'TRIG:HYSTeresis {val}')
 
     def hysteresis_query(self) -> float:  # Added: General hysteresis query
-        return float(self._p.query_scpi('TRIG:HYSTeresis?'))
+        return parse_float(self._p.query_scpi('TRIG:HYSTeresis?'))
+

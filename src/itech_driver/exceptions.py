@@ -1,25 +1,26 @@
-"""Custom exceptions for the power supply driver."""
+"""Driver-specific errors compatible with the common core hierarchy."""
+from scpi_driver_core.exceptions import (
+    ScpiDriverError, ScpiTimeoutError, TransportError, ConfigurationError,
+)
 
-class PowerSupplyError(Exception):
-    """Base exception for power supply errors."""
-    pass
+PowerSupplyError = ScpiDriverError
 
-class InstrumentNotFoundError(PowerSupplyError):
-    """Raised when an instrument cannot be found or connected."""
-    pass
 
-class CommandError(PowerSupplyError):
-    """Raised when a SCPI command fails."""
-    pass
+class InstrumentNotFoundError(TransportError):
+    """Instrument connection failed."""
 
-class TimeoutError(PowerSupplyError):
-    """Raised when a operation times out."""
-    pass
+
+class CommandError(TransportError):
+    """SCPI transport operation failed."""
+
+
+class TimeoutError(ScpiTimeoutError):
+    """A bounded driver operation timed out."""
+
 
 class ProtectionTripError(PowerSupplyError):
-    """Raised when protection circuits trip."""
-    pass
+    """Instrument protection circuit tripped."""
 
-class ValidationError(PowerSupplyError):
-    """Raised when input validation fails."""
-    pass
+
+class ValidationError(ConfigurationError):
+    """Input validation failed."""

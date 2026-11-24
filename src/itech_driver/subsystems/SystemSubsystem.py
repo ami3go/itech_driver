@@ -1,3 +1,4 @@
+from scpi_driver_core.scpi.parsers import parse_int
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
 # System Subsystem (SYSTem)
@@ -59,7 +60,7 @@ class SystemSubsystem:
         self._p.write_scpi(f'SYST:COMMunicate:GPIB:ADDRess {int(addr)}')
 
     def comm_gpib_addr_query(self) -> int:  # Corrected: Fixed method name from gpiB to gpib
-        return int(self._p.query_scpi('SYST:COMMunicate:GPIB:ADDRess?'))
+        return parse_int(self._p.query_scpi('SYST:COMMunicate:GPIB:ADDRess?'))
 
     def lan_ip_set(self, ip_cfg: str):
         """Set LAN IP configuration string (might accept 'DHCP' or '192.168.x.y')."""
@@ -79,3 +80,4 @@ class SystemSubsystem:
 
     def lan_gateway_query(self) -> str:
         return self._p.query_scpi('SYST:COMMunicate:LAN:DGATeway?')
+

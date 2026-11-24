@@ -1,148 +1,132 @@
-import pyvisa
+"""ITECH compatibility API backed by the shared SCPI core."""
+from __future__ import annotations
+
+import logging
+import math
+import struct
 import time
-from typing import Union, Optional
-from .exceptions import InstrumentNotFoundError, CommandError, TimeoutError
-from .utils.retry import retry
+from typing import Union
+
+from scpi_driver_core import ScpiClient, ScpiSession
+from scpi_driver_core.exceptions import (
+    ConfigurationError, ScpiTimeoutError, TransportError, UnsupportedOperationError,
+    ResponseParseError,
+)
+from scpi_driver_core.scpi.codec import ScpiTextCodec
+from scpi_driver_core.transport.base import Transport
+from scpi_driver_core.transport.visa import VisaTransport
+
+from .exceptions import CommandError, InstrumentNotFoundError, TimeoutError
 
 Number = Union[int, float]
 BoolLike = Union[bool, int]
+_LOG = logging.getLogger(__name__)
+_BINARY_TYPES = frozenset("bBhHiIlLqQfd")
+
 
 class BaseInstrument:
-    def __init__(self, resource_name: str, timeout: int = 5000, termination: str = '\n', interface_kwargs: dict = None):
-        self._rm = pyvisa.ResourceManager()
-        self._res = self._rm.open_resource(resource_name, **(interface_kwargs or {}))
-        self._res.timeout = timeout
+    """Own one core session. Construction opens transport but sends no SCPI."""
+
+    def __init__(
+        self, resource_name: str, timeout: int = 5000, termination: str = "\n",
+        interface_kwargs: dict | None = None, *,
+        transport: Transport | None = None, visa_library: str = "",
+        resource_manager=None, chunk_size: int = 20 * 1024,
+    ):
+        if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or not math.isfinite(timeout) or timeout <= 0:
+            raise ConfigurationError("timeout must be finite positive milliseconds")
+        if not isinstance(termination, str) or not termination:
+            raise ConfigurationError("termination must be a nonempty ASCII string")
         try:
-            self._res.read_termination = termination
-            self._res.write_termination = termination
-        except Exception:
-            pass
-        self._p = self  # used by subsystems
+            terminator = termination.encode("ascii")
+        except UnicodeEncodeError as exc:
+            raise ConfigurationError("termination must be ASCII") from exc
+        # Core currently does not expose arbitrary VISA open_resource kwargs.
+        if interface_kwargs:
+            raise ConfigurationError(
+                "interface_kwargs is no longer supported; use core transport injection "
+                "or visa_library/resource_manager/chunk_size"
+            )
+        if transport is not None and (visa_library or resource_manager is not None or chunk_size != 20 * 1024):
+            raise ConfigurationError("VISA options cannot be combined with an injected transport")
+        seconds = timeout / 1000
+        if transport is None:
+            transport = VisaTransport(
+                resource_name, timeout_s=seconds, visa_library=visa_library,
+                resource_manager=resource_manager, chunk_size=chunk_size,
+            )
+        codec = ScpiTextCodec(command_terminator=terminator, response_terminator=terminator)
+        self.session = ScpiSession(
+            resource_name, ScpiClient(transport, codec=codec, timeout_s=seconds),
+            communication_timeout_s=seconds,
+        )
+        self._p = self
+        self.system = self.source = self.output = self.status = None
+        self.trigger = self.arb = self.battery = self.initiate = None
+        self.abort = self.io = self.ieee = None
+        try:
+            self.session.open()
+        except ScpiTimeoutError as exc:
+            raise TimeoutError(str(exc)) from exc
+        except TransportError as exc:
+            raise InstrumentNotFoundError(str(exc)) from exc
 
-        # Subsystems are attached by __init__.py
-        self.system = None
-        self.source = None
-        self.output = None
-        self.status = None
-        self.trigger = None
-        self.arb = None
-        self.battery = None
-        self.initiate = None
-        self.abort = None
-        self.io = None
-        self.ieee = None
+    @property
+    def client(self) -> ScpiClient:
+        return self.session.client
 
-    @retry(max_attempts=3, delay=0.1, exceptions=(CommandError, TimeoutError))
-    def write_scpi(self, cmd: str):
-        self._res.write(cmd)
-        self.log_command(cmd, is_query=False)
+    def write_scpi(self, cmd: str) -> None:
+        # An ambiguous write must never be replayed automatically.
+        try:
+            self.client.write(cmd)
+        except ScpiTimeoutError as exc:
+            raise TimeoutError(str(exc)) from exc
+        except TransportError as exc:
+            raise CommandError(str(exc)) from exc
+        _LOG.debug("SCPI write: %s", cmd)
 
-    # def write_scpi(self, cmd: str) -> None:
-    # """Send SCPI command with error handling."""
-    #     try:
-    #         self._res.write(cmd)
-    #     except pyvisa.errors.VisaIOError as e:
-    #         raise CommandError(f"Failed to write command '{cmd}': {e}") from e
-
-    @retry(max_attempts=3, delay=0.1, exceptions=(CommandError, TimeoutError))
     def query_scpi(self, cmd: str, delay: float = 0.0) -> str:
+        if not math.isfinite(delay) or delay < 0:
+            raise ConfigurationError("delay must be finite and nonnegative")
         if delay:
             time.sleep(delay)
-        return self._res.query(cmd).strip()
+        # Even queries may have side effects (e.g. event register reads).
+        try:
+            return self.client.query(cmd).strip()
+        except ScpiTimeoutError as exc:
+            raise TimeoutError(str(exc)) from exc
+        except TransportError as exc:
+            raise CommandError(str(exc)) from exc
 
-    @retry(max_attempts=3, delay=0.1, exceptions=(CommandError, TimeoutError))
-    def query_binary(self, cmd: str, datatype: str = 'f', container=list):
-        return self._res.query_binary_values(cmd, datatype=datatype, container=container)
-
-    # def query_scpi(self, cmd: str, delay: float = 0.0) -> str:
-    # """Send SCPI query with error handling."""
-    #     if delay:
-    #         time.sleep(delay)
-    #     try:
-    #         return self._res.query(cmd).strip()
-    #     except pyvisa.errors.VisaIOError as e:
-    #         if "timeout" in str(e).lower():
-    #             raise TimeoutError(f"Query timeout for command '{cmd}': {e}") from e
-    #         raise CommandError(f"Failed to query '{cmd}': {e}") from e
+    def query_binary(self, cmd: str, datatype: str = "f", container=list,
+                     *, is_big_endian: bool = False, consume_terminator: bool = True):
+        """Decode an IEEE-488.2 definite-length block; default is little endian."""
+        if len(datatype) != 1 or datatype not in _BINARY_TYPES:
+            raise ConfigurationError(f"unsupported binary datatype: {datatype!r}")
+        fmt = (">" if is_big_endian else "<") + datatype
+        try:
+            payload = self.client.query_binary_block(cmd, consume_terminator=consume_terminator)
+        except ScpiTimeoutError as exc:
+            raise TimeoutError(str(exc)) from exc
+        except TransportError as exc:
+            raise CommandError(str(exc)) from exc
+        if len(payload) % struct.calcsize(fmt):
+            raise ResponseParseError("binary payload is not a whole number of values", raw=payload)
+        return container([item[0] for item in struct.iter_unpack(fmt, payload)])
 
     def identify(self) -> str:
-        """Identify the instrument (convenience method for ieee.idn())."""
-        return self.ieee.idn()
+        return self.query_scpi("*IDN?")
 
-    def close(self):
-        try:
-            self._res.close()
-        except Exception:
-            pass
-        try:
-            self._rm.close()
-        except Exception:
-            pass
+    def close(self) -> None:
+        self.session.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, traceback):
+        self.close()
 
     @property
     def visa(self):
-        return self._res
-
-    # def enable_debug(self, level: int = logging.DEBUG) -> None:
-    #     """Enable debug logging for this instrument."""
-    #     from .utils.ulogger import setup_logging
-    #     setup_logging(level)
-    #     self._debug_enabled = True
-    #
-    # def log_command(self, command: str, is_query: bool = False) -> None:
-    #     """Log SCPI commands for debugging."""
-    #     if getattr(self, '_debug_enabled', False):
-    #         logger = ulogger.getLogger('itech_driver')
-    #         action = "QUERY" if is_query else "WRITE"
-    #         logger.debug(f"{action}: {command}")
-
-    # from .exceptions import InstrumentNotFoundError, CommandError, TimeoutError
-    #
-    # class BaseInstrument:
-    #     def __init__(self, resource_name: str, timeout: int = 5000,
-    #                  termination: str = '\n', interface_kwargs: dict = None):
-    #         try:
-    #             self._rm = pyvisa.ResourceManager()
-    #             self._res = self._rm.open_resource(resource_name, **(interface_kwargs or {}))
-    #             self._res.timeout = timeout
-    #             try:
-    #                 self._res.read_termination = termination
-    #                 self._res.write_termination = termination
-    #             except Exception:
-    #                 pass
-    #         except pyvisa.errors.VisaIOError as e:
-    #             raise InstrumentNotFoundError(f"Cannot connect to {resource_name}: {e}") from e
-    #
-    #     def write_scpi(self, cmd: str) -> None:
-    #         """Send SCPI command with error handling."""
-    #         try:
-    #             self._res.write(cmd)
-    #         except pyvisa.errors.VisaIOError as e:
-    #             raise CommandError(f"Failed to write command '{cmd}': {e}") from e
-    #
-    #
-    from .utils.retry import retry
-    from .exceptions import CommandError, TimeoutError
-
-    # class BaseInstrument:
-    #     # ... existing code ...
-    #
-    #     @retry(max_attempts=3, delay=0.1, exceptions=(CommandError, TimeoutError))
-    #     def write_scpi(self, cmd: str) -> None:
-    #         """Send SCPI command with retry mechanism."""
-    #         try:
-    #             self._res.write(cmd)
-    #         except pyvisa.errors.VisaIOError as e:
-    #             raise CommandError(f"Failed to write command '{cmd}': {e}") from e
-    #
-    #     @retry(max_attempts=3, delay=0.1, exceptions=(CommandError, TimeoutError))
-    #     def query_scpi(self, cmd: str, delay: float = 0.0) -> str:
-    #         """Send SCPI query with retry mechanism."""
-    #         if delay:
-    #             time.sleep(delay)
-    #         try:
-    #             return self._res.query(cmd).strip()
-    #         except pyvisa.errors.VisaIOError as e:
-    #             if "timeout" in str(e).lower():
-    #                 raise TimeoutError(f"Query timeout for command '{cmd}': {e}") from e
-    #             raise CommandError(f"Failed to query '{cmd}': {e}") from e
+        """Raw VISA access bypasses core locking, framing and health tracking."""
+        raise UnsupportedOperationError("use session.transport or client, not raw VISA")

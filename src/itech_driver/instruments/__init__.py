@@ -67,47 +67,26 @@ def auto_detect_instrument(resource_name: str, **kwargs) -> BaseInstrument:
     Returns:
         BaseInstrument: Detected instrument instance or GenericSCPIInstrument
     """
-    # Create a temporary generic instrument to query IDN
-    temp_instr = GenericSCPIInstrument(resource_name, **kwargs)
+    from scpi_driver_core.scpi.parsers import parse_identity
 
+    # Close temporary connection before opening the model-specific driver.
+    # Unknown valid identities retain generic support; failed I/O is not hidden.
+    temp = GenericSCPIInstrument(resource_name, **kwargs)
     try:
-        idn = temp_instr.identify().upper()
-
-        # Check for specific instrument models
-        if any(model in idn for model in ['IT-M3900D', 'ITM3900D', 'IT3900D']):
-            return ITM3900D(resource_name, **kwargs)
-        elif 'ITECH' in idn:
-            # For other ITECH instruments, return generic but with brand awareness
-            return BaseInstrument(resource_name, **kwargs)
-        else:
-            # Return generic instrument for unknown models
-            return temp_instr
-
-    except Exception as e:
-        # If identification fails, return generic instrument
-        print(f"Warning: Could not identify instrument: {e}")
-        return temp_instr
+        identity = parse_identity(temp.identify())
+        model = identity.model.upper()
+        if not any(token in model for token in ('IT-M3900D', 'ITM3900D', 'IT3900D')):
+            return temp
+    except BaseException:
+        temp.close()
+        raise
+    temp.close()
+    return ITM3900D(resource_name, **kwargs)
 
 
 def create_instrument_from_idn(resource_name: str, **kwargs) -> BaseInstrument:
-    """Create instrument based on IDN string with fallback options.
-
-    This is similar to auto_detect_instrument but provides more control
-    over the detection process.
-
-    Args:
-        resource_name: VISA resource string
-        **kwargs: Additional arguments passed to instrument constructor
-
-    Returns:
-        BaseInstrument: Appropriate instrument instance
-    """
-    try:
-        # Try auto-detection first
-        return auto_detect_instrument(resource_name, **kwargs)
-    except Exception as e:
-        print(f"Auto-detection failed: {e}. Using generic instrument.")
-        return BaseInstrument(resource_name, **kwargs)
+    """Detect a supported model or return a generic driver for a valid unknown ID."""
+    return auto_detect_instrument(resource_name, **kwargs)
 
 
 # Export specific instrument classes for direct import
