@@ -17,31 +17,31 @@ class BatterySubsystem:
         self._p = parent
 
     def charge_voltage_set(self, volts: Number):
-        execute_parameterized(self._p, "BatterySubsystem.charge_voltage_set", f'{volts}')
+        execute_parameterized(self._p, "BatterySubsystem.charge_voltage_set", volts)
 
     def charge_voltage_query(self) -> float:
         return execute(self._p, "BatterySubsystem.charge_voltage_query")
 
     def charge_current_set(self, amps: Number):
-        execute_parameterized(self._p, "BatterySubsystem.charge_current_set", f'{amps}')
+        execute_parameterized(self._p, "BatterySubsystem.charge_current_set", amps)
 
     def charge_current_query(self) -> float:
         return execute(self._p, "BatterySubsystem.charge_current_query")
 
     def shutdown_voltage_set(self, volts: Number):
-        execute_parameterized(self._p, "BatterySubsystem.shutdown_voltage_set", f'{volts}')
+        execute_parameterized(self._p, "BatterySubsystem.shutdown_voltage_set", volts)
 
     def shutdown_voltage_query(self) -> float:
         return execute(self._p, "BatterySubsystem.shutdown_voltage_query")
 
     def shutdown_current_set(self, amps: Number):
-        execute_parameterized(self._p, "BatterySubsystem.shutdown_current_set", f'{amps}')
+        execute_parameterized(self._p, "BatterySubsystem.shutdown_current_set", amps)
 
     def shutdown_current_query(self) -> float:
         return execute(self._p, "BatterySubsystem.shutdown_current_query")
 
     def shutdown_capacity_set(self, ah: Number):
-        execute_parameterized(self._p, "BatterySubsystem.shutdown_capacity_set", f'{ah}')
+        execute_parameterized(self._p, "BatterySubsystem.shutdown_capacity_set", ah)
 
     def shutdown_capacity_query(self) -> float:
         return execute(self._p, "BatterySubsystem.shutdown_capacity_query")
@@ -49,7 +49,7 @@ class BatterySubsystem:
     def shutdown_time_set(self, seconds: Number):
         if isinstance(seconds, bool) or not isinstance(seconds, (int, float)) or not math.isfinite(seconds) or seconds < 0:
             raise ConfigurationError("battery cutoff time must be a finite nonnegative number of seconds")
-        execute_parameterized(self._p, "BatterySubsystem.shutdown_time_set", f'{seconds}')
+        execute_parameterized(self._p, "BatterySubsystem.shutdown_time_set", seconds)
 
     def shutdown_time_query(self) -> float:
         return execute(self._p, "BatterySubsystem.shutdown_time_query")

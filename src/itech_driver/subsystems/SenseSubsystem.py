@@ -32,13 +32,13 @@ class SenseSubsystem:
         self._p = parent
 
     def acquisition_points_set(self, points: int):
-        execute_parameterized(self._p, "SenseSubsystem.acquisition_points_set", f"{_points(points)}")
+        execute_parameterized(self._p, "SenseSubsystem.acquisition_points_set", _points(points))
 
     def acquisition_offset_set(self, points: int):
-        execute_parameterized(self._p, "SenseSubsystem.acquisition_offset_set", f"{_offset(points)}")
+        execute_parameterized(self._p, "SenseSubsystem.acquisition_offset_set", _offset(points))
 
     def acquisition_interval_set(self, interval: float):
-        execute_parameterized(self._p, "SenseSubsystem.acquisition_interval_set", f"{_interval(interval)}")
+        execute_parameterized(self._p, "SenseSubsystem.acquisition_interval_set", _interval(interval))
 
     def acquisition_points_query(self):
         raise UnsupportedOperationError("acquisition points readback not guide-qualified")

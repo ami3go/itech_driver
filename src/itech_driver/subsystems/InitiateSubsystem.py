@@ -18,13 +18,13 @@ class InitiateSubsystem:
         execute(self._p, "InitiateSubsystem.arb")
 
     def continuous_arb_set(self, enable: BoolLike):
-        execute_parameterized(self._p, "InitiateSubsystem.continuous_arb_set", f'{1 if enable else 0}')
+        execute_parameterized(self._p, "InitiateSubsystem.continuous_arb_set", enable)
 
     def continuous_arb_query(self) -> bool:  # Added: Missing query method
         return execute(self._p, "InitiateSubsystem.continuous_arb_query")
 
     def continuous_acq_set(self, enable: BoolLike):
-        execute_parameterized(self._p, "InitiateSubsystem.continuous_acq_set", f'{1 if enable else 0}')
+        execute_parameterized(self._p, "InitiateSubsystem.continuous_acq_set", enable)
 
     def continuous_acq_query(self) -> bool:  # Added: Missing query method
         return execute(self._p, "InitiateSubsystem.continuous_acq_query")

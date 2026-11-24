@@ -31,7 +31,7 @@ class TriggerSubsystem:
             self.acquire_arm()
 
     def acquire_mode_set(self, mode: str):
-        execute_parameterized(self._p, "TriggerSubsystem.acquire_mode_set", f'{mode}')
+        execute_parameterized(self._p, "TriggerSubsystem.acquire_mode_set", mode)
 
     def acquire_mode_query(self) -> str:
         return execute(self._p, "TriggerSubsystem.acquire_mode_query")
@@ -101,21 +101,21 @@ class TriggerSubsystem:
         raise UnsupportedOperationError("select an explicit ACQ, ARB, DLOG or ELOG trigger source")
 
     @staticmethod
-    def _numeric_arg(value: Number) -> str:
+    def _numeric_arg(value: Number) -> Number:
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
             raise ConfigurationError("trigger level must be a finite real number")
         if value < 0:
             raise ConfigurationError("trigger level must be nonnegative")
-        return str(value)
+        return value
 
     def acquire_voltage_level_set(self, value: Number):
-        execute_parameterized(self._p, "TriggerSubsystem.acquire_voltage_level_set", f"{self._numeric_arg(value)}")
+        execute_parameterized(self._p, "TriggerSubsystem.acquire_voltage_level_set", self._numeric_arg(value))
 
     def acquire_voltage_level_query(self) -> float:
         return execute(self._p, "TriggerSubsystem.acquire_voltage_level_query")
 
     def acquire_current_level_set(self, value: Number):
-        execute_parameterized(self._p, "TriggerSubsystem.acquire_current_level_set", f"{self._numeric_arg(value)}")
+        execute_parameterized(self._p, "TriggerSubsystem.acquire_current_level_set", self._numeric_arg(value))
 
     def acquire_current_level_query(self) -> float:
         return execute(self._p, "TriggerSubsystem.acquire_current_level_query")

@@ -12,7 +12,7 @@ class IOConfigSubsystem:
         self._p = parent
 
     def select(self, idx: int):
-        execute_parameterized(self._p, "IOConfigSubsystem.select", f'{self._pin_index(idx)}')
+        execute_parameterized(self._p, "IOConfigSubsystem.select", self._pin_index(idx))
 
     def select_query(self) -> int:
         raw = execute(self._p, "IOConfigSubsystem.select_query")
@@ -38,12 +38,12 @@ class IOConfigSubsystem:
             direction = int(dir_mask)
         else:
             raise ConfigurationError("direction must be OUT/0 or IN/1")
-        execute_parameterized(self._p, "IOConfigSubsystem.direction_set", f"{pin},{direction}")
+        execute_parameterized(self._p, "IOConfigSubsystem.direction_set", pin, direction)
 
     def direction_query(self, pin_list: int | str) -> bool:
         """Return True for input and False for output; reject unknown replies."""
         pin = self._pin_index(pin_list)
-        raw = execute_parameterized(self._p, "IOConfigSubsystem.direction_query", f"{pin}").strip().upper()
+        raw = execute_parameterized(self._p, "IOConfigSubsystem.direction_query", pin).strip().upper()
         if raw in ("0", "OUT"):
             return False
         if raw in ("1", "IN"):
@@ -54,19 +54,19 @@ class IOConfigSubsystem:
         pin = self._pin_index(ch)
         if type(enable) not in (bool, int) or enable not in (0, 1):
             raise ConfigurationError("PWM enable must be bool or 0/1")
-        execute_parameterized(self._p, "IOConfigSubsystem.pwm_enable", f'{pin},{int(enable)}')
+        execute_parameterized(self._p, "IOConfigSubsystem.pwm_enable", pin, enable)
 
     def pwm_freq_set(self, ch: int, freq: Number):
         pin = self._pin_index(ch)
         if isinstance(freq, bool) or not isinstance(freq, (int, float)) or not math.isfinite(freq) or not 2 <= freq <= 21000:
             raise ConfigurationError("PWM frequency must be in 2..21000 Hz")
-        execute_parameterized(self._p, "IOConfigSubsystem.pwm_freq_set", f'{pin},{freq}')
+        execute_parameterized(self._p, "IOConfigSubsystem.pwm_freq_set", pin, freq)
 
     def pwm_duty_set(self, ch: int, duty_percent: int):
         pin = self._pin_index(ch)
         if type(duty_percent) is not int or not 1 <= duty_percent <= 100:
             raise ConfigurationError("PWM duty must be an integer in 1..100 percent")
-        execute_parameterized(self._p, "IOConfigSubsystem.pwm_duty_set", f'{pin},{duty_percent}')
+        execute_parameterized(self._p, "IOConfigSubsystem.pwm_duty_set", pin, duty_percent)
 
     _PIN_FUNCTIONS = (
         ("PSCL",), ("PSST",), ("OFFS",), ("EXTT", "TOUT"),
@@ -84,13 +84,13 @@ class IOConfigSubsystem:
         pin = self._pin_index(pin)
         if type(enabled) not in (bool,int) or enabled not in (0,1):
             raise ConfigurationError("reverse state must be bool or 0/1")
-        execute_parameterized(self._p, "IOConfigSubsystem.reverse_set", f"{pin},{int(enabled)}")
+        execute_parameterized(self._p, "IOConfigSubsystem.reverse_set", pin, enabled)
 
     def reverse_query(self, pin):
-        return parse_bool(execute_parameterized(self._p, "IOConfigSubsystem.reverse_query", f"{self._pin_index(pin)}"))
+        return parse_bool(execute_parameterized(self._p, "IOConfigSubsystem.reverse_query", self._pin_index(pin)))
 
     def pwm_enable_query(self, pin):
-        return parse_bool(execute_parameterized(self._p, "IOConfigSubsystem.pwm_enable_query", f"{self._pin_index(pin)}"))
+        return parse_bool(execute_parameterized(self._p, "IOConfigSubsystem.pwm_enable_query", self._pin_index(pin)))
 
     def _pin_numeric_query(self, header, pin, bound=None):
         pin = self._pin_index(pin)
@@ -103,7 +103,7 @@ class IOConfigSubsystem:
         return self._pin_numeric_query(command_spec("IOConfigSubsystem.pwm_freq_query").header,pin,bound)
 
     def pwm_duty_query(self,pin):
-        raw = execute_parameterized(self._p, "IOConfigSubsystem.pwm_duty_query", f"{self._pin_index(pin)}")
+        raw = execute_parameterized(self._p, "IOConfigSubsystem.pwm_duty_query", self._pin_index(pin))
         duty = parse_int(raw)
         if not 0 <= duty <= 100:
             raise ResponseParseError("invalid duty cycle",raw=raw)
@@ -121,7 +121,7 @@ class IOConfigSubsystem:
             hi = self.pulse_width_query(pin,bound="MAX")
             if not 0 <= lo <= seconds <= hi:
                 raise ConfigurationError("pulse width outside reported range")
-            execute_parameterized(self._p, "IOConfigSubsystem.pulse_width_set", f"{pin},{seconds}")
+            execute_parameterized(self._p, "IOConfigSubsystem.pulse_width_set", pin, seconds)
 
     def _function_token(self,pin,function):
         token = self._FUNCTION_ALIASES.get(function.upper()) if isinstance(function,str) else None
@@ -134,11 +134,11 @@ class IOConfigSubsystem:
         token = self._function_token(pin,function)
         # Use guide long forms for pin-specific tokens.
         wire = {"PSCL":"PSClear","PSST":"PSSTa","OFFS":"OFFSta","EXTT":"EXTTrig"}.get(token,token)
-        execute_parameterized(self._p, "IOConfigSubsystem.pin_function_set", f"{pin},{wire}")
+        execute_parameterized(self._p, "IOConfigSubsystem.pin_function_set", pin, wire)
 
     def pin_function_query(self,pin):
         pin = self._pin_index(pin)
-        raw = execute_parameterized(self._p, "IOConfigSubsystem.pin_function_query", f"{pin}")
+        raw = execute_parameterized(self._p, "IOConfigSubsystem.pin_function_query", pin)
         try:
             return self._function_token(pin,raw.strip())
         except ConfigurationError as exc:
@@ -172,7 +172,7 @@ class IOConfigSubsystem:
         pin = self._pin_index(pin)
         if type(high) not in (bool,int) or high not in (0,1):
             raise ConfigurationError("output level must be bool or 0/1")
-        execute_parameterized(self._p, "IOConfigSubsystem.output_level_set", f"{pin},{int(high)}")
+        execute_parameterized(self._p, "IOConfigSubsystem.output_level_set", pin, high)
 
     def _level_query(self,header,pin):
         raw = self._p.query_scpi(f"{header}? {self._pin_index(pin)}").strip().upper()

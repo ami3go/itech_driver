@@ -34,14 +34,14 @@ class SourceSubsystem:
 
     def function_set(self, mode: str):
         """Select CV or CC priority, not a measurement of actual regulation mode."""
-        execute_parameterized(self._p, "SourceSubsystem.function_set", f"{self._enum_arg(mode, self._FUNCTIONS)}")
+        execute_parameterized(self._p, "SourceSubsystem.function_set", self._enum_arg(mode, self._FUNCTIONS))
 
     def function_query(self) -> str:
         return self._enum_query(command_spec("SourceSubsystem.function_query").header, self._FUNCTIONS)
 
     def function_mode_set(self, mode: str):
         """Select fixed, list, or battery operation. Does not initiate or trigger."""
-        execute_parameterized(self._p, "SourceSubsystem.function_mode_set", f"{self._enum_arg(mode, self._MODES)}")
+        execute_parameterized(self._p, "SourceSubsystem.function_mode_set", self._enum_arg(mode, self._MODES))
 
     def function_mode_query(self) -> str:
         return self._enum_query(command_spec("SourceSubsystem.function_mode_query").header, self._MODES)
@@ -86,7 +86,7 @@ class SourceSubsystem:
     def ovp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
         enable = strict_bool(enable, "enable")
-        execute_parameterized(self._p, "SourceSubsystem.ovp_enable", f'{1 if enable else 0}')
+        execute_parameterized(self._p, "SourceSubsystem.ovp_enable", enable)
 
     def ovp_enable_query(self, channel: int = 1) -> bool:  # Added: Missing query method
         self._check_channel(channel)
@@ -104,7 +104,7 @@ class SourceSubsystem:
     def ocp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
         enable = strict_bool(enable, "enable")
-        execute_parameterized(self._p, "SourceSubsystem.ocp_enable", f'{1 if enable else 0}')
+        execute_parameterized(self._p, "SourceSubsystem.ocp_enable", enable)
 
     def ocp_enable_query(self, channel: int = 1) -> bool:  # Added: Missing query method
         self._check_channel(channel)
@@ -122,7 +122,7 @@ class SourceSubsystem:
     def opp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
         enable = strict_bool(enable, "enable")
-        execute_parameterized(self._p, "SourceSubsystem.opp_enable", f'{1 if enable else 0}')
+        execute_parameterized(self._p, "SourceSubsystem.opp_enable", enable)
 
     def opp_enable_query(self, channel: int = 1) -> bool:
         self._check_channel(channel)
@@ -218,7 +218,7 @@ class SourceSubsystem:
         """
         self._check_channel(channel)
         enable = strict_bool(enable, "enable")
-        execute_parameterized(self._p, "SourceSubsystem.remote_sense_set", f'{1 if enable else 0}')
+        execute_parameterized(self._p, "SourceSubsystem.remote_sense_set", enable)
 
     def remote_sense_query(self, channel: int = 1) -> bool:
         self._check_channel(channel)
@@ -301,7 +301,7 @@ class SourceSubsystem:
     def uvp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
         enable = strict_bool(enable, "enable")
-        execute_parameterized(self._p, "SourceSubsystem.uvp_enable", f"{int(enable)}")
+        execute_parameterized(self._p, "SourceSubsystem.uvp_enable", enable)
 
     def uvp_enable_query(self, channel: int = 1) -> bool:
         self._check_channel(channel)
@@ -319,7 +319,7 @@ class SourceSubsystem:
     def ucp_enable(self, enable: BoolLike, channel: int = 1):
         self._check_channel(channel)
         enable = strict_bool(enable, "enable")
-        execute_parameterized(self._p, "SourceSubsystem.ucp_enable", f"{int(enable)}")
+        execute_parameterized(self._p, "SourceSubsystem.ucp_enable", enable)
 
     def ucp_enable_query(self, channel: int = 1) -> bool:
         self._check_channel(channel)
@@ -380,13 +380,13 @@ class SourceSubsystem:
         return self._limit_query(command_spec("SourceSubsystem.current_both_time_query").header, bound)
 
     def cv_loop_speed_set(self, speed: str):
-        execute_parameterized(self._p, "SourceSubsystem.cv_loop_speed_set", f"{self._enum_arg(speed, {'HIGH': 'HIGH', 'LOW': 'LOW'})}")
+        execute_parameterized(self._p, "SourceSubsystem.cv_loop_speed_set", self._enum_arg(speed, {"HIGH": "HIGH", "LOW": "LOW"}))
 
     def cv_loop_speed_query(self) -> str:
         return self._enum_query(command_spec("SourceSubsystem.cv_loop_speed_query").header, {"HIGH": "HIGH", "LOW": "LOW"})
 
     def cc_loop_speed_set(self, speed: str):
-        execute_parameterized(self._p, "SourceSubsystem.cc_loop_speed_set", f"{self._enum_arg(speed, {'HIGH': 'HIGH', 'LOW': 'LOW'})}")
+        execute_parameterized(self._p, "SourceSubsystem.cc_loop_speed_set", self._enum_arg(speed, {"HIGH": "HIGH", "LOW": "LOW"}))
 
     def cc_loop_speed_query(self) -> str:
         return self._enum_query(command_spec("SourceSubsystem.cc_loop_speed_query").header, {"HIGH": "HIGH", "LOW": "LOW"})
