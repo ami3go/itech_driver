@@ -1,3 +1,4 @@
+import math
 import warnings
 from scpi_driver_core import ConfigurationError, IdentityError, ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float
