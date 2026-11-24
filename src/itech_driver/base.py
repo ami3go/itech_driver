@@ -12,6 +12,7 @@ from scpi_driver_core.exceptions import (
     ResponseParseError,
 )
 from scpi_driver_core.scpi.codec import ScpiTextCodec
+from scpi_driver_core.scpi.errors import ScpiErrorQueue, ScpiExecutionPolicy
 from scpi_driver_core.transport.base import Transport
 from scpi_driver_core.transport.visa import VisaTransport
 
@@ -110,6 +111,26 @@ class BaseInstrument:
         if len(payload) % struct.calcsize(fmt):
             raise ResponseParseError("binary payload is not a whole number of values", raw=payload)
         return container([item[0] for item in struct.iter_unpack(fmt, payload)])
+
+    def enable_scpi_error_checking(self) -> None:
+        """Opt in to destructive error-queue checks after successful writes.
+
+        Existing errors may predate the current operation. A queue error does
+        not imply that the command was not executed; never retry automatically.
+        """
+        self.client.enable_error_checking(
+            ScpiErrorQueue(self.client, maximum_entries=21),
+            ScpiExecutionPolicy(check_error_queue_after_write=True),
+        )
+
+    def disable_scpi_error_checking(self) -> None:
+        self.client.disable_error_checking()
+
+    def drain_scpi_errors(self, *, max_entries: int = 21):
+        """Explicitly consume FIFO errors, with a bound including the zero sentinel."""
+        if type(max_entries) is not int or not 1 <= max_entries <= 21:
+            raise ConfigurationError("max_entries must be an integer in 1..21")
+        return ScpiErrorQueue(self.client, maximum_entries=max_entries).drain()
 
     def identify(self) -> str:
         return self.query_scpi("*IDN?")
