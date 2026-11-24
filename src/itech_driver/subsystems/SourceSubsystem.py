@@ -429,3 +429,18 @@ class SourceSubsystem:
             if parse_bool(self._p.query_scpi("OUTP:STAT?")) or self.external_programming_query():
                 raise ConfigurationError("disable output and external control before changing coefficients")
             self._p.write_scpi(f"SOUR:EXT:PROG:CHAN:{coefficient} {channel},{value}")
+
+    def resistance_query(self, *, bound=None) -> float:
+        """Query programmed internal resistance in ohms (CV priority only)."""
+        with self._p.session.operation_lock():
+            if self.function_query() != "VOLT":
+                raise ConfigurationError("internal resistance requires CV priority")
+            return self._limit_query("SOUR:RES",bound)
+
+    def resistance_set(self, ohms: Number):
+        """Set CV internal resistance using the device's reported range."""
+        self._check_setpoint(ohms)
+        with self._p.session.operation_lock():
+            if self.function_query() != "VOLT":
+                raise ConfigurationError("internal resistance requires CV priority")
+            self._limit_set("SOUR:RES",ohms)
