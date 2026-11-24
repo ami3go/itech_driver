@@ -21,6 +21,8 @@ assert callable(connect_tcp)
 assert importlib.util.find_spec("pyvisa") is None, "VISA unexpectedly mandatory"
 assert importlib.util.find_spec("serial") is None, "serial unexpectedly mandatory"
 assert importlib.util.find_spec("logger") is None
-from importlib.metadata import metadata
+from importlib.metadata import metadata, version
+from itech_driver import __version__
+assert __version__ == version("itech-itm3900d-driver")
 assert metadata("itech-itm3900d-driver")["Requires-Python"] == ">=3.10"
 """], check=True, cwd=tmp)
