@@ -30,7 +30,7 @@ def test_session_and_subsystem_wiring():
 
 
 def test_exact_command_coverage():
-    t = ScriptedScpiTransport()
+    t = ScriptedScpiTransport().on("*IDN?", IDN)
     commands = [
         "SOUR:VOLT 12.5", "OUTP:STAT OFF", "ARB:FUNCTION:SHAPE UDEF",
         "BATT:CHAR:VOLT 3.5", "IO:SELect 1", "TRIG:ACQ:SOUR EXT",
@@ -51,7 +51,7 @@ def test_exact_command_coverage():
         d.initiate.arb()
         d.abort.arb()
         d.ieee.clear_status()
-        assert [s.upper() for s in t.history] == [s.upper() for s in ["SOUR:VOLT? MIN","SOUR:VOLT? MAX",*commands]]
+        assert [s.upper() for s in t.history] == [s.upper() for s in ["*IDN?","SOUR:VOLT? MIN","SOUR:VOLT? MAX",*commands]]
         assert d.source.voltage_query() == 12.5
         assert d.output.state_query() is False
         assert d.status.oper_condition_query() == 4
