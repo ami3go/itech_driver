@@ -1,3 +1,4 @@
+from scpi_driver_core import ConfigurationError, ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_float
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
@@ -21,11 +22,67 @@ class TriggerSubsystem:
     def acquire_mode_query(self) -> str:
         return self._p.query_scpi('TRIG:ACQ:MODE?')
 
+    _SOURCE_ALIASES = {
+        "VOLT": "VOLT", "VOLTAGE": "VOLT",
+        "CURR": "CURR", "CURRENT": "CURR",
+        "EXT": "EXT", "EXTERNAL": "EXT",
+        "BUS": "BUS", "MAN": "MAN", "MANUAL": "MAN",
+        "IMM": "IMM", "IMMEDIATE": "IMM",
+    }
+    _SOURCES = {
+        "ACQ": frozenset(("VOLT", "CURR", "EXT", "BUS", "MAN", "IMM")),
+        "ARB": frozenset(("EXT", "BUS", "MAN", "IMM")),
+        "DLOG": frozenset(("VOLT", "CURR", "EXT", "BUS", "MAN", "IMM")),
+        "ELOG": frozenset(("VOLT", "CURR", "EXT", "BUS", "MAN", "IMM")),
+    }
+
+    @classmethod
+    def _normalize_source(cls, subsystem: str, source: str) -> str:
+        token = cls._SOURCE_ALIASES.get(source.upper()) if isinstance(source, str) else None
+        if token not in cls._SOURCES[subsystem]:
+            raise ConfigurationError(f"invalid {subsystem} trigger source: {source!r}")
+        return token
+
+    def _source_set(self, subsystem: str, source: str):
+        token = self._normalize_source(subsystem, source)
+        self._p.write_scpi(f"TRIG:{subsystem}:SOUR {token}")
+
+    def _source_query(self, subsystem: str) -> str:
+        raw = self._p.query_scpi(f"TRIG:{subsystem}:SOUR?")
+        try:
+            return self._normalize_source(subsystem, raw.strip())
+        except ConfigurationError as exc:
+            raise ResponseParseError(f"invalid {subsystem} trigger source response", raw=raw) from exc
+
+    def acquire_source_set(self, source: str):
+        self._source_set("ACQ", source)
+
+    def acquire_source_query(self) -> str:
+        return self._source_query("ACQ")
+
+    def arb_source_set(self, source: str):
+        self._source_set("ARB", source)
+
+    def arb_source_query(self) -> str:
+        return self._source_query("ARB")
+
+    def dlog_source_set(self, source: str):
+        self._source_set("DLOG", source)
+
+    def dlog_source_query(self) -> str:
+        return self._source_query("DLOG")
+
+    def elog_source_set(self, source: str):
+        self._source_set("ELOG", source)
+
+    def elog_source_query(self) -> str:
+        return self._source_query("ELOG")
+
     def source_set(self, src: str):
-        self._p.write_scpi(f'TRIG:SOUR {src}')
+        raise UnsupportedOperationError("select an explicit ACQ, ARB, DLOG or ELOG trigger source")
 
     def source_query(self) -> str:
-        return self._p.query_scpi('TRIG:SOUR?')
+        raise UnsupportedOperationError("select an explicit ACQ, ARB, DLOG or ELOG trigger source")
 
     def level_set(self, val: Number):
         self._p.write_scpi(f'TRIG:LEV {val}')
