@@ -5,6 +5,7 @@ Run ONLY in a disposable git checkout. Fetch PR refs, freeze exact commits,
 attempt ordered merges, abort conflicts, and write JSON. No release decision.
 """
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -25,7 +26,7 @@ def sha(repo,ref):
     return git(repo,"rev-parse","--verify",ref+"^{commit}").stdout.strip()
 
 
-def audit(repo,base,prs,*,fetch=True):
+def audit(repo,base,prs,*,fetch=True,archive=None):
     base_sha=sha(repo,base)
     if len(set(prs))!=len(prs) or any(type(n) is not int or n<=0 for n in prs):
         raise ValueError("invalid PR inventory")
@@ -61,6 +62,11 @@ def audit(repo,base,prs,*,fetch=True):
                                               "audit_commit":sha(work,"HEAD")})
             result["audit_tree"]=git(work,"rev-parse","HEAD^{tree}").stdout.strip()
             result["status"]="CONFLICTS" if any(r["status"] in ("CONFLICT","MERGE_ERROR") for r in result["results"]) else "CLEAN_MERGE_AUDIT"
+            if archive is not None and result["status"]=="CLEAN_MERGE_AUDIT":
+                archive=Path(archive).resolve()
+                git(work,"archive","--format=zip","--output="+str(archive),"HEAD")
+                result["archive_sha256"]=hashlib.sha256(archive.read_bytes()).hexdigest()
+                result["audit_commit"]=sha(work,"HEAD")
         finally:
             git(repo,"worktree","remove","--force",str(work))
     return result
@@ -72,8 +78,9 @@ def main():
     parser.add_argument("--base",required=True)
     parser.add_argument("--output",type=Path,required=True)
     parser.add_argument("--prs",nargs="+",type=int,default=DEFAULT_PRS)
+    parser.add_argument("--archive",type=Path)
     args=parser.parse_args()
-    report=audit(args.repo.resolve(),args.base,args.prs)
+    report=audit(args.repo.resolve(),args.base,args.prs,archive=args.archive)
     args.output.write_text(json.dumps(report,indent=2)+"\n",encoding="utf-8")
     for r in report["results"]:
         print(f'PR #{r["pr"]}: {r["status"]} {", ".join(r.get("files",[]))}')
