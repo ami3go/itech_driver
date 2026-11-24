@@ -8,8 +8,8 @@ devices:
     dialogues:
       - q: "*IDN?"
         r: "ITECH,IT-M3900D,SIM001,1.0"
-      - q: "OUTP1:STAT OFF"
-      - q: "OUTP1:STAT?"
+      - q: "OUTP:STAT OFF"
+      - q: "OUTP:STAT?"
         r: "OFF"
     properties:
       voltage:
