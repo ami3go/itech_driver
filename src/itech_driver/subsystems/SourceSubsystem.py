@@ -372,3 +372,15 @@ class SourceSubsystem:
     def current_both_time_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
         return self._limit_query("SOUR:CURR:SLEW:BOTH", bound)
+
+    def cv_loop_speed_set(self, speed: str):
+        self._p.write_scpi(f"SOUR:CV:PRI {self._enum_arg(speed, {'HIGH': 'HIGH', 'LOW': 'LOW'})}")
+
+    def cv_loop_speed_query(self) -> str:
+        return self._enum_query("SOUR:CV:PRI", {"HIGH": "HIGH", "LOW": "LOW"})
+
+    def cc_loop_speed_set(self, speed: str):
+        self._p.write_scpi(f"SOUR:CC:PRI {self._enum_arg(speed, {'HIGH': 'HIGH', 'LOW': 'LOW'})}")
+
+    def cc_loop_speed_query(self) -> str:
+        return self._enum_query("SOUR:CC:PRI", {"HIGH": "HIGH", "LOW": "LOW"})
