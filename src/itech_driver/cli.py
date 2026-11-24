@@ -14,6 +14,11 @@ def main(argv=None) -> None:
 
     # Discover command
     discover_parser = subparsers.add_parser('discover', help='Discover instruments')
+    discover_parser.add_argument('--subnet')
+    discover_parser.add_argument('--port', type=int, default=30000)
+    discover_parser.add_argument('--timeout', type=int, default=1000)
+    discover_parser.add_argument('--vcp', action='store_true')
+    discover_parser.add_argument('--baudrate', type=int, default=9600)
 
     # Control command
     control_parser = subparsers.add_parser('control', help='Control instrument')
@@ -26,29 +31,27 @@ def main(argv=None) -> None:
     args = parser.parse_args(argv)
 
     if args.command == 'discover':
-        discover_instruments()
+        discover_instruments(args)
     elif args.command == 'control':
         control_instrument(args)
     else:
         parser.print_help()
 
 
-def discover_instruments() -> None:
-    """Discover and list available instruments."""
-    import pyvisa
-    rm = pyvisa.ResourceManager()
-    resources = rm.list_resources()
-
-    print("Available instruments:")
-    for resource in resources:
-        print(f"  {resource}")
-        try:
-            instr = auto_detect_instrument(resource, timeout=1000)
-            with instr:
-                idn = instr.identify()
-                print(f"    IDN: {idn}")
-        except Exception as e:
-            print(f"    Error: {e}")
+def discover_instruments(args=None) -> None:
+    """CLI entry point; enumerate and query identities only."""
+    from .discovery import discover_instruments as discover
+    if args is None:
+        main(["discover", *sys.argv[1:]])
+        return
+    report = discover(subnet=args.subnet, port=args.port, timeout=args.timeout,
+                      probe_vcp=args.vcp, baudrate=args.baudrate)
+    for device in report.devices:
+        print(device.identity.raw)
+        for endpoint in device.endpoints:
+            print(f"  {endpoint.interface}: {endpoint.address}")
+    for diagnostic in report.diagnostics:
+        print(diagnostic, file=sys.stderr)
 
 
 def control_instrument(args) -> None:
