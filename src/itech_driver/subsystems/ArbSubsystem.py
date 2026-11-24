@@ -1,9 +1,30 @@
 from scpi_driver_core import ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float, parse_int
 from ..base import  BaseInstrument, BoolLike, Number
+from ..utils.validation import exact_integer, finite_number, strict_bool
 # -------------------------
 # ARB / List Subsystem (ARB)
 # -------------------------
+# Conservative IT-M3900D family LIST bounds, User Manual V2.6/5,2025,
+# section 4.6.1 pp.58–59. Full command/firmware qualification remains separate.
+# Zero repetition is deliberately not accepted: finite execution only.
+_LIST_STEPS = 200
+_LIST_FILES = 10
+_FINITE_REPEATS = 999999
+
+
+def _step(value):
+    return exact_integer(value, minimum=1, maximum=_LIST_STEPS, name="LIST step")
+
+
+def _slot(value):
+    return exact_integer(value, minimum=1, maximum=_LIST_FILES, name="LIST file")
+
+
+def _repeat(value):
+    return exact_integer(value, minimum=1, maximum=_FINITE_REPEATS, name="finite repeat count")
+
+
 class ArbSubsystem:
     """ARB / List / Sequence programming and execution."""
     def __init__(self, parent: BaseInstrument):
@@ -23,31 +44,31 @@ class ArbSubsystem:
 
     # UDEFined list helpers
     def udef_count_set(self, steps: int):
-        self._p.write_scpi(f'ARB:UDEFined:COUNt {int(steps)}')
+        self._p.write_scpi(f'ARB:UDEFined:COUNt {_step(steps)}')
 
     def udef_count_query(self) -> int:  # Added: Missing query method
         return parse_int(self._p.query_scpi('ARB:UDEFined:COUNt?'))
 
     def udef_level_set(self, step: int, level: Number):
-        self._p.write_scpi(f'ARB:UDEFined:LEVel {int(step)},{float(level)}')
+        self._p.write_scpi(f'ARB:UDEFined:LEVel {_step(step)},{float(finite_number(level))}')
 
     def udef_level_query(self, step: int) -> float:  # Added: Missing query method
-        return parse_float(self._p.query_scpi(f'ARB:UDEFined:LEVel? {int(step)}'))
+        return parse_float(self._p.query_scpi(f'ARB:UDEFined:LEVel? {_step(step)}'))
 
     def udef_dwell_set(self, step: int, seconds: Number):
-        self._p.write_scpi(f'ARB:UDEFined:DWELl {int(step)},{float(seconds)}')
+        self._p.write_scpi(f'ARB:UDEFined:DWELl {_step(step)},{float(finite_number(seconds))}')
 
     def udef_dwell_query(self, step: int) -> float:  # Added: Missing query method
-        return parse_float(self._p.query_scpi(f'ARB:UDEFined:DWELl? {int(step)}'))
+        return parse_float(self._p.query_scpi(f'ARB:UDEFined:DWELl? {_step(step)}'))
 
     def udef_slew_set(self, step: int, slew_val: Number):
-        self._p.write_scpi(f'ARB:UDEFined:SLEW {int(step)},{float(slew_val)}')
+        self._p.write_scpi(f'ARB:UDEFined:SLEW {_step(step)},{float(finite_number(slew_val))}')
 
     def udef_slew_query(self, step: int) -> float:  # Added: Missing query method
-        return parse_float(self._p.query_scpi(f'ARB:UDEFined:SLEW? {int(step)}'))
+        return parse_float(self._p.query_scpi(f'ARB:UDEFined:SLEW? {_step(step)}'))
 
     def count_set(self, cnt: int):
-        self._p.write_scpi(f'ARB:COUNT {int(cnt)}')
+        self._p.write_scpi(f'ARB:COUNT {_repeat(cnt)}')
 
     def count_query(self) -> int:  # Added: Missing query method
         return parse_int(self._p.query_scpi('ARB:COUNT?'))
@@ -63,10 +84,10 @@ class ArbSubsystem:
             "ARB termination response requires IT-M3900D guide qualification")
 
     def save(self, index: int):
-        self._p.write_scpi(f'ARB:SAVE {int(index)}')
+        self._p.write_scpi(f'ARB:SAVE {_slot(index)}')
 
     def recall(self, index: int):
-        self._p.write_scpi(f'ARB:RECall {int(index)}')
+        self._p.write_scpi(f'ARB:RECall {_slot(index)}')
 
     def init(self):
         self._p.write_scpi('INITiate:ARB')
@@ -75,7 +96,7 @@ class ArbSubsystem:
         self._p.write_scpi('TRIGger:ARB')
 
     def pause_set(self, enable: BoolLike):
-        self._p.write_scpi(f'ARB:PAUSe:STATe {1 if enable else 0}')
+        self._p.write_scpi(f'ARB:PAUSe:STATe {1 if strict_bool(enable) else 0}')
 
     def pause_query(self) -> bool:  # Added: Missing query method
         return parse_bool(self._p.query_scpi('ARB:PAUSe:STATe?'))
