@@ -35,19 +35,19 @@ class SystemSubsystem:
     def beeper_state_set(self, on: BoolLike):
         if type(on) not in (bool, int) or on not in (0, 1):
             raise ConfigurationError("beeper state must be bool or 0/1")
-        execute_parameterized(self._p, "SystemSubsystem.beeper_state_set", f'{"ON" if on else "OFF"}')
+        execute_parameterized(self._p, "SystemSubsystem.beeper_state_set", on)
 
     def beeper_state_query(self) -> bool:
         return execute(self._p, "SystemSubsystem.beeper_state_query")
 
     def date_set(self, yyyy: int, mm: int, dd: int):
-        execute_parameterized(self._p, "SystemSubsystem.date_set", f'{yyyy},{mm},{dd}')
+        execute_parameterized(self._p, "SystemSubsystem.date_set", yyyy, mm, dd)
 
     def date_query(self) -> str:
         return execute(self._p, "SystemSubsystem.date_query")
 
     def time_set(self, hh: int, mm: int, ss: int):
-        execute_parameterized(self._p, "SystemSubsystem.time_set", f'{hh},{mm},{ss}')
+        execute_parameterized(self._p, "SystemSubsystem.time_set", hh, mm, ss)
 
     def time_query(self) -> str:
         return execute(self._p, "SystemSubsystem.time_query")
@@ -55,13 +55,13 @@ class SystemSubsystem:
     # Communication helpers
     def comm_select(self, iface: str):
         """SYST:COMM:SEL <CPD>  e.g. 'LAN','USB','GPIB','SER'"""
-        execute_parameterized(self._p, "SystemSubsystem.comm_select", f'{iface}')
+        execute_parameterized(self._p, "SystemSubsystem.comm_select", iface)
 
     def comm_select_query(self) -> str:
         return execute(self._p, "SystemSubsystem.comm_select_query")
 
     def comm_gpib_addr_set(self, addr: int):  # Corrected: Fixed method name from gpiB to gpib
-        execute_parameterized(self._p, "SystemSubsystem.comm_gpib_addr_set", f'{int(addr)}')
+        execute_parameterized(self._p, "SystemSubsystem.comm_gpib_addr_set", addr)
 
     def comm_gpib_addr_query(self) -> int:  # Corrected: Fixed method name from gpiB to gpib
         return execute(self._p, "SystemSubsystem.comm_gpib_addr_query")
@@ -116,7 +116,7 @@ class SystemSubsystem:
         token = modes.get(mode.upper()) if isinstance(mode, str) else None
         if token is None:
             raise ConfigurationError("LAN IP mode must be AUTO or MANual")
-        execute_parameterized(self._p, "SystemSubsystem.lan_ip_mode_set", f"{token}")
+        execute_parameterized(self._p, "SystemSubsystem.lan_ip_mode_set", token)
 
     def lan_ip_mode_query(self) -> str:
         raw = execute(self._p, "SystemSubsystem.lan_ip_mode_query").strip().upper()

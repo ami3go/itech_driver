@@ -26,19 +26,19 @@ class OutputSubsystem:
         return execute(self._p, "OutputSubsystem.state_query")
 
     def delay_rise_set(self, seconds: Number):
-        execute_parameterized(self._p, "OutputSubsystem.delay_rise_set", f'{seconds}')
+        execute_parameterized(self._p, "OutputSubsystem.delay_rise_set", seconds)
 
     def delay_rise_query(self) -> float:
         return execute(self._p, "OutputSubsystem.delay_rise_query")
 
     def delay_fall_set(self, seconds: Number):
-        execute_parameterized(self._p, "OutputSubsystem.delay_fall_set", f'{seconds}')
+        execute_parameterized(self._p, "OutputSubsystem.delay_fall_set", seconds)
 
     def delay_fall_query(self) -> float:
         return execute(self._p, "OutputSubsystem.delay_fall_query")
 
     def inhibit_mode_set(self, mode: str):
-        execute_parameterized(self._p, "OutputSubsystem.inhibit_mode_set", f'{mode}')
+        execute_parameterized(self._p, "OutputSubsystem.inhibit_mode_set", mode)
 
     def inhibit_mode_query(self) -> str:  # Added: Missing query method
         return execute(self._p, "OutputSubsystem.inhibit_mode_query")
@@ -96,7 +96,7 @@ class OutputSubsystem:
             raise ConfigurationError("power-on mode must be RST, LAST_ON or LAST_OFF")
         if token == "LAST_ON" and allow_restore_output is not True:
             raise ConfigurationError("LAST_ON requires explicit allow_restore_output=True")
-        execute_parameterized(self._p, "OutputSubsystem.power_on_mode_set", f"{token}")
+        execute_parameterized(self._p, "OutputSubsystem.power_on_mode_set", token)
 
     def power_on_mode_query(self) -> str:
         raw = execute(self._p, "OutputSubsystem.power_on_mode_query").strip().upper()

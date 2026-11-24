@@ -3,13 +3,14 @@
 The inventory in docs/command_registry.json remains historical coverage.
 A runtime spec establishes software wire syntax, not hardware qualification.
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+import re
 from enum import Enum
 from types import MappingProxyType
 
 from scpi_driver_core import ConfigurationError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float, parse_int
-from .utils.validation import strict_bool
+from .utils.validation import strict_bool, finite_number, nonnegative_number
 
 
 class ResultKind(str, Enum):
@@ -33,6 +34,38 @@ class ResultKind(str, Enum):
     PLANNER = "planner"
 
 
+class FieldKind(str, Enum):
+    INTEGER = "integer"
+    NUMBER = "finite_number"
+    NONNEGATIVE = "nonnegative_number"
+    TOKEN = "discrete_token"
+    BOOL01 = "boolean_01"
+    ONOFF = "boolean_onoff"
+
+
+@dataclass(frozen=True)
+class WireField:
+    name: str
+    kind: FieldKind
+
+    def format(self, value):
+        if self.kind is FieldKind.INTEGER:
+            if type(value) is not int:
+                raise ConfigurationError(f"{self.name} must be an exact integer")
+        elif self.kind is FieldKind.NUMBER:
+            finite_number(value, self.name)
+        elif self.kind is FieldKind.NONNEGATIVE:
+            nonnegative_number(value, self.name)
+        elif self.kind is FieldKind.TOKEN:
+            if not isinstance(value, str) or re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]*", value) is None:
+                raise ConfigurationError(f"{self.name} must be a single discrete token")
+        elif self.kind is FieldKind.BOOL01:
+            return str(int(strict_bool(value, self.name)))
+        elif self.kind is FieldKind.ONOFF:
+            return "ON" if strict_bool(value, self.name) else "OFF"
+        return str(value)
+
+
 @dataclass(frozen=True)
 class CommandSpec:
     method: str
@@ -45,6 +78,7 @@ class CommandSpec:
     effect: str = "unknown_read"
     parameters: tuple[str, ...] = ()
     dependencies: tuple[str, ...] = ()
+    fields: tuple[WireField, ...] = ()
 
     @property
     def modifies_state(self) -> bool:
@@ -365,11 +399,85 @@ LOGGING_CONFIG_TEMPLATES = (
     "SENS:{kind}:FUNC:VOLT {value}", "SENS:{kind}:FUNC:CURR {value}",
     "SENS:{kind}:FUNC:PEAK {value}", "SENS:{kind}:PER {value}", "SENS:{kind}:TIME {value}",
 )
-COMMAND_SPECS = MappingProxyType({
+_BASE_COMMAND_SPECS = {
     **{m: CommandSpec(m, h, k, f, effect="write" if k is ResultKind.BOOL_WRITE else "unknown_read") for m, h, k, f in _ROWS},
     **{m: CommandSpec(m, h, k, f, effect=e) for m, h, k, f, e in _ADDITIONAL_ROWS},
     **{m: CommandSpec(m, h, k, f, effect=e, parameters=p) for m, h, k, f, e, p in _PARAMETERIZED_ROWS},
     **{m: CommandSpec(m, h, k, f, effect=e, parameters=p, dependencies=d) for m, h, k, f, e, p, d in _FINAL_ROWS},
+}
+
+_WIRE_FIELDS = MappingProxyType({
+    "ArbSubsystem.function_shape_set": (WireField("shape", FieldKind.TOKEN),),
+    "ArbSubsystem.function_type_set": (WireField("type", FieldKind.TOKEN),),
+    "ArbSubsystem.udef_count_set": (WireField("steps", FieldKind.INTEGER),),
+    "ArbSubsystem.count_set": (WireField("cnt", FieldKind.INTEGER),),
+    "ArbSubsystem.save": (WireField("index", FieldKind.INTEGER),),
+    "ArbSubsystem.recall": (WireField("index", FieldKind.INTEGER),),
+    "ArbSubsystem.udef_level_set": (WireField("step", FieldKind.INTEGER), WireField("level", FieldKind.NUMBER),),
+    "ArbSubsystem.udef_level_query": (WireField("step", FieldKind.INTEGER),),
+    "ArbSubsystem.udef_dwell_set": (WireField("step", FieldKind.INTEGER), WireField("seconds", FieldKind.NUMBER),),
+    "ArbSubsystem.udef_dwell_query": (WireField("step", FieldKind.INTEGER),),
+    "ArbSubsystem.udef_slew_set": (WireField("step", FieldKind.INTEGER), WireField("slew_val", FieldKind.NUMBER),),
+    "ArbSubsystem.udef_slew_query": (WireField("step", FieldKind.INTEGER),),
+    "ArbSubsystem.pause_set": (WireField("enable", FieldKind.BOOL01),),
+    "SourceSubsystem.function_set": (WireField("mode", FieldKind.TOKEN),),
+    "SourceSubsystem.function_mode_set": (WireField("mode", FieldKind.TOKEN),),
+    "SourceSubsystem.ovp_enable": (WireField("enable", FieldKind.BOOL01),),
+    "SourceSubsystem.ocp_enable": (WireField("enable", FieldKind.BOOL01),),
+    "SourceSubsystem.opp_enable": (WireField("enable", FieldKind.BOOL01),),
+    "SourceSubsystem.remote_sense_set": (WireField("enable", FieldKind.BOOL01),),
+    "SourceSubsystem.uvp_enable": (WireField("enable", FieldKind.BOOL01),),
+    "SourceSubsystem.ucp_enable": (WireField("enable", FieldKind.BOOL01),),
+    "SourceSubsystem.cv_loop_speed_set": (WireField("speed", FieldKind.TOKEN),),
+    "SourceSubsystem.cc_loop_speed_set": (WireField("speed", FieldKind.TOKEN),),
+    "IOConfigSubsystem.select": (WireField("pin", FieldKind.INTEGER),),
+    "IOConfigSubsystem.direction_set": (WireField("pin", FieldKind.INTEGER), WireField("direction", FieldKind.BOOL01),),
+    "IOConfigSubsystem.direction_query": (WireField("pin", FieldKind.INTEGER),),
+    "IOConfigSubsystem.pwm_enable": (WireField("pin", FieldKind.INTEGER), WireField("enable", FieldKind.BOOL01),),
+    "IOConfigSubsystem.pwm_freq_set": (WireField("pin", FieldKind.INTEGER), WireField("frequency", FieldKind.NONNEGATIVE),),
+    "IOConfigSubsystem.pwm_duty_set": (WireField("pin", FieldKind.INTEGER), WireField("duty_percent", FieldKind.INTEGER),),
+    "IOConfigSubsystem.reverse_set": (WireField("pin", FieldKind.INTEGER), WireField("enabled", FieldKind.BOOL01),),
+    "IOConfigSubsystem.reverse_query": (WireField("pin", FieldKind.INTEGER),),
+    "IOConfigSubsystem.pwm_enable_query": (WireField("pin", FieldKind.INTEGER),),
+    "IOConfigSubsystem.pwm_duty_query": (WireField("pin", FieldKind.INTEGER),),
+    "IOConfigSubsystem.pulse_width_set": (WireField("pin", FieldKind.INTEGER), WireField("seconds", FieldKind.NONNEGATIVE),),
+    "IOConfigSubsystem.pin_function_set": (WireField("pin", FieldKind.INTEGER), WireField("function", FieldKind.TOKEN),),
+    "IOConfigSubsystem.pin_function_query": (WireField("pin", FieldKind.INTEGER),),
+    "IOConfigSubsystem.output_level_set": (WireField("pin", FieldKind.INTEGER), WireField("high", FieldKind.BOOL01),),
+    "SenseSubsystem.acquisition_points_set": (WireField("points", FieldKind.INTEGER),),
+    "SenseSubsystem.acquisition_offset_set": (WireField("points", FieldKind.INTEGER),),
+    "SenseSubsystem.acquisition_interval_set": (WireField("interval", FieldKind.NUMBER),),
+    "BatterySubsystem.charge_voltage_set": (WireField("volts", FieldKind.NONNEGATIVE),),
+    "BatterySubsystem.charge_current_set": (WireField("amps", FieldKind.NONNEGATIVE),),
+    "BatterySubsystem.shutdown_voltage_set": (WireField("volts", FieldKind.NONNEGATIVE),),
+    "BatterySubsystem.shutdown_current_set": (WireField("amps", FieldKind.NONNEGATIVE),),
+    "BatterySubsystem.shutdown_capacity_set": (WireField("ah", FieldKind.NONNEGATIVE),),
+    "BatterySubsystem.shutdown_time_set": (WireField("seconds", FieldKind.NONNEGATIVE),),
+    "OutputSubsystem.delay_rise_set": (WireField("seconds", FieldKind.NONNEGATIVE),),
+    "OutputSubsystem.delay_fall_set": (WireField("seconds", FieldKind.NONNEGATIVE),),
+    "OutputSubsystem.inhibit_mode_set": (WireField("mode", FieldKind.TOKEN),),
+    "OutputSubsystem.power_on_mode_set": (WireField("mode", FieldKind.TOKEN),),
+    "SystemSubsystem.beeper_state_set": (WireField("on", FieldKind.ONOFF),),
+    "SystemSubsystem.date_set": (WireField("year", FieldKind.INTEGER), WireField("month", FieldKind.INTEGER), WireField("day", FieldKind.INTEGER),),
+    "SystemSubsystem.time_set": (WireField("hour", FieldKind.INTEGER), WireField("minute", FieldKind.INTEGER), WireField("second", FieldKind.INTEGER),),
+    "SystemSubsystem.comm_select": (WireField("interface", FieldKind.TOKEN),),
+    "SystemSubsystem.comm_gpib_addr_set": (WireField("address", FieldKind.INTEGER),),
+    "SystemSubsystem.lan_ip_mode_set": (WireField("mode", FieldKind.TOKEN),),
+    "TriggerSubsystem.acquire_mode_set": (WireField("mode", FieldKind.TOKEN),),
+    "TriggerSubsystem.acquire_voltage_level_set": (WireField("value", FieldKind.NONNEGATIVE),),
+    "TriggerSubsystem.acquire_current_level_set": (WireField("value", FieldKind.NONNEGATIVE),),
+    "TriggerSubsystem.acquire_source_set": (WireField("source", FieldKind.TOKEN),),
+    "TriggerSubsystem.arb_source_set": (WireField("source", FieldKind.TOKEN),),
+    "TriggerSubsystem.dlog_source_set": (WireField("source", FieldKind.TOKEN),),
+    "TriggerSubsystem.elog_source_set": (WireField("source", FieldKind.TOKEN),),
+    "InitiateSubsystem.continuous_arb_set": (WireField("enable", FieldKind.BOOL01),),
+    "InitiateSubsystem.continuous_acq_set": (WireField("enable", FieldKind.BOOL01),),
+})
+COMMAND_SPECS = MappingProxyType({
+    method: replace(spec, fields=_WIRE_FIELDS[method],
+                    parameters=tuple(f"{field.name}:{field.kind.value}" for field in _WIRE_FIELDS[method]))
+    if method in _WIRE_FIELDS else spec
+    for method, spec in _BASE_COMMAND_SPECS.items()
 })
 
 
@@ -408,17 +516,18 @@ def _execute(driver, spec, *args):
     return parser(raw)
 
 
-def execute_parameterized(driver, method: str, payload: str):
-    """Execute a fixed registered header with one already validated payload.
+def execute_parameterized(driver, method: str, *values):
+    """Render individual typed wire fields; subsystem validators own ranges.
 
-    Never accept multiple program messages or arbitrary headers. Per-command
-    numeric, enum and hardware-envelope validation remains in typed methods.
+    This is an internal transport helper, not a substitute for the public
+    method's model, application, channel or compound preconditions.
     """
     spec = command_spec(method)
     if spec.kind not in (ResultKind.PARAM_WRITE, ResultKind.PARAM_QUERY):
         raise ConfigurationError("registered parameterized command required")
-    if not isinstance(payload, str) or not payload or any(c in payload for c in ("\r", "\n", ";", "\x00")):
-        raise ConfigurationError("invalid single-command argument payload")
+    if len(values) != len(spec.fields):
+        raise ConfigurationError(f"{method} requires {len(spec.fields)} wire arguments")
+    payload = ",".join(field.format(value) for field, value in zip(spec.fields, values))
     command = spec.header + " " + payload
     with driver._qualified_method_scope(method):
         if spec.kind is ResultKind.PARAM_WRITE:
