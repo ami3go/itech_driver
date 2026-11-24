@@ -4,7 +4,6 @@ from contextlib import contextmanager
 from scpi_driver_core import ScpiDriverError, SafetyGuardError
 from ..base import BaseInstrument
 from ..capabilities import discover_capabilities, descriptor_for
-from scpi_driver_core.scpi.parsers import parse_identity
 from ..subsystems.LoggingSubsystem import LoggingSubsystem
 from ..subsystems.FetchSubsystem import FetchSubsystem
 from ..subsystems.SenseSubsystem import SenseSubsystem
@@ -53,9 +52,17 @@ class ITM3900D(BaseInstrument):
         self.dlog = LoggingSubsystem(self, 'DLOG')
 
 
-    def model_descriptor(self):
-        """Read identity and return nominal descriptor, or None for unknown model."""
-        return descriptor_for(parse_identity(self.identify()))
+    def identity_snapshot(self, *, refresh=False):
+        with self.session.operation_lock():
+            try:
+                return super().identity_snapshot(refresh=refresh)
+            except ScpiDriverError:
+                self._invalidate_mode()
+                raise
+
+    def model_descriptor(self, *, refresh=True):
+        """Return nominal descriptor, or None for an unknown identity."""
+        return descriptor_for(self.identity_snapshot(refresh=refresh))
 
     def discover_capabilities(self, *, application_limits=None):
         return discover_capabilities(self, application_limits=application_limits)

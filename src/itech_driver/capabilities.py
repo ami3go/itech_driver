@@ -5,7 +5,7 @@ import math
 from types import MappingProxyType
 from typing import Mapping
 from scpi_driver_core import ConfigurationError, IdentityError, ResponseParseError, UnsupportedOperationError
-from scpi_driver_core.scpi.parsers import parse_identity, parse_float
+from scpi_driver_core.scpi.parsers import parse_float
 
 
 @dataclass(frozen=True)
@@ -197,7 +197,7 @@ def effective_ranges(descriptor, live, application=None):
 def discover_capabilities(driver, *, application_limits=None):
     """Explicit read-only probe; retain reported ranges separately from effective limits."""
     with driver.session.operation_lock():
-        ident = parse_identity(driver.identify())
+        ident = driver.identity_snapshot(refresh=True)
         descriptor = descriptor_for(ident)
         if descriptor is None:
             raise IdentityError("unknown or unsupported ITECH model: " + ident.model)
