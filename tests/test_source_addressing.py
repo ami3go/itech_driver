@@ -6,11 +6,11 @@ from itech_driver import ITM3900D
 
 @pytest.mark.parametrize("quantity,header", [("voltage", "SOUR:VOLT"), ("current", "SOUR:CURR")])
 def test_single_output_setpoint(quantity, header):
-    t = ScriptedScpiTransport().on(f"{header} 2.5").on(f"{header}?", "2.5")
+    t = ScriptedScpiTransport().on(f"{header}? MIN","0").on(f"{header}? MAX","10").on(f"{header} 2.5").on(f"{header}?", "2.5")
     with ITM3900D("sim", transport=t) as d:
         getattr(d.source, quantity + "_set")(2.5)
         assert getattr(d.source, quantity + "_query")(channel=1) == 2.5
-        assert t.history == [f"{header} 2.5", f"{header}?"]
+        assert t.history == [f"{header}? MIN", f"{header}? MAX", f"{header} 2.5", f"{header}?"]
 
 
 @pytest.mark.parametrize("quantity", ["voltage", "current"])
