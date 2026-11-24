@@ -159,7 +159,7 @@ class BaseInstrument:
     def __exit__(self, exc_type, exc, traceback):
         try:
             self.close()
-        except Exception as cleanup:
+        except BaseException as cleanup:
             if exc is None:
                 raise
             if hasattr(exc, "add_note"):
