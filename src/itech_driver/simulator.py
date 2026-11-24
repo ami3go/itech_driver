@@ -8,6 +8,8 @@ import math
 from scpi_driver_core.simulation import ScriptedScpiTransport
 from scpi_driver_core.models import ScpiError
 from scpi_driver_core.exceptions import ConfigurationError, TransportTimeoutError
+from .command_specs import command_spec
+import re
 
 
 @dataclass
@@ -111,8 +113,8 @@ class ItechSimulator:
         t=self.transport
         t.on("*IDN?","ITECH,IT-M3902D-80-40,SIMULATED,0.0")
         t.on("*CLS",lambda _: self._clear_errors())
-        t.on("OUTP:STAT?",lambda _:str(int(self.state.output)))
-        t.on_regex(r"^OUTP:STAT (ON|OFF|0|1)$",self._output)
+        t.on(command_spec("OutputSubsystem.state_query").header,lambda _:str(int(self.state.output)))
+        t.on_regex("^" + re.escape(command_spec("OutputSubsystem.state_set").header) + r" (ON|OFF|0|1)$",self._output)
         t.on("STAT:QUES:COND?",lambda _:str(int(self.state.tripped)))
         t.on("SOUR:FUNC:MODE?","FIX")
         t.on("SOUR:EXT:PROG?","0")
@@ -125,7 +127,8 @@ class ItechSimulator:
             t.on(f"SOUR:{q}:OVER:PROT:STAT?",lambda _,q=q:str(int(self.protection[q])))
             t.on(f"SOUR:{q}:OVER:PROT:LEV?",lambda _,q=q:str(self.thresholds[q]))
             t.on_regex(fr"^SOUR:{q}:OVER:PROT:LEV [^ ]+$",lambda cmd,q=q:self._set_threshold(cmd,q))
-            t.on(f"MEAS:{q}?",lambda _,q=q:str(self._measured(q)))
+            method = {"VOLT":"voltage_query","CURR":"current_query","POW":"power_query"}[q]
+            t.on(command_spec("MeasurementSubsystem." + method).header,lambda _,q=q:str(self._measured(q)))
         t.on_regex(r"^ARB:COUNT [^ ]+$",self._repeat)
         t.on_regex(r"^TRIG:ARB:SOUR (BUS|EXT)$",lambda cmd:setattr(self.state,"trigger_source",cmd.split()[-1].upper()))
         t.on("TRIG:ARB:SOUR?",lambda _:self.state.trigger_source)
