@@ -7,6 +7,7 @@ import time
 from typing import Union
 
 from scpi_driver_core import ScpiClient, ScpiSession
+from scpi_driver_core.models import Identity
 from scpi_driver_core.exceptions import (
     ConfigurationError, ScpiTimeoutError, TransportError, UnsupportedOperationError,
     ResponseParseError,
@@ -132,6 +133,15 @@ class BaseInstrument:
         if type(max_entries) is not int or not 1 <= max_entries <= 21:
             raise ConfigurationError("max_entries must be an integer in 1..21")
         return ScpiErrorQueue(self.client, maximum_entries=max_entries).drain()
+
+    def identity_snapshot(self, *, refresh: bool = False) -> Identity:
+        """Immutable generation-scoped metadata via the shared core."""
+        try:
+            return self.session.get_identity(refresh=refresh)
+        except ScpiTimeoutError as exc:
+            raise TimeoutError(str(exc)) from exc
+        except TransportError as exc:
+            raise CommandError(str(exc)) from exc
 
     def identify(self) -> str:
         return self.query_scpi("*IDN?")

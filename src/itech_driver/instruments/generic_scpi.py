@@ -2,7 +2,6 @@
 from typing import Dict, Any
 from ..base import BaseInstrument
 from ..capabilities import unknown_feature_states
-from scpi_driver_core.scpi.parsers import parse_identity
 from ..subsystems.IEEE488 import IEEE488
 
 
@@ -27,9 +26,9 @@ class GenericSCPIInstrument(BaseInstrument):
         return dict.fromkeys(("voltage_set", "current_set", "voltage_measure",
                               "current_measure", "output_control", "ovp", "ocp"))
 
-    def get_instrument_info(self) -> Dict[str, Any]:
-        """Read fresh identity; never reuse evidence from a previous session."""
-        identity = parse_identity(self.identify())
+    def get_instrument_info(self, *, refresh: bool = True) -> Dict[str, Any]:
+        """Compatibility dictionary; fresh by default, opt into session cache."""
+        identity = self.identity_snapshot(refresh=refresh)
         return {
             "manufacturer": identity.manufacturer,
             "model": identity.model,
