@@ -134,12 +134,50 @@ class SourceSubsystem:
     def output_power_limit_set(self, value: Number, channel: int = 1):
         """Set the programmed power limit, not the OPP trip threshold."""
         self._check_channel(channel)
-        self._check_setpoint(value)
-        self._p.write_scpi(f'SOUR:POW:LIM {value}')
+        self._limit_set('SOUR:POW:LIM', value)
 
     def output_power_limit_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return parse_float(self._p.query_scpi('SOUR:POW:LIM?'))
+        return self._limit_query('SOUR:POW:LIM')
+
+    def _limit_query(self, header, bound=None):
+        if bound is not None and bound not in ("MIN", "MAX", "DEF"):
+            raise ConfigurationError("bound must be MIN, MAX, DEF or None")
+        suffix = "" if bound is None else " " + bound
+        return parse_float(self._p.query_scpi(header + "?" + suffix))
+
+    def _limit_set(self, header, value):
+        self._check_setpoint(value)
+        with self._p.session.operation_lock():
+            minimum = self._limit_query(header, "MIN")
+            maximum = self._limit_query(header, "MAX")
+            if not 0 <= minimum <= maximum or not minimum <= value <= maximum:
+                raise ConfigurationError("limit outside reported instrument range")
+            self._p.write_scpi(f"{header} {value}")
+
+    def voltage_limit_set(self, value: Number, channel: int = 1):
+        self._check_channel(channel)
+        self._limit_set("SOUR:VOLT:LIM", value)
+
+    def voltage_limit_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:VOLT:LIM", bound)
+
+    def current_limit_set(self, value: Number, channel: int = 1):
+        self._check_channel(channel)
+        self._limit_set("SOUR:CURR:LIM", value)
+
+    def current_limit_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:CURR:LIM", bound)
+
+    def programmed_power_limit_set(self, value: Number, channel: int = 1):
+        self._check_channel(channel)
+        self._limit_set("SOUR:POW:LIM", value)
+
+    def programmed_power_limit_query(self, channel: int = 1, *, bound=None) -> float:
+        self._check_channel(channel)
+        return self._limit_query("SOUR:POW:LIM", bound)
 
     # Retain historical behavior explicitly during migration; never silently
     # turn an existing OPP threshold operation into a different setting.
