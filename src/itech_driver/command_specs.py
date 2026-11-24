@@ -473,11 +473,26 @@ _WIRE_FIELDS = MappingProxyType({
     "InitiateSubsystem.continuous_arb_set": (WireField("enable", FieldKind.BOOL01),),
     "InitiateSubsystem.continuous_acq_set": (WireField("enable", FieldKind.BOOL01),),
 })
-COMMAND_SPECS = MappingProxyType({
+_TYPED_COMMAND_SPECS = MappingProxyType({
     method: replace(spec, fields=_WIRE_FIELDS[method],
                     parameters=tuple(f"{field.name}:{field.kind.value}" for field in _WIRE_FIELDS[method]))
     if method in _WIRE_FIELDS else spec
     for method, spec in _BASE_COMMAND_SPECS.items()
+})
+
+# Imported from the checked-in guide-index evidence inventory, not HIL proof.
+_GUIDE_INDEX_PAGES = MappingProxyType({
+    "OutputSubsystem.state_set": 93,
+    "OutputSubsystem.state_query": 94,
+    "SourceSubsystem.voltage_set": 57,
+    "SourceSubsystem.voltage_query": 58,
+    "SourceSubsystem.current_set": 38,
+    "SourceSubsystem.current_query": 39,
+})
+COMMAND_SPECS = MappingProxyType({
+    method: replace(spec, guide_status="indexed_text_reference", guide_page=_GUIDE_INDEX_PAGES[method])
+    if method in _GUIDE_INDEX_PAGES else spec
+    for method, spec in _TYPED_COMMAND_SPECS.items()
 })
 
 

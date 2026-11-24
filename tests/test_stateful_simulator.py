@@ -46,3 +46,23 @@ def test_timeout_does_not_replay():
             d.identify()
         assert sim.transport.history==["*IDN?"]
         assert not d.session.is_connected
+
+
+@pytest.mark.parametrize("count", [1, 10001, 999999])
+def test_arb_repeat_envelope_matches_driver(count):
+    sim = ItechSimulator()
+    with ITM3900D("sim", transport=sim.transport) as d:
+        d.arb.count_set(count)
+        assert d.arb.count_query() == count
+        d.arb.init()
+        assert sim.state.remaining == count
+        d.arb.abort()
+        assert sim.state.arb == "ABORTED"
+
+
+def test_simulator_rejects_outside_family_repeat_envelope():
+    sim = ItechSimulator()
+    with ITM3900D("sim", transport=sim.transport) as d:
+        d.write_scpi("ARB:COUNT 1000000")
+        assert d.query_scpi("SYST:ERR?").startswith("-222")
+        assert d.arb.count_query() == 1

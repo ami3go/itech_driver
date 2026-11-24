@@ -9,6 +9,7 @@ from scpi_driver_core.simulation import ScriptedScpiTransport
 from scpi_driver_core.models import ScpiError
 from scpi_driver_core.exceptions import ConfigurationError, TransportTimeoutError
 from .command_specs import command_spec
+from .arb_integer_qualification import FAMILY_INTEGER_MAX
 import re
 
 
@@ -82,7 +83,7 @@ class ItechSimulator:
             self.state.acquisition_ready=True
 
     def _repeat(self,cmd):
-        v=self._value(cmd,10000)
+        v=self._value(cmd,FAMILY_INTEGER_MAX["count_set"])
         if v is not None and v.is_integer() and v>=1:
             self.state.repeats=int(v)
         elif v is not None:
@@ -108,6 +109,11 @@ class ItechSimulator:
         def failure(_):
             raise TransportTimeoutError("synthetic timeout")
         self.transport.on(header,failure)
+
+    @staticmethod
+    def _short_header(header):
+        # SCPI mixed-case keywords designate the mandatory short spelling.
+        return "".join(c for c in header if not c.islower())
 
     def _register(self):
         t=self.transport
@@ -136,12 +142,15 @@ class ItechSimulator:
             method = {"VOLT":"voltage_query","CURR":"current_query","POW":"power_query"}[q]
             t.on(command_spec("MeasurementSubsystem." + method).header,lambda _,q=q:str(self._measured(q)))
         t.on_regex("^" + re.escape(command_spec("ArbSubsystem.count_set").header) + r" [^ ]+$",self._repeat)
+        t.on(command_spec("ArbSubsystem.count_query").header,lambda _:str(self.state.repeats))
         t.on_regex("^" + re.escape(command_spec("TriggerSubsystem.arb_source_set").header) + r" (BUS|EXT)$",lambda cmd:setattr(self.state,"trigger_source",cmd.split()[-1].upper()))
         t.on(command_spec("TriggerSubsystem.arb_source_query").header,lambda _:self.state.trigger_source)
-        t.on("INIT:ARB",lambda _:self._arm()).on(command_spec("InitiateSubsystem.arb").header,lambda _:self._arm())
+        arm_header = command_spec("InitiateSubsystem.arb").header
+        t.on(arm_header,lambda _:self._arm()).on(self._short_header(arm_header),lambda _:self._arm())
         t.on("*TRG",lambda _:self._trigger("BUS"))
-        t.on("ABOR:ARB",lambda _:setattr(self.state,"arb","ABORTED"))
-        t.on(command_spec("AbortSubsystem.arb").header,lambda _:setattr(self.state,"arb","ABORTED"))
+        abort_header = command_spec("AbortSubsystem.arb").header
+        t.on(abort_header,lambda _:setattr(self.state,"arb","ABORTED"))
+        t.on(self._short_header(abort_header),lambda _:setattr(self.state,"arb","ABORTED"))
         t.on(command_spec("ArbSubsystem.state_query").header,lambda _:self.state.arb)
         t.on(command_spec("TriggerSubsystem.acquire_arm").header,lambda _:self._arm_acq())
 

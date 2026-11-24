@@ -37,3 +37,17 @@ def test_protection_queries_and_trigger_source_use_existing_wire():
         d.trigger.arb_source_set("BUS")
         assert d.trigger.arb_source_query() == "BUS"
     assert t.history == ["SOUR:VOLT:OVER:PROT:LEV?", "TRIG:ARB:SOUR BUS", "TRIG:ARB:SOUR?"]
+
+
+def test_runtime_guide_index_references_match_inventory():
+    inventory = Path(__file__).resolve().parents[1] / "docs" / "command_registry.json"
+    entries = json.loads(inventory.read_text(encoding="utf-8"))["entries"]
+    for entry in entries:
+        spec = COMMAND_SPECS[entry["method"]]
+        guide = entry["guide"]
+        if guide["status"] == "indexed_text_reference" and isinstance(guide["page"], int):
+            assert spec.guide_status == guide["status"]
+            assert spec.guide_page == guide["page"]
+        else:
+            assert spec.guide_status == "unverified"
+            assert spec.guide_page is None
