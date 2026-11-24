@@ -1,7 +1,6 @@
 """ITECH compatibility API backed by the shared SCPI core."""
 from __future__ import annotations
 
-import logging
 import math
 import struct
 import time
@@ -13,6 +12,7 @@ from scpi_driver_core.exceptions import (
     ResponseParseError,
 )
 from scpi_driver_core.scpi.codec import ScpiTextCodec
+from scpi_driver_core.scpi.errors import ScpiErrorQueue, ScpiExecutionPolicy
 from scpi_driver_core.transport.base import Transport
 from scpi_driver_core.transport.visa import VisaTransport
 
@@ -20,7 +20,6 @@ from .exceptions import CommandError, InstrumentNotFoundError, TimeoutError
 
 Number = Union[int, float]
 BoolLike = Union[bool, int]
-_LOG = logging.getLogger(__name__)
 _BINARY_TYPES = frozenset("bBhHiIlLqQfd")
 
 
@@ -35,12 +34,9 @@ class BaseInstrument:
     ):
         if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or not math.isfinite(timeout) or timeout <= 0:
             raise ConfigurationError("timeout must be finite positive milliseconds")
-        if not isinstance(termination, str) or not termination:
-            raise ConfigurationError("termination must be a nonempty ASCII string")
-        try:
-            terminator = termination.encode("ascii")
-        except UnicodeEncodeError as exc:
-            raise ConfigurationError("termination must be ASCII") from exc
+        if termination not in ("\n", "\r\n", "\r"):
+            raise ConfigurationError("termination must be LF, CRLF or CR")
+        terminator = termination.encode("ascii")
         # Core currently does not expose arbitrary VISA open_resource kwargs.
         if interface_kwargs:
             raise ConfigurationError(
@@ -75,6 +71,10 @@ class BaseInstrument:
     def client(self) -> ScpiClient:
         return self.session.client
 
+    def _assert_write_authorized(self) -> None:
+        """Policy hook for compound operations; base has no remote policy."""
+        return None
+
     def write_scpi(self, cmd: str) -> None:
         # An ambiguous write must never be replayed automatically.
         try:
@@ -83,7 +83,6 @@ class BaseInstrument:
             raise TimeoutError(str(exc)) from exc
         except TransportError as exc:
             raise CommandError(str(exc)) from exc
-        _LOG.debug("SCPI write: %s", cmd)
 
     def query_scpi(self, cmd: str, delay: float = 0.0) -> str:
         if not math.isfinite(delay) or delay < 0:
@@ -114,6 +113,26 @@ class BaseInstrument:
             raise ResponseParseError("binary payload is not a whole number of values", raw=payload)
         return container([item[0] for item in struct.iter_unpack(fmt, payload)])
 
+    def enable_scpi_error_checking(self) -> None:
+        """Opt in to destructive error-queue checks after successful writes.
+
+        Existing errors may predate the current operation. A queue error does
+        not imply that the command was not executed; never retry automatically.
+        """
+        self.client.enable_error_checking(
+            ScpiErrorQueue(self.client, maximum_entries=21),
+            ScpiExecutionPolicy(check_error_queue_after_write=True),
+        )
+
+    def disable_scpi_error_checking(self) -> None:
+        self.client.disable_error_checking()
+
+    def drain_scpi_errors(self, *, max_entries: int = 21):
+        """Explicitly consume FIFO errors, with a bound including the zero sentinel."""
+        if type(max_entries) is not int or not 1 <= max_entries <= 21:
+            raise ConfigurationError("max_entries must be an integer in 1..21")
+        return ScpiErrorQueue(self.client, maximum_entries=max_entries).drain()
+
     def identify(self) -> str:
         return self.query_scpi("*IDN?")
 
@@ -124,7 +143,16 @@ class BaseInstrument:
         return self
 
     def __exit__(self, exc_type, exc, traceback):
-        self.close()
+        try:
+            self.close()
+        except Exception as cleanup:
+            if exc is None:
+                raise
+            if hasattr(exc, "add_note"):
+                exc.add_note(f"Session cleanup failed: {cleanup!r}")
+            else:
+                exc.cleanup_error = cleanup
+        return False
 
     @property
     def visa(self):

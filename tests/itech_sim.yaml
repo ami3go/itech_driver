@@ -5,24 +5,38 @@ devices:
       GPIB INSTR:
         q: "\n"
         r: "\n"
+      USB INSTR:
+        q: "\n"
+        r: "\n"
+      TCPIP INSTR:
+        q: "\n"
+        r: "\n"
     dialogues:
+      - q: "SOUR:VOLT? MIN"
+        r: "0"
+      - q: "SOUR:VOLT? MAX"
+        r: "30"
       - q: "*IDN?"
         r: "ITECH,IT-M3900D,SIM001,1.0"
-      - q: "OUTP1:STAT OFF"
-      - q: "OUTP1:STAT?"
+      - q: "OUTP:STAT OFF"
+      - q: "OUTP:STAT?"
         r: "OFF"
     properties:
       voltage:
         default: 1.0
         getter:
-          q: "SOUR1:VOLT?"
+          q: "SOUR:VOLT?"
           r: "{:.1f}"
         setter:
-          q: "SOUR1:VOLT {:.1f}"
+          q: "SOUR:VOLT {:.1f}"
         specs:
           min: 0.0
           max: 30.0
           type: float
 resources:
   GPIB::9::INSTR:
+    device: itech
+  USB::0x1234::0x5678::SIM001::INSTR:
+    device: itech
+  TCPIP::127.0.0.1::inst0::INSTR:
     device: itech

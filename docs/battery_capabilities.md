@@ -1,0 +1,3 @@
+# Battery feature boundaries
+
+The IT-M3900D battery subsystem exposes charging and cutoff configuration and source functional-mode selection. This is not an electrochemical battery simulator, programmable battery model, or qualified charge/discharge executor. `simulation_supported` and `execution_supported` are False; the unverified execution methods fail before I/O. Selecting BATT mode does not establish that a test is running. Exact model-specific charging and cutoff ranges and physical behavior require separate verification. Do not infer sink or bidirectional capability from battery-test configuration.

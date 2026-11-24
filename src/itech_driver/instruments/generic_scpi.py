@@ -1,88 +1,41 @@
-"""Generic SCPI instrument for unknown or basic power supplies."""
-
-from typing import Dict, Any, Optional
+"""Generic SCPI identification; unknown instruments have no qualified controls."""
+from typing import Dict, Any
 from ..base import BaseInstrument
-from scpi_driver_core.exceptions import ScpiDriverError
+from scpi_driver_core.scpi.parsers import parse_identity
 from ..subsystems.IEEE488 import IEEE488
-from ..subsystems.SourceSubsystem import SourceSubsystem
-from ..subsystems.OutputSubsystem import OutputSubsystem
-from ..subsystems.SystemSubsystem import SystemSubsystem
-# from ..subsystems.measurement import MeasurementSubsystem
+
 
 class GenericSCPIInstrument(BaseInstrument):
-    """Generic SCPI instrument for basic control of power supplies.
-
-    This class provides a generic interface that should work with most
-    SCPI-compliant power supplies, even if they're not specifically supported.
-    """
+    """Unknown model: IEEE common commands only, no device-specific capability claims."""
 
     def __init__(self, resource_name: str, **kwargs):
         super().__init__(resource_name, **kwargs)
-
-        # Add basic subsystems that work with most instruments
-        self.source = SourceSubsystem(self)
-        self.output = OutputSubsystem(self)
-        self.system = SystemSubsystem(self)
         self.ieee = IEEE488(self)
-        # self.measurement = MeasurementSubsystem(self)
 
-        self._instrument_info = None
+    def detect_capabilities(self) -> Dict[str, bool | None]:
+        """None denotes unknown, not proof of support or lack of support.
 
-    def detect_capabilities(self) -> Dict[str, bool]:
-        """Attempt to detect instrument capabilities.
-
-        Returns:
-            Dictionary indicating which SCPI commands are supported
+        A syntactically valid query response alone cannot establish support
+        for the associated setter, particularly on an unidentified model.
+        No speculative probes or error queue consumption.
         """
-        capabilities = {
-            'voltage_set': self._test_command('SOUR:VOLT?'),
-            'current_set': self._test_command('SOUR:CURR?'),
-            'voltage_measure': self._test_command('MEAS:VOLT?'),
-            'current_measure': self._test_command('MEAS:CURR?'),
-            'output_control': self._test_command('OUTP:STAT?'),
-            'ovp': self._test_command('SOUR:VOLT:PROT?'),
-            'ocp': self._test_command('SOUR:CURR:PROT?'),
-        }
-
-        return capabilities
-
-    def _test_command(self, command: str) -> bool:
-        """Test if a SCPI command is supported."""
-        if not command.strip().endswith('?') or ';' in command:
-            raise ValueError('capability checks require a single query')
-        try:
-            self.query_scpi(command)
-            return True
-        except ScpiDriverError:
-            return False
+        return dict.fromkeys(("voltage_set", "current_set", "voltage_measure",
+                              "current_measure", "output_control", "ovp", "ocp"))
 
     def get_instrument_info(self) -> Dict[str, Any]:
-        """Get information about the connected instrument."""
-        if self._instrument_info is None:
-            try:
-                idn = self.identify()
-                parts = idn.split(',')
+        """Read fresh identity; never reuse evidence from a previous session."""
+        identity = parse_identity(self.identify())
+        return {
+            "manufacturer": identity.manufacturer,
+            "model": identity.model,
+            "serial": identity.serial_number,
+            "firmware": identity.firmware_version,
+            "capabilities": self.detect_capabilities(),
+            "is_identified": True,
+        }
 
-                self._instrument_info = {
-                    'manufacturer': parts[0] if len(parts) > 0 else 'Unknown',
-                    'model': parts[1] if len(parts) > 1 else 'Unknown',
-                    'serial': parts[2] if len(parts) > 2 else 'Unknown',
-                    'firmware': parts[3] if len(parts) > 3 else 'Unknown',
-                    'capabilities': self.detect_capabilities(),
-                    'is_identified': True
-                }
-            except ScpiDriverError:
-                self._instrument_info = {
-                    'manufacturer': 'Unknown',
-                    'model': 'Generic SCPI',
-                    'serial': 'Unknown',
-                    'firmware': 'Unknown',
-                    'capabilities': {},
-                    'is_identified': False
-                }
-
-        return self._instrument_info
-
-    def is_command_supported(self, command: str) -> bool:
-        """Check if a specific SCPI command is supported."""
-        return self._test_command(command)
+    def is_command_supported(self, command: str) -> bool | None:
+        """Unknown capability; do not test arbitrary commands against hardware."""
+        if not isinstance(command,str) or not command.strip().endswith("?") or ";" in command:
+            raise ValueError("capability checks require a single query")
+        return None

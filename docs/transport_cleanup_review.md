@@ -1,0 +1,3 @@
+# Transport cleanup review (#68)
+
+Baseline `66160cf` contained commented duplicate VISA implementations in base.py. Migration #1 removed these and delegates byte transport, sessions and framing to scpi-driver-core. The active BaseInstrument adapter remains intentional compatibility code for timeout units and exceptions, not a second transport. This PR removes the remaining abandoned subsystem import placeholder and unused typing imports in itm3900d.py. Generic placeholders were removed by #131 and commented test.py by #139. Verify compileall and regression CI on this head; repository-wide lint and integrated branch review remain pending. No hardware access.

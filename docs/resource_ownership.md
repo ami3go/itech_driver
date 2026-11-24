@@ -1,0 +1,3 @@
+# Resource ownership
+
+Each driver owns its core session. The pinned core VISA transport borrows the PyVISA ResourceManager (potentially process-wide), and closes only its resource. Never close a shared manager from a driver. Factory probe ownership is covered by #59. Context exit preserves a primary failure and attaches an observable cleanup error when the core raises one. Repeated close is supported. The pinned core VISA implementation suppresses resource-close exceptions internally, so full low-level cleanup observability is not established: a core-level change and fake VISA failure regression are required before closing #63. A closed session is not proof that a physical output is disabled.

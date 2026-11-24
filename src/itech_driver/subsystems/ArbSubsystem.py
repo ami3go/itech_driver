@@ -1,3 +1,4 @@
+from scpi_driver_core import ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float, parse_int
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
@@ -52,10 +53,14 @@ class ArbSubsystem:
         return parse_int(self._p.query_scpi('ARB:COUNT?'))
 
     def terminate_last_set(self, last_state: int):
-        self._p.write_scpi(f'ARB:TERMinate:LAST {int(last_state)}')
+        """Unavailable until IT-M3900D termination modes are qualified."""
+        raise UnsupportedOperationError(
+            "ARB termination modes require IT-M3900D guide qualification")
 
-    def terminate_last_query(self) -> int:  # Added: Missing query method
-        return parse_int(self._p.query_scpi('ARB:TERMinate:LAST?'))
+    def terminate_last_query(self) -> int:
+        """Do not interpret an unqualified discrete response as an integer."""
+        raise UnsupportedOperationError(
+            "ARB termination response requires IT-M3900D guide qualification")
 
     def save(self, index: int):
         self._p.write_scpi(f'ARB:SAVE {int(index)}')
@@ -78,6 +83,13 @@ class ArbSubsystem:
     def abort(self):
         self._p.write_scpi('ABORt:ARB')
 
-    def state_query(self) -> str:  # Added: ARB state query
-        return self._p.query_scpi('ARB:STATe?')
+    def state_query(self) -> str:
+        """Return raw execution status; do not infer completion or output state.
+
+        Guide p.268 indexes ARB:EXE:STATe?; response codes are not yet qualified.
+        """
+        response = self._p.query_scpi('ARB:EXE:STAT?').strip()
+        if not response:
+            raise ResponseParseError('empty ARB execution status', raw=response)
+        return response
 
