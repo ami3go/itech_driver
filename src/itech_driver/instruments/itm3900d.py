@@ -51,6 +51,7 @@ class ITM3900D(BaseInstrument):
         self.sense = SenseSubsystem(self)
         self.fetch = FetchSubsystem(self)
         self.elog = LoggingSubsystem(self, 'ELOG')
+        self.dlog = LoggingSubsystem(self, 'DLOG')
 
 
     def discover_capabilities(self):
