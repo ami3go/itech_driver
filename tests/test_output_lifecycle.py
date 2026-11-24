@@ -1,7 +1,7 @@
 import pytest
 from scpi_driver_core import SafetyGuardError
 from scpi_driver_core.exceptions import TransportTimeoutError
-from scpi_driver_core.simulation import ScriptedScpiTransport, ScriptedReply
+from scpi_driver_core.simulation import ScriptedScpiTransport
 from itech_driver import ITM3900D
 from itech_driver.output_lifecycle import request_output_off, request_output_on, observe_output
 
@@ -36,7 +36,9 @@ def test_malformed_state_unknown(bad):
 
 
 def test_off_timeout_never_replayed():
-    t=scripted().on("OUTP:STAT OFF",ScriptedReply(raises=TransportTimeoutError("lost")))
+    def fail_write(_):
+        raise TransportTimeoutError("lost after transmission")
+    t=scripted().on("OUTP:STAT OFF",fail_write)
     with ITM3900D("sim",transport=t) as d:
         assert request_output_off(d,max_residual_v=0.1,max_residual_a=0.1).outcome=="unknown"
         assert t.history==["OUTP:STAT OFF"]
