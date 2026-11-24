@@ -74,3 +74,23 @@ class OutputSubsystem:
         if not value.is_integer() or not 1 <= value <= 3600:
             raise ResponseParseError("invalid watchdog delay response", raw=raw)
         return int(value)
+
+    def power_on_mode_set(self, mode: str, *, allow_restore_output: bool = False):
+        """Set startup policy, never switch output on as part of this method.
+
+        LAST_ON can restore a previously enabled output on a later power cycle.
+        It requires explicit acknowledgment; LAST_OFF preserves settings with
+        output disabled. RST restores the factory startup settings.
+        """
+        token = mode.upper() if isinstance(mode, str) else None
+        if token not in ("RST", "LAST_ON", "LAST_OFF"):
+            raise ConfigurationError("power-on mode must be RST, LAST_ON or LAST_OFF")
+        if token == "LAST_ON" and allow_restore_output is not True:
+            raise ConfigurationError("LAST_ON requires explicit allow_restore_output=True")
+        self._p.write_scpi(f"OUTP:PON:STAT {token}")
+
+    def power_on_mode_query(self) -> str:
+        raw = self._p.query_scpi("OUTP:PON:STAT?").strip().upper()
+        if raw not in ("RST", "LAST_ON", "LAST_OFF"):
+            raise ResponseParseError("invalid power-on mode response", raw=raw)
+        return raw
