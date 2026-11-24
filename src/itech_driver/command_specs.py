@@ -331,7 +331,8 @@ def execute_parameterized(driver, method: str, payload: str):
     if not isinstance(payload, str) or not payload or any(c in payload for c in ("\r", "\n", ";", "\x00")):
         raise ConfigurationError("invalid single-command argument payload")
     command = spec.header + " " + payload
-    if spec.kind is ResultKind.PARAM_WRITE:
-        driver.write_scpi(command)
-        return None
-    return driver.query_scpi(command)
+    with driver._qualified_method_scope(method):
+        if spec.kind is ResultKind.PARAM_WRITE:
+            driver.write_scpi(command)
+            return None
+        return driver.query_scpi(command)
