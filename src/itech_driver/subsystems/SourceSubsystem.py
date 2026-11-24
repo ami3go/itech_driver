@@ -384,3 +384,48 @@ class SourceSubsystem:
 
     def cc_loop_speed_query(self) -> str:
         return self._enum_query("SOUR:CC:PRI", {"HIGH": "HIGH", "LOW": "LOW"})
+
+    def external_programming_query(self) -> bool:
+        return parse_bool(self._p.query_scpi("SOUR:EXT:PROG?"))
+
+    def external_programming_set(self, enabled: BoolLike, *, wiring_confirmed=False,
+                                 deenergized_confirmed=False, option_confirmed=False):
+        """Change analog control only with independently confirmed safe conditions."""
+        if type(enabled) not in (bool,int) or enabled not in (0,1):
+            raise ConfigurationError("external programming state must be bool or 0/1")
+        if not all(flag is True for flag in (wiring_confirmed,deenergized_confirmed,option_confirmed)):
+            raise ConfigurationError("confirm analog option, wiring and de-energized output")
+        with self._p.session.operation_lock():
+            if parse_bool(self._p.query_scpi("OUTP:STAT?")):
+                raise ConfigurationError("programmed output must be disabled")
+            self._p.write_scpi(f"SOUR:EXT:PROG {int(enabled)}")
+
+    @staticmethod
+    def _analog_channel(channel):
+        if type(channel) is not int or channel not in (1,2,3):
+            raise ConfigurationError("external analog channel must be 1, 2 or 3")
+        return channel
+
+    def external_coefficient_query(self, channel: int, coefficient: str) -> float:
+        channel = self._analog_channel(channel)
+        if coefficient not in ("MX","MB"):
+            raise ConfigurationError("coefficient must be MX or MB")
+        raw = self._p.query_scpi(f"SOUR:EXT:PROG:CHAN:{coefficient}? {channel}")
+        value = parse_float(raw)
+        if not -9000 <= value <= 9000:
+            raise ResponseParseError("external coefficient outside documented bounds",raw=raw)
+        return value
+
+    def external_coefficient_set(self, channel: int, coefficient: str, value: Number, *,
+                                 option_confirmed=False, deenergized_confirmed=False):
+        channel = self._analog_channel(channel)
+        if coefficient not in ("MX","MB"):
+            raise ConfigurationError("coefficient must be MX or MB")
+        if isinstance(value,bool) or not isinstance(value,(int,float)) or not math.isfinite(value) or not -9000 <= value <= 9000:
+            raise ConfigurationError("external coefficient must be finite in -9000..9000")
+        if option_confirmed is not True or deenergized_confirmed is not True:
+            raise ConfigurationError("confirm analog option and de-energized output")
+        with self._p.session.operation_lock():
+            if parse_bool(self._p.query_scpi("OUTP:STAT?")) or self.external_programming_query():
+                raise ConfigurationError("disable output and external control before changing coefficients")
+            self._p.write_scpi(f"SOUR:EXT:PROG:CHAN:{coefficient} {channel},{value}")
