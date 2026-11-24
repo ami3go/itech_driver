@@ -1,3 +1,4 @@
+from scpi_driver_core import ResponseParseError
 from scpi_driver_core.scpi.parsers import parse_bool, parse_float, parse_int
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
@@ -78,6 +79,13 @@ class ArbSubsystem:
     def abort(self):
         self._p.write_scpi('ABORt:ARB')
 
-    def state_query(self) -> str:  # Added: ARB state query
-        return self._p.query_scpi('ARB:STATe?')
+    def state_query(self) -> str:
+        """Return raw execution status; do not infer completion or output state.
+
+        Guide p.268 indexes ARB:EXE:STATe?; response codes are not yet qualified.
+        """
+        response = self._p.query_scpi('ARB:EXE:STAT?').strip()
+        if not response:
+            raise ResponseParseError('empty ARB execution status', raw=response)
+        return response
 
