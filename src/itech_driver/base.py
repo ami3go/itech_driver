@@ -121,7 +121,16 @@ class BaseInstrument:
         return self
 
     def __exit__(self, exc_type, exc, traceback):
-        self.close()
+        try:
+            self.close()
+        except Exception as cleanup:
+            if exc is None:
+                raise
+            if hasattr(exc, "add_note"):
+                exc.add_note(f"Session cleanup failed: {cleanup!r}")
+            else:
+                exc.cleanup_error = cleanup
+        return False
 
     @property
     def visa(self):
