@@ -3,6 +3,7 @@ from scpi_driver_core.scpi.parsers import parse_bool, parse_float, parse_int
 from typing import Optional
 from ..base import  BaseInstrument, BoolLike, Number
 from ..utils.validation import validate_channel, strict_bool
+from ..command_specs import execute
 # -------------------------
 # Output Subsystem (OUTPut)
 # -------------------------
@@ -18,11 +19,11 @@ class OutputSubsystem:
     def state_set(self, on: BoolLike, channel: int = 1):
         self._check_channel(channel)
         on = strict_bool(on, "output state")
-        self._p.write_scpi(f'OUTP:STAT {"ON" if on else "OFF"}')
+        execute(self._p, "OutputSubsystem.state_set", on)
 
     def state_query(self, channel: int = 1) -> bool:
         self._check_channel(channel)
-        return parse_bool(self._p.query_scpi('OUTP:STAT?'))
+        return execute(self._p, "OutputSubsystem.state_query")
 
     def delay_rise_set(self, seconds: Number):
         self._p.write_scpi(f'OUTP:DELay:RISE {seconds}')
