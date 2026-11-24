@@ -1,3 +1,4 @@
+from scpi_driver_core import UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_int
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
@@ -9,7 +10,7 @@ class SystemSubsystem:
         self._p = parent
 
     def preset(self):
-        self._p.write_scpi('SYST:PRES')  # Corrected: Standard SCPI preset command
+        raise UnsupportedOperationError("use status.preset() for register preset or ieee.reset() for explicit reset")
 
     def version(self) -> str:
         return self._p.query_scpi('SYST:VERSion?')
