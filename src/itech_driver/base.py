@@ -12,10 +12,9 @@ from scpi_driver_core.exceptions import (
     ConfigurationError, ScpiTimeoutError, TransportError, UnsupportedOperationError,
     ResponseParseError,
 )
-from scpi_driver_core.scpi.codec import ScpiTextCodec
 from scpi_driver_core.scpi.errors import ScpiErrorQueue, ScpiExecutionPolicy
 from scpi_driver_core.transport.base import Transport
-from scpi_driver_core.transport.visa import VisaTransport
+from .connection import ConnectionConfig
 
 from .exceptions import CommandError, InstrumentNotFoundError, TimeoutError
 
@@ -32,31 +31,27 @@ class BaseInstrument:
         interface_kwargs: dict | None = None, *,
         transport: Transport | None = None, visa_library: str = "",
         resource_manager=None, chunk_size: int = 20 * 1024,
+        command_termination: str | None = None, response_termination: str | None = None,
+        connection: ConnectionConfig | None = None,
     ):
-        if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or not math.isfinite(timeout) or timeout <= 0:
-            raise ConfigurationError("timeout must be finite positive milliseconds")
+        if interface_kwargs:
+            raise ConfigurationError("interface_kwargs is no longer supported; use ConnectionConfig or core transport injection")
         if termination not in ("\n", "\r\n", "\r"):
             raise ConfigurationError("termination must be LF, CRLF or CR")
-        terminator = termination.encode("ascii")
-        # Core currently does not expose arbitrary VISA open_resource kwargs.
-        if interface_kwargs:
-            raise ConfigurationError(
-                "interface_kwargs is no longer supported; use core transport injection "
-                "or visa_library/resource_manager/chunk_size"
-            )
-        if transport is not None and (visa_library or resource_manager is not None or chunk_size != 20 * 1024):
-            raise ConfigurationError("VISA options cannot be combined with an injected transport")
-        seconds = timeout / 1000
-        if transport is None:
-            transport = VisaTransport(
-                resource_name, timeout_s=seconds, visa_library=visa_library,
-                resource_manager=resource_manager, chunk_size=chunk_size,
-            )
-        codec = ScpiTextCodec(command_terminator=terminator, response_terminator=terminator)
-        self._bind_session(ScpiSession(
-            resource_name, ScpiClient(transport, codec=codec, timeout_s=seconds),
-            communication_timeout_s=seconds,
-        ))
+        if connection is not None:
+            if (not isinstance(connection, ConnectionConfig) or resource_name != connection.resource
+                    or timeout != 5000 or termination != "\n" or transport is not None
+                    or visa_library or resource_manager is not None or chunk_size != 20 * 1024
+                    or command_termination is not None or response_termination is not None):
+                raise ConfigurationError("connection config cannot be mixed with legacy overrides")
+            config = connection
+        else:
+            config = ConnectionConfig(
+                resource_name, timeout,
+                termination if command_termination is None else command_termination,
+                termination if response_termination is None else response_termination,
+                visa_library=visa_library, resource_manager=resource_manager, chunk_size=chunk_size)
+        self._bind_session(config.make_session(transport))
         try:
             self.session.open()
         except ScpiTimeoutError as exc:
