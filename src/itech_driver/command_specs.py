@@ -573,6 +573,13 @@ def execute_parameterized(driver, method: str, *values):
     payload = ",".join(field.format(value) for field, value in zip(spec.fields, values))
     command = spec.header + " " + payload
     with driver._qualified_method_scope(method):
+        # Exact integer fields alone do not enforce the ARB command envelope.
+        # Local import avoids the registry/capabilities initialization cycle.
+        if method.startswith("ArbSubsystem."):
+            from .arb_integer_qualification import FAMILY_INTEGER_MAX, validate_arb_integer
+            operation = method.split(".", 1)[1]
+            if operation in FAMILY_INTEGER_MAX:
+                validate_arb_integer(driver, operation, values[0])
         if spec.kind is ResultKind.PARAM_WRITE:
             driver.write_scpi(command)
             return None
