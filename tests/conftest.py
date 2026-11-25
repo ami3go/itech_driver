@@ -56,4 +56,9 @@ def approved_hil_config(config):
 
 def pytest_runtest_setup(item):
     if "hardware" in item.keywords and item.config.getoption("--run-hil"):
+        if item.nodeid not in {
+            "tests/test_hardware_interfaces.py::test_physical_read_only_identity",
+            "tests/test_hardware_interfaces.py::test_physical_remote_local",
+        }:
+            raise pytest.UsageError("physical test not integrated with the communication-only safety gate")
         approved_hil_config(item.config)

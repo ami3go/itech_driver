@@ -22,14 +22,14 @@ def bench():
 
 @pytest.fixture
 def permit(tmp_path, bench):
-    authority, key = tmp_path / "authority", tmp_path / "key"
-    enroll(authority, "123456")
-    issue(authority, bench, key, "123456", now=1000)
-    return authority, key
+    authority, key, private = tmp_path / "authority", tmp_path / "key", tmp_path / "private"
+    enroll(private, authority, "123456")
+    issue(private, authority, bench, key, "123456", now=1000)
+    return authority, key, private
 
 
 def test_validity_scope_and_expiry(bench, permit):
-    authority, key = permit
+    authority, key, private = permit
     assert validate(authority, bench, key, now=1000)
     assert validate(authority, bench, key, now=1000+TTL-1)
     for now in (999, 1000+TTL):
@@ -41,9 +41,9 @@ def test_validity_scope_and_expiry(bench, permit):
 
 
 def test_tamper_and_wrong_pin(tmp_path, bench, permit):
-    authority, key = permit
+    authority, key, private = permit
     with pytest.raises(ValueError):
-        issue(authority, bench, tmp_path / "bad", "654321", now=1000)
+        issue(private, authority, bench, tmp_path / "bad", "654321", now=1000)
     assert not (tmp_path / "bad").exists()
     record = json.loads(key.read_text())
     record["payload"]["expires"] += 1
@@ -79,3 +79,13 @@ def test_runner_no_io_modes():
                             capture_output=True, text=True, cwd=root)
     assert result.returncode == 2
     assert "BLOCKED" in result.stderr
+
+def test_public_key_cannot_issue_and_other_authority_rejected(tmp_path, bench, permit):
+    authority, key, private = permit
+    assert "encrypted_private_pem" not in json.loads(authority.read_text())
+    with pytest.raises((KeyError, ValueError)):
+        issue(authority, authority, bench, tmp_path / "forged", "123456", now=1000)
+    other_private, other_public = tmp_path / "other-private", tmp_path / "other-public"
+    enroll(other_private, other_public, "123456")
+    with pytest.raises(ValueError):
+        validate(other_public, bench, key, now=1000)

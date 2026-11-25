@@ -1,17 +1,16 @@
 """Local, operator-issued HIL permit. No instrument I/O.
 
 This is a cooperative local gate, not an electrical interlock or an adversarial
-security boundary. Protect the authority and PIN from the executing agent.
+security boundary. Protect the encrypted private signing key and PIN from the executing agent.
+The runner requires only a trusted operator public key.
 """
 import hashlib
-import hmac
 import json
 import secrets
 import time
 from pathlib import Path
 
 TTL = 24 * 60 * 60
-ROUNDS = 600_000
 INTERFACES = {"tcp", "visa-lan", "usbtmc", "vcp"}
 
 
@@ -34,16 +33,21 @@ def private_write(path, data):
         stream.write(canonical(data))
 
 
-def pin_hash(pin, salt):
+def pin_bytes(pin):
     if not isinstance(pin, str) or not pin.isascii() or not pin.isdecimal() or len(pin) < 6:
         raise ValueError("operator PIN must contain at least six ASCII digits")
-    return hashlib.pbkdf2_hmac("sha256", pin.encode(), bytes.fromhex(salt), ROUNDS).hex()
+    return pin.encode()
 
 
-def enroll(path, pin):
-    salt = secrets.token_hex(32)
-    private_write(path, {"salt": salt, "verifier": pin_hash(pin, salt),
-                         "signing_key": secrets.token_hex(32)})
+def enroll(private_path, authority_path, pin):
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+    key = Ed25519PrivateKey.generate()
+    private_write(private_path, {"encrypted_private_pem": key.private_bytes(
+        serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8,
+        serialization.BestAvailableEncryption(pin_bytes(pin))).decode("ascii")})
+    private_write(authority_path, {"public_hex": key.public_key().public_bytes(
+        serialization.Encoding.Raw, serialization.PublicFormat.Raw).hex()})
 
 
 def validate_config(config):
@@ -88,27 +92,33 @@ def digest_config(config):
     return hashlib.sha256(canonical(validate_config(config))).hexdigest()
 
 
-def issue(authority, config, key_path, pin, now=None):
-    authority = read_object(authority)
-    if not hmac.compare_digest(pin_hash(pin, authority["salt"]), authority["verifier"]):
-        raise ValueError("operator PIN rejected")
+def issue(private_path, authority_path, config, key_path, pin, now=None):
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+    key = serialization.load_pem_private_key(
+        read_object(private_path)["encrypted_private_pem"].encode("ascii"),
+        password=pin_bytes(pin))
+    if not isinstance(key, Ed25519PrivateKey):
+        raise ValueError("unexpected private key type")
+    public = key.public_key().public_bytes(serialization.Encoding.Raw,
+                                           serialization.PublicFormat.Raw).hex()
+    if public != read_object(authority_path)["public_hex"]:
+        raise ValueError("private/public authority mismatch")
     now = int(time.time() if now is None else now)
     payload = {"version": 1, "id": secrets.token_hex(16), "issued": now,
                "expires": now + TTL, "config_sha256": digest_config(config)}
-    signature = hmac.new(bytes.fromhex(authority["signing_key"]), canonical(payload),
-                         hashlib.sha256).hexdigest()
-    private_write(key_path, {"payload": payload, "signature": signature})
+    private_write(key_path, {"payload": payload, "signature": key.sign(canonical(payload)).hex()})
 
 
 def validate(authority, config, key_path, now=None):
+    from cryptography.exceptions import InvalidSignature
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
     try:
         authority = read_object(authority)
         token = read_object(key_path)
         payload = token["payload"]
-        expected = hmac.new(bytes.fromhex(authority["signing_key"]), canonical(payload),
-                            hashlib.sha256).hexdigest()
-        if not hmac.compare_digest(expected, token["signature"]):
-            raise ValueError("signature mismatch")
+        public = Ed25519PublicKey.from_public_bytes(bytes.fromhex(authority["public_hex"]))
+        public.verify(bytes.fromhex(token["signature"]), canonical(payload))
         now = time.time() if now is None else now
         issued, expires = payload["issued"], payload["expires"]
         if (payload["version"] != 1 or type(issued) is not int or type(expires) is not int
@@ -117,7 +127,7 @@ def validate(authority, config, key_path, now=None):
         if payload["config_sha256"] != digest_config(config):
             raise ValueError("bench scope mismatch")
         return payload["id"]
-    except (OSError, KeyError, TypeError, ValueError, AttributeError):
+    except (OSError, KeyError, TypeError, ValueError, AttributeError, InvalidSignature):
         raise ValueError("HIL authorization rejected") from None
 
 

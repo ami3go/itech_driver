@@ -10,6 +10,8 @@ No physical access or qualification evidence during development.
 - [Issue traceability](HIL_ISSUE_TRACEABILITY.md)
 - Existing [manifest gate](../qualification_manifest.md), [physical gate](../physical_qualification_gate.md), [interface guide](../interface-qualification.md) and [performance evidence](../performance_qualification.md) remain authoritative for evidence requirements. Legacy direct hardware commands now additionally require a scoped permit and bench configuration; use the new runner.
 
+A dedicated optional HIL dependency provides Ed25519 permit verification. The operator retains the encrypted private key; the runner reads only the trusted public key.
+
 Only two existing communication test procedures are connected to the runner.
 The communication suite includes unresolved discovery and recovery items, so it intentionally refuses execution; select an individual implemented test.
 This is not a production qualification or a complete executable HIL campaign.

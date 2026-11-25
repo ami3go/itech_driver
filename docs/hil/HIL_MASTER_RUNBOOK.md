@@ -4,7 +4,7 @@
 
 From a checkout in a dedicated environment on Windows or Linux:
 
-    python -m pip install -e ".[dev,discovery]"
+    python -m pip install -e ".[dev,discovery,hil]"
     python -m pytest
     python scripts/hil/run_hil.py --list
     python scripts/hil/run_hil.py --dry-run --suite full
@@ -14,8 +14,7 @@ hardware. Never use real endpoints with offline simulators.
 
 ## Operator preparation
 
-Obtain manufacturer programming guide (part 402225, copyright 2024, candidate
-V1.4/09,2024 per existing repository) and exact user manual from the ITECH
+Obtain manufacturer programming guide (part 402225, copyright 2024, V1.4/09,2024 confirmed from indexed cover text) and exact user manual (candidate V2.5/12,2024, indexed cover confirmed) from the ITECH
 IT-M3900D product download page. Distributor PDF:
 https://www.altoo.dk/files/itech/manuals/IT-M3900D-Programming-Guide.pdf
 Official product page:
@@ -50,23 +49,27 @@ For all energized work this increment intentionally refuses execution.
 
 In a private directory outside the checkout, create the local authority once:
 
-    python scripts/hil/generate_hil_key.py --enroll --authority /private/authority.json
+    python scripts/hil/generate_hil_key.py --enroll --private /operator/signing.json --authority /private/authority.json
 
 Issue one scope-bound key (replace paths with actual external paths):
 
-    python scripts/hil/generate_hil_key.py --authority /private/authority.json --config /private/bench.json --key /private/permit.json
+    python scripts/hil/generate_hil_key.py --private /operator/signing.json --authority /private/authority.json --config /private/bench.json --key /private/permit.json
 
 The operator enters the PIN interactively; never send it to an agent or log.
 Use a new permit filename for renewal. Files are created exclusively; on POSIX
 mode 0600. On Windows enforce equivalent NTFS ACLs on the private directory.
-Authority contains a signing secret: never commit or share it. Restrict access
-and protect operator control; a process with authority-file read/write access
-can forge a permit, so this is a cooperative execution guard, not isolation
-against a malicious local process. The PIN verifier is salted PBKDF2; permit
-is HMAC-bound to the entire configuration and valid for at most 24 hours.
-Changing a configuration field invalidates the permit. Never store permits or
-authority in evidence. Delete/revoke local authority if compromised; existing
-permits cannot be used with a newly enrolled authority.
+The signing private key is encrypted with the operator PIN and must remain
+accessible only to the operator, not to the executing agent. The runner reads
+only the trusted Ed25519 public key; it cannot create valid signatures with
+that key. Store the public key in an operator-managed location with write
+access restricted, and bind the approved runner to that authority path;
+an agent that can replace the trusted public key or invoke raw transport APIs
+can bypass this cooperative gate. Use a long randomly chosen PIN and protect
+the encrypted private key from offline guessing. Permit is signed, bound to the
+entire configuration and valid for at most 24 hours. Changing a configuration
+field invalidates the permit. Never store permits or private key in evidence.
+Replace compromised keys and remove trust in the old public key. This does
+not replace independent electrical isolation or access control.
 
 ## Local preflight and physical tests
 
