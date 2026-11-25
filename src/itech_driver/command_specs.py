@@ -78,6 +78,8 @@ class CommandSpec:
     effect: str = "unknown_read"
     parameters: tuple[str, ...] = ()
     dependencies: tuple[str, ...] = ()
+    bound_selectors: tuple[str, ...] = ()
+    unit: str | None = None
     fields: tuple[WireField, ...] = ()
 
     @property
@@ -488,6 +490,52 @@ _GUIDE_INDEX_PAGES = MappingProxyType({
     "SourceSubsystem.voltage_query": 58,
     "SourceSubsystem.current_set": 38,
     "SourceSubsystem.current_query": 39,
+    "SourceSubsystem.output_power_limit_set": 76,
+    "SourceSubsystem.output_power_limit_query": 77,
+    "SourceSubsystem.voltage_limit_set": 75,
+    "SourceSubsystem.voltage_limit_query": 76,
+    "SourceSubsystem.current_limit_set": 56,
+    "SourceSubsystem.current_limit_query": 56,
+    "SourceSubsystem.programmed_power_limit_set": 76,
+    "SourceSubsystem.programmed_power_limit_query": 77,
+    "SourceSubsystem.ovp_delay_set": 67,
+    "SourceSubsystem.ovp_delay_query": 68,
+    "SourceSubsystem.ocp_delay_set": 48,
+    "SourceSubsystem.ocp_delay_query": 48,
+    "SourceSubsystem.opp_delay_set": 81,
+    "SourceSubsystem.opp_delay_query": 82,
+    "SourceSubsystem.uvp_delay_set": 71,
+    "SourceSubsystem.uvp_delay_query": 72,
+    "SourceSubsystem.ucp_delay_set": 52,
+    "SourceSubsystem.ucp_delay_query": 53,
+    "SourceSubsystem.uvp_warmup_set": 73,
+    "SourceSubsystem.uvp_warmup_query": 74,
+    "SourceSubsystem.ucp_warmup_set": 54,
+    "SourceSubsystem.ucp_warmup_query": 55,
+    "SourceSubsystem.voltage_rise_time_set": 60,
+    "SourceSubsystem.voltage_rise_time_query": 61,
+    "SourceSubsystem.voltage_fall_time_set": 62,
+    "SourceSubsystem.voltage_fall_time_query": 63,
+    "SourceSubsystem.voltage_both_time_set": 59,
+    "SourceSubsystem.voltage_both_time_query": 60,
+    "SourceSubsystem.current_rise_time_set": 41,
+    "SourceSubsystem.current_rise_time_query": 42,
+    "SourceSubsystem.current_fall_time_set": 43,
+    "SourceSubsystem.current_fall_time_query": 44,
+    "SourceSubsystem.current_both_time_set": 40,
+    "SourceSubsystem.current_both_time_query": 41,
+    "SourceSubsystem.resistance_set": 83,
+    "SourceSubsystem.resistance_query": 84,
+    "SourceSubsystem.ovp_set": 65,
+    "SourceSubsystem.ovp_query": 66,
+    "SourceSubsystem.ocp_set": 46,
+    "SourceSubsystem.ocp_query": 47,
+    "SourceSubsystem.opp_threshold_set": 80,
+    "SourceSubsystem.opp_threshold_query": 80,
+    "SourceSubsystem.uvp_set": 70,
+    "SourceSubsystem.uvp_query": 71,
+    "SourceSubsystem.ucp_set": 51,
+    "SourceSubsystem.ucp_query": 52,
 })
 # A setter that reads live bounds depends on the matching qualified query.
 _RANGE_READ_DEPENDENCIES = MappingProxyType({
@@ -517,10 +565,92 @@ _RANGE_AWARE_COMMAND_SPECS = MappingProxyType({
     if method in _RANGE_READ_DEPENDENCIES else spec
     for method, spec in _TYPED_COMMAND_SPECS.items()
 })
+# IT-M3900D programming guide V1.4/09,2024, part 402225, source index pp. IX–X.
+# These are syntax attestations, not numerical ranges or firmware qualification.
+_SOURCE_BOUND_QUERY_KEYS = frozenset((
+    "SourceSubsystem.voltage_query",
+    "SourceSubsystem.current_query",
+    "SourceSubsystem.output_power_limit_query",
+    "SourceSubsystem.voltage_limit_query",
+    "SourceSubsystem.current_limit_query",
+    "SourceSubsystem.programmed_power_limit_query",
+    "SourceSubsystem.ovp_delay_query",
+    "SourceSubsystem.ocp_delay_query",
+    "SourceSubsystem.opp_delay_query",
+    "SourceSubsystem.uvp_delay_query",
+    "SourceSubsystem.ucp_delay_query",
+    "SourceSubsystem.uvp_warmup_query",
+    "SourceSubsystem.ucp_warmup_query",
+    "SourceSubsystem.voltage_rise_time_query",
+    "SourceSubsystem.voltage_fall_time_query",
+    "SourceSubsystem.voltage_both_time_query",
+    "SourceSubsystem.current_rise_time_query",
+    "SourceSubsystem.current_fall_time_query",
+    "SourceSubsystem.current_both_time_query",
+    "SourceSubsystem.resistance_query",
+))
+_SOURCE_UNITS = MappingProxyType({
+    "SourceSubsystem.voltage_set": "V",
+    "SourceSubsystem.voltage_query": "V",
+    "SourceSubsystem.current_set": "A",
+    "SourceSubsystem.current_query": "A",
+    "SourceSubsystem.output_power_limit_set": "W",
+    "SourceSubsystem.output_power_limit_query": "W",
+    "SourceSubsystem.voltage_limit_set": "V",
+    "SourceSubsystem.voltage_limit_query": "V",
+    "SourceSubsystem.current_limit_set": "A",
+    "SourceSubsystem.current_limit_query": "A",
+    "SourceSubsystem.programmed_power_limit_set": "W",
+    "SourceSubsystem.programmed_power_limit_query": "W",
+    "SourceSubsystem.ovp_delay_set": "s",
+    "SourceSubsystem.ovp_delay_query": "s",
+    "SourceSubsystem.ocp_delay_set": "s",
+    "SourceSubsystem.ocp_delay_query": "s",
+    "SourceSubsystem.opp_delay_set": "s",
+    "SourceSubsystem.opp_delay_query": "s",
+    "SourceSubsystem.uvp_delay_set": "s",
+    "SourceSubsystem.uvp_delay_query": "s",
+    "SourceSubsystem.ucp_delay_set": "s",
+    "SourceSubsystem.ucp_delay_query": "s",
+    "SourceSubsystem.uvp_warmup_set": "s",
+    "SourceSubsystem.uvp_warmup_query": "s",
+    "SourceSubsystem.ucp_warmup_set": "s",
+    "SourceSubsystem.ucp_warmup_query": "s",
+    "SourceSubsystem.voltage_rise_time_set": "s",
+    "SourceSubsystem.voltage_rise_time_query": "s",
+    "SourceSubsystem.voltage_fall_time_set": "s",
+    "SourceSubsystem.voltage_fall_time_query": "s",
+    "SourceSubsystem.voltage_both_time_set": "s",
+    "SourceSubsystem.voltage_both_time_query": "s",
+    "SourceSubsystem.current_rise_time_set": "s",
+    "SourceSubsystem.current_rise_time_query": "s",
+    "SourceSubsystem.current_fall_time_set": "s",
+    "SourceSubsystem.current_fall_time_query": "s",
+    "SourceSubsystem.current_both_time_set": "s",
+    "SourceSubsystem.current_both_time_query": "s",
+    "SourceSubsystem.resistance_set": "ohm",
+    "SourceSubsystem.resistance_query": "ohm",
+    "SourceSubsystem.ovp_set": "V",
+    "SourceSubsystem.ovp_query": "V",
+    "SourceSubsystem.ocp_set": "A",
+    "SourceSubsystem.ocp_query": "A",
+    "SourceSubsystem.opp_threshold_set": "W",
+    "SourceSubsystem.opp_threshold_query": "W",
+    "SourceSubsystem.uvp_set": "V",
+    "SourceSubsystem.uvp_query": "V",
+    "SourceSubsystem.ucp_set": "A",
+    "SourceSubsystem.ucp_query": "A",
+})
+_SOURCE_METADATA_SPECS = MappingProxyType({
+    method: replace(spec, unit=_SOURCE_UNITS[method],
+                    bound_selectors=("MIN", "MAX", "DEF") if method in _SOURCE_BOUND_QUERY_KEYS else ())
+    if method in _SOURCE_UNITS else spec
+    for method, spec in _RANGE_AWARE_COMMAND_SPECS.items()
+})
 COMMAND_SPECS = MappingProxyType({
     method: replace(spec, guide_status="indexed_text_reference", guide_page=_GUIDE_INDEX_PAGES[method])
     if method in _GUIDE_INDEX_PAGES else spec
-    for method, spec in _RANGE_AWARE_COMMAND_SPECS.items()
+    for method, spec in _SOURCE_METADATA_SPECS.items()
 })
 
 
@@ -529,6 +659,22 @@ def command_spec(method: str) -> CommandSpec:
         return COMMAND_SPECS[method]
     except KeyError as exc:
         raise UnsupportedOperationError(f"no typed runtime specification for {method}") from exc
+
+
+def source_bound_command(method: str, bound=None) -> str:
+    """Render only guide-indexed source range queries; never probe thresholds."""
+    spec = command_spec(method)
+    if not spec.bound_selectors:
+        raise UnsupportedOperationError(f"no documented source range selectors for {method}")
+    if bound is not None and (not isinstance(bound, str) or bound not in spec.bound_selectors):
+        raise ConfigurationError("bound must be MIN, MAX, DEF or None")
+    return spec.header.removesuffix("?") + "?" + ("" if bound is None else " " + bound)
+
+
+def execute_source_bound(driver, method: str, bound=None) -> float:
+    command = source_bound_command(method, bound)
+    with driver._qualified_method_scope(method):
+        return parse_float(driver.query_scpi(command))
 
 
 def execute(driver, method: str, *args):

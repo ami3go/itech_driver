@@ -1674,12 +1674,12 @@
         "self._p.write_scpi(f'SOUR{channel}:VOLT:PROT:LEV {value}')"
       ],
       "guide": {
-        "page": null,
+        "page": 65,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -1693,12 +1693,12 @@
         "return parse_float(self._p.query_scpi(f'SOUR{channel}:VOLT:PROT:LEV?'))"
       ],
       "guide": {
-        "page": null,
+        "page": 66,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -1750,12 +1750,12 @@
         "self._p.write_scpi(f'SOUR{channel}:CURR:PROT:LEV {value}')"
       ],
       "guide": {
-        "page": null,
+        "page": 46,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -1769,12 +1769,12 @@
         "return parse_float(self._p.query_scpi(f'SOUR{channel}:CURR:PROT:LEV?'))"
       ],
       "guide": {
-        "page": null,
+        "page": 47,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4258,12 +4258,12 @@
         "self._limit_query(\"SOUR:CURR:SLEW:BOTH\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 41,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4279,12 +4279,12 @@
         "self._limit_set(\"SOUR:CURR:SLEW:BOTH\", seconds)"
       ],
       "guide": {
-        "page": null,
+        "page": 40,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4300,12 +4300,12 @@
         "self._limit_query(\"SOUR:CURR:SLEW:NEG\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 44,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4321,12 +4321,12 @@
         "self._limit_set(\"SOUR:CURR:SLEW:NEG\", seconds)"
       ],
       "guide": {
-        "page": null,
+        "page": 43,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4342,12 +4342,12 @@
         "self._limit_query(\"SOUR:CURR:LIM\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 56,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4363,12 +4363,12 @@
         "self._limit_set(\"SOUR:CURR:LIM\", value)"
       ],
       "guide": {
-        "page": null,
+        "page": 56,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4384,12 +4384,12 @@
         "self._limit_query(\"SOUR:CURR:SLEW:POS\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 42,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4405,12 +4405,12 @@
         "self._limit_set(\"SOUR:CURR:SLEW:POS\", seconds)"
       ],
       "guide": {
-        "page": null,
+        "page": 41,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4552,12 +4552,12 @@
         "self._limit_query(\"SOUR:CURR:OVER:PROT:DEL\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 48,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4573,12 +4573,12 @@
         "self._limit_set(\"SOUR:CURR:OVER:PROT:DEL\", seconds)"
       ],
       "guide": {
-        "page": null,
+        "page": 48,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4594,12 +4594,12 @@
         "self._limit_query(\"SOUR:POW:OVER:PROT:DEL\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 82,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4615,12 +4615,12 @@
         "self._limit_set(\"SOUR:POW:OVER:PROT:DEL\", seconds)"
       ],
       "guide": {
-        "page": null,
+        "page": 81,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4678,12 +4678,12 @@
         "self._p.query_scpi('SOUR:POW:OVER:PROT:LEV?')"
       ],
       "guide": {
-        "page": null,
+        "page": 80,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4700,12 +4700,12 @@
         "self._p.write_scpi(f'SOUR:POW:OVER:PROT:LEV {value}')"
       ],
       "guide": {
-        "page": null,
+        "page": 80,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4721,12 +4721,12 @@
         "self._limit_query('SOUR:POW:LIM')"
       ],
       "guide": {
-        "page": null,
+        "page": 77,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4742,12 +4742,12 @@
         "self._limit_set('SOUR:POW:LIM', value)"
       ],
       "guide": {
-        "page": null,
+        "page": 76,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4763,12 +4763,12 @@
         "self._limit_query(\"SOUR:VOLT:OVER:PROT:DEL\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 68,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4784,12 +4784,12 @@
         "self._limit_set(\"SOUR:VOLT:OVER:PROT:DEL\", seconds)"
       ],
       "guide": {
-        "page": null,
+        "page": 67,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4805,12 +4805,12 @@
         "self._limit_query(\"SOUR:POW:LIM\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 77,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4826,12 +4826,12 @@
         "self._limit_set(\"SOUR:POW:LIM\", value)"
       ],
       "guide": {
-        "page": null,
+        "page": 76,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4847,12 +4847,12 @@
         "self.function_query()"
       ],
       "guide": {
-        "page": null,
+        "page": 84,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4869,12 +4869,12 @@
         "self.function_query()"
       ],
       "guide": {
-        "page": null,
+        "page": 83,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4890,12 +4890,12 @@
         "self._limit_query(\"SOUR:CURR:UND:PROT:DEL\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 53,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4911,12 +4911,12 @@
         "self._limit_set(\"SOUR:CURR:UND:PROT:DEL\", seconds)"
       ],
       "guide": {
-        "page": null,
+        "page": 52,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4974,12 +4974,12 @@
         "self._p.query_scpi(\"SOUR:CURR:UND:PROT:LEV?\")"
       ],
       "guide": {
-        "page": null,
+        "page": 52,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -4996,12 +4996,12 @@
         "self._p.write_scpi(f\"SOUR:CURR:UND:PROT:LEV {value}\")"
       ],
       "guide": {
-        "page": null,
+        "page": 51,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5017,12 +5017,12 @@
         "self._limit_query(\"SOUR:CURR:UND:PROT:WARM\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 55,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5038,12 +5038,12 @@
         "self._limit_set(\"SOUR:CURR:UND:PROT:WARM\", seconds)"
       ],
       "guide": {
-        "page": null,
+        "page": 54,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5059,12 +5059,12 @@
         "self._limit_query(\"SOUR:VOLT:UND:PROT:DEL\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 72,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5080,12 +5080,12 @@
         "self._limit_set(\"SOUR:VOLT:UND:PROT:DEL\", seconds)"
       ],
       "guide": {
-        "page": null,
+        "page": 71,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5143,12 +5143,12 @@
         "self._p.query_scpi(\"SOUR:VOLT:UND:PROT:LEV?\")"
       ],
       "guide": {
-        "page": null,
+        "page": 71,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5165,12 +5165,12 @@
         "self._p.write_scpi(f\"SOUR:VOLT:UND:PROT:LEV {value}\")"
       ],
       "guide": {
-        "page": null,
+        "page": 70,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5186,12 +5186,12 @@
         "self._limit_query(\"SOUR:VOLT:UND:PROT:WARM\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 74,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5207,12 +5207,12 @@
         "self._limit_set(\"SOUR:VOLT:UND:PROT:WARM\", seconds)"
       ],
       "guide": {
-        "page": null,
+        "page": 73,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5228,12 +5228,12 @@
         "self._limit_query(\"SOUR:VOLT:SLEW:BOTH\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 60,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5249,12 +5249,12 @@
         "self._limit_set(\"SOUR:VOLT:SLEW:BOTH\", seconds)"
       ],
       "guide": {
-        "page": null,
+        "page": 59,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5270,12 +5270,12 @@
         "self._limit_query(\"SOUR:VOLT:SLEW:NEG\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 63,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5291,12 +5291,12 @@
         "self._limit_set(\"SOUR:VOLT:SLEW:NEG\", seconds)"
       ],
       "guide": {
-        "page": null,
+        "page": 62,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5312,12 +5312,12 @@
         "self._limit_query(\"SOUR:VOLT:LIM\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 76,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5333,12 +5333,12 @@
         "self._limit_set(\"SOUR:VOLT:LIM\", value)"
       ],
       "guide": {
-        "page": null,
+        "page": 75,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5354,12 +5354,12 @@
         "self._limit_query(\"SOUR:VOLT:SLEW:POS\", bound)"
       ],
       "guide": {
-        "page": null,
+        "page": 61,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",
@@ -5375,12 +5375,12 @@
         "self._limit_set(\"SOUR:VOLT:SLEW:POS\", seconds)"
       ],
       "guide": {
-        "page": null,
+        "page": 60,
         "syntax": null,
         "arguments": null,
         "response": null,
-        "models": null,
-        "status": "unverified"
+        "models": "IT-M3900D series; actual model/firmware not yet qualified",
+        "status": "indexed_text_reference"
       },
       "retry": "no_automatic_replay",
       "offline_test": "not_assessed",

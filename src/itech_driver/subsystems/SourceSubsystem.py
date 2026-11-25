@@ -1,4 +1,5 @@
-from ..command_specs import execute, execute_parameterized, command_spec
+from ..command_specs import (execute, execute_parameterized, command_spec,
+                             execute_source_bound, source_bound_command)
 import math
 import warnings
 from scpi_driver_core import ConfigurationError, IdentityError, ResponseParseError, UnsupportedOperationError
@@ -135,13 +136,10 @@ class SourceSubsystem:
 
     def output_power_limit_query(self, channel: int = 1) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.output_power_limit_query").header)
+        return self._limit_query("SourceSubsystem.output_power_limit_query")
 
-    def _limit_query(self, header, bound=None):
-        if bound is not None and bound not in ("MIN", "MAX", "DEF"):
-            raise ConfigurationError("bound must be MIN, MAX, DEF or None")
-        suffix = "" if bound is None else " " + bound
-        return parse_float(self._p.query_scpi(header + "?" + suffix))
+    def _limit_query(self, method, bound=None):
+        return execute_source_bound(self._p, method, bound)
 
     def _limit_set(self, method, value):
         self._check_setpoint(value)
@@ -155,8 +153,14 @@ class SourceSubsystem:
                 descriptor = self._p.model_descriptor(refresh=False)
                 if descriptor is None:
                     raise IdentityError("recognized rated ITECH model required for electrical setting")
-            minimum = self._limit_query(header, "MIN")
-            maximum = self._limit_query(header, "MAX")
+            # Identity refresh or a changed generation can invalidate evidence.
+            self._p._require_methods(method, *spec.dependencies)
+            query_method = spec.dependencies[0]
+            generation = self._p.session.generation
+            minimum = self._limit_query(query_method, "MIN")
+            maximum = self._limit_query(query_method, "MAX")
+            if generation != self._p.session.generation:
+                raise UnsupportedOperationError("session changed during range discovery")
             if not 0 <= minimum <= maximum:
                 raise ConfigurationError("invalid reported instrument range")
             permitted = Range(minimum, maximum)
@@ -165,6 +169,7 @@ class SourceSubsystem:
                     descriptor, header, permitted, self._p.application_limits
                 )
             permitted.validate(value)
+            self._p._require_methods(method, *spec.dependencies)
             self._p.write_scpi(f"{header} {value}")
 
     def voltage_limit_set(self, value: Number, channel: int = 1):
@@ -173,7 +178,7 @@ class SourceSubsystem:
 
     def voltage_limit_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.voltage_limit_query").header, bound)
+        return self._limit_query("SourceSubsystem.voltage_limit_query", bound)
 
     def current_limit_set(self, value: Number, channel: int = 1):
         self._check_channel(channel)
@@ -181,7 +186,7 @@ class SourceSubsystem:
 
     def current_limit_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.current_limit_query").header, bound)
+        return self._limit_query("SourceSubsystem.current_limit_query", bound)
 
     def programmed_power_limit_set(self, value: Number, channel: int = 1):
         self._check_channel(channel)
@@ -189,7 +194,7 @@ class SourceSubsystem:
 
     def programmed_power_limit_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.programmed_power_limit_query").header, bound)
+        return self._limit_query("SourceSubsystem.programmed_power_limit_query", bound)
 
     # Retain historical behavior explicitly during migration; never silently
     # turn an existing OPP threshold operation into a different setting.
@@ -242,7 +247,7 @@ class SourceSubsystem:
 
     def ovp_delay_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.ovp_delay_query").header, bound)
+        return self._limit_query("SourceSubsystem.ovp_delay_query", bound)
 
     def ocp_delay_set(self, seconds: Number, channel: int = 1):
         self._check_channel(channel)
@@ -250,7 +255,7 @@ class SourceSubsystem:
 
     def ocp_delay_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.ocp_delay_query").header, bound)
+        return self._limit_query("SourceSubsystem.ocp_delay_query", bound)
 
     def opp_delay_set(self, seconds: Number, channel: int = 1):
         self._check_channel(channel)
@@ -258,7 +263,7 @@ class SourceSubsystem:
 
     def opp_delay_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.opp_delay_query").header, bound)
+        return self._limit_query("SourceSubsystem.opp_delay_query", bound)
 
     def uvp_delay_set(self, seconds: Number, channel: int = 1):
         self._check_channel(channel)
@@ -266,7 +271,7 @@ class SourceSubsystem:
 
     def uvp_delay_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.uvp_delay_query").header, bound)
+        return self._limit_query("SourceSubsystem.uvp_delay_query", bound)
 
     def ucp_delay_set(self, seconds: Number, channel: int = 1):
         self._check_channel(channel)
@@ -274,7 +279,7 @@ class SourceSubsystem:
 
     def ucp_delay_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.ucp_delay_query").header, bound)
+        return self._limit_query("SourceSubsystem.ucp_delay_query", bound)
 
     def uvp_warmup_set(self, seconds: Number, channel: int = 1):
         self._check_channel(channel)
@@ -282,7 +287,7 @@ class SourceSubsystem:
 
     def uvp_warmup_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.uvp_warmup_query").header, bound)
+        return self._limit_query("SourceSubsystem.uvp_warmup_query", bound)
 
     def ucp_warmup_set(self, seconds: Number, channel: int = 1):
         self._check_channel(channel)
@@ -290,7 +295,7 @@ class SourceSubsystem:
 
     def ucp_warmup_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.ucp_warmup_query").header, bound)
+        return self._limit_query("SourceSubsystem.ucp_warmup_query", bound)
 
     def uvp_set(self, value: Number, channel: int = 1, *, qualification: ProtectionThresholdQualification | None = None):
         self._check_channel(channel)
@@ -335,7 +340,7 @@ class SourceSubsystem:
 
     def voltage_rise_time_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.voltage_rise_time_query").header, bound)
+        return self._limit_query("SourceSubsystem.voltage_rise_time_query", bound)
 
     def voltage_fall_time_set(self, seconds: Number, channel: int = 1):
         """Set duration in seconds, not a slew rate in units/s."""
@@ -344,7 +349,7 @@ class SourceSubsystem:
 
     def voltage_fall_time_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.voltage_fall_time_query").header, bound)
+        return self._limit_query("SourceSubsystem.voltage_fall_time_query", bound)
 
     def voltage_both_time_set(self, seconds: Number, channel: int = 1):
         """Set duration in seconds, not a slew rate in units/s."""
@@ -353,7 +358,7 @@ class SourceSubsystem:
 
     def voltage_both_time_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.voltage_both_time_query").header, bound)
+        return self._limit_query("SourceSubsystem.voltage_both_time_query", bound)
 
     def current_rise_time_set(self, seconds: Number, channel: int = 1):
         """Set duration in seconds, not a slew rate in units/s."""
@@ -362,7 +367,7 @@ class SourceSubsystem:
 
     def current_rise_time_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.current_rise_time_query").header, bound)
+        return self._limit_query("SourceSubsystem.current_rise_time_query", bound)
 
     def current_fall_time_set(self, seconds: Number, channel: int = 1):
         """Set duration in seconds, not a slew rate in units/s."""
@@ -371,7 +376,7 @@ class SourceSubsystem:
 
     def current_fall_time_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.current_fall_time_query").header, bound)
+        return self._limit_query("SourceSubsystem.current_fall_time_query", bound)
 
     def current_both_time_set(self, seconds: Number, channel: int = 1):
         """Set duration in seconds, not a slew rate in units/s."""
@@ -380,7 +385,7 @@ class SourceSubsystem:
 
     def current_both_time_query(self, channel: int = 1, *, bound=None) -> float:
         self._check_channel(channel)
-        return self._limit_query(command_spec("SourceSubsystem.current_both_time_query").header, bound)
+        return self._limit_query("SourceSubsystem.current_both_time_query", bound)
 
     def cv_loop_speed_set(self, speed: str):
         execute_parameterized(self._p, "SourceSubsystem.cv_loop_speed_set", self._enum_arg(speed, {"HIGH": "HIGH", "LOW": "LOW"}))
@@ -447,10 +452,11 @@ class SourceSubsystem:
 
     def resistance_query(self, *, bound=None) -> float:
         """Query programmed internal resistance in ohms (CV priority only)."""
+        source_bound_command("SourceSubsystem.resistance_query", bound)
         with self._p.session.operation_lock():
             if self.function_query() != "VOLT":
                 raise ConfigurationError("internal resistance requires CV priority")
-            return self._limit_query(command_spec("SourceSubsystem.resistance_query").header,bound)
+            return self._limit_query("SourceSubsystem.resistance_query",bound)
 
     def resistance_set(self, ohms: Number):
         """Set CV internal resistance using the device's reported range."""

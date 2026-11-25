@@ -4,9 +4,8 @@ from enum import Enum
 from types import MappingProxyType
 from typing import Mapping
 from .utils.validation import validate_bounds, validate_range
-from .command_specs import command_spec
+from .command_specs import execute_source_bound
 from scpi_driver_core import ConfigurationError, IdentityError, ResponseParseError, UnsupportedOperationError
-from scpi_driver_core.scpi.parsers import parse_float
 
 
 @dataclass(frozen=True)
@@ -217,13 +216,14 @@ def discover_capabilities(driver, *, application_limits=None):
                    "SourceSubsystem.programmed_power_limit_query")
         driver._require_methods(*methods)
         ident = driver.identity_snapshot(refresh=True)
+        driver._require_methods(*methods)
+        generation = driver.session.generation
         descriptor = descriptor_for(ident)
         if descriptor is None:
             raise IdentityError("unknown or unsupported ITECH model: " + ident.model)
         def probe(method, ceiling):
-            header = command_spec(method).header.removesuffix("?")
-            lo = parse_float(driver.query_scpi(header + "? MIN"))
-            hi = parse_float(driver.query_scpi(header + "? MAX"))
+            lo = execute_source_bound(driver, method, "MIN")
+            hi = execute_source_bound(driver, method, "MAX")
             if not 0 <= lo <= hi or hi <= 0 or lo > ceiling:
                 raise ResponseParseError("invalid instrument capability range", raw=f"{lo},{hi}")
             return Range(lo, hi)
@@ -231,6 +231,9 @@ def discover_capabilities(driver, *, application_limits=None):
         live = ElectricalRanges(*(probe(method, ceiling) for method, ceiling in zip(
             methods, (ratings.voltage_v, ratings.current_a, ratings.voltage_v,
                       ratings.current_a, ratings.power_w))))
+        if generation != driver.session.generation:
+            raise UnsupportedOperationError("session changed during capability discovery")
+        driver._require_methods(*methods)
         effective = effective_ranges(descriptor, live, application_limits)
         return Capabilities(ident.model, ident.firmware_version, ratings,
                             effective.voltage, effective.current, effective.voltage_limit,
