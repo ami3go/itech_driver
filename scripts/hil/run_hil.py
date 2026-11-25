@@ -1,5 +1,8 @@
 """Single entry point for implemented HIL procedures; no I/O for list/dry-run."""
 import argparse
+from datetime import datetime, timezone
+import importlib.metadata
+import platform
 import json
 from pathlib import Path
 import subprocess
@@ -36,7 +39,7 @@ def main(argv=None):
         p.exit(2, "BLOCKED: selected suite includes unimplemented procedures; no hardware contacted.\n")
     if not (a.config and a.authority and a.key):
         p.error("--config, --authority and --key required")
-    from itech_driver.hil_authorization import read_object, validate, pytest_arguments
+    from itech_driver.hil_authorization import read_object, validate, pytest_arguments, digest_config
     try:
         config = read_object(a.config)
         for path in (a.authority, a.key):
@@ -64,7 +67,34 @@ def main(argv=None):
            "--hil-key", str(Path(a.key).resolve()), "-x",
            "--junitxml", str(evidence / "results.xml"), *args, *nodes]
     print("Communication-only run. Operator must independently verify final safe state.")
-    result = subprocess.run(cmd, cwd=ROOT, check=False)
+    def version(package):
+        try:
+            return importlib.metadata.version(package)
+        except importlib.metadata.PackageNotFoundError:
+            return None
+
+    meta = {"evidence_type": "physical", "execution_status": "INCONCLUSIVE",
+            "start_utc": datetime.now(timezone.utc).isoformat(),
+            "end_utc": None, "exit_code": None,
+            "driver_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
+            "driver_version": version("itech-itm3900d-driver"),
+            "core_version": version("scpi-driver-core"),
+            "python": platform.python_version(), "os": platform.platform(),
+            "bench_id": config["bench_id"], "model": config["model"], "serial": config["serial"],
+            "firmware": config["firmware"], "interface": config["interface"],
+            "operator": config["operator"], "config_sha256": digest_config(config),
+            "authorization_validated": True, "cases": [c["id"] for c in selected],
+            "final_safe_state": "UNVERIFIED: independent operator evidence required"}
+    def save_metadata():
+        (evidence / "execution.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+
+    save_metadata()
+    try:
+        result = subprocess.run(cmd, cwd=ROOT, check=False)
+        meta["exit_code"] = result.returncode
+    finally:
+        meta["end_utc"] = datetime.now(timezone.utc).isoformat()
+        save_metadata()
     print("JUnit is execution evidence, not a physical qualification verdict.")
     return result.returncode
 

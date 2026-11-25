@@ -7,6 +7,7 @@ No physical access or qualification evidence during development.
 - [Master runbook](HIL_MASTER_RUNBOOK.md)
 - [SCPI traceability inventory](HIL_SCPI_TRACEABILITY.md)
 - [Machine-readable work inventory](test_matrix.json)
+- [Evidence export](HIL_EVIDENCE_TEMPLATE.md)
 - [Issue traceability](HIL_ISSUE_TRACEABILITY.md)
 - Existing [manifest gate](../qualification_manifest.md), [physical gate](../physical_qualification_gate.md), [interface guide](../interface-qualification.md) and [performance evidence](../performance_qualification.md) remain authoritative for evidence requirements. Legacy direct hardware commands now additionally require a scoped permit and bench configuration; use the new runner.
 
