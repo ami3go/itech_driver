@@ -74,3 +74,30 @@ def test_generic_base_retains_direct_subsystem_compatibility():
     with BaseInstrument("sim", transport=t) as base:
         assert MeasurementSubsystem(base).voltage_query() == 1.25
     assert t.history == ["MEAS:VOLT?"]
+
+
+@pytest.mark.parametrize("name", ["voltage_set","current_set","output_power_limit_set","voltage_limit_set","current_limit_set","programmed_power_limit_set","ovp_delay_set","ocp_delay_set","opp_delay_set","uvp_delay_set","ucp_delay_set","uvp_warmup_set","ucp_warmup_set","voltage_rise_time_set","voltage_fall_time_set","voltage_both_time_set","current_rise_time_set","current_fall_time_set","current_both_time_set","resistance_set"])
+def test_range_setter_needs_qualified_read_before_any_probe(name):
+    t = make()
+    with ITM3900D("sim", transport=t) as d:
+        bind(d, t, ["SourceSubsystem." + name])
+        with pytest.raises(UnsupportedOperationError):
+            getattr(d.source, name)(1)
+    assert t.history == ["*IDN?"]
+
+
+def test_qualified_range_setter_keeps_exact_wire_and_validation():
+    t = make().on("SOUR:VOLT? MIN", "0").on("SOUR:VOLT? MAX", "80").on("SOUR:VOLT 5")
+    with ITM3900D("sim", transport=t) as d:
+        bind(d, t, ["SourceSubsystem.voltage_set", "SourceSubsystem.voltage_query"])
+        d.source.voltage_set(5)
+    assert t.history == ["*IDN?", "SOUR:VOLT? MIN", "SOUR:VOLT? MAX", "SOUR:VOLT 5"]
+
+
+def test_discovery_does_not_probe_unqualified_ranges():
+    t = make()
+    with ITM3900D("sim", transport=t) as d:
+        bind(d, t, ["SourceSubsystem.voltage_query"])
+        with pytest.raises(UnsupportedOperationError):
+            d.discover_capabilities()
+    assert t.history == ["*IDN?"]

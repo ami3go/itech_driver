@@ -489,10 +489,38 @@ _GUIDE_INDEX_PAGES = MappingProxyType({
     "SourceSubsystem.current_set": 38,
     "SourceSubsystem.current_query": 39,
 })
+# A setter that reads live bounds depends on the matching qualified query.
+_RANGE_READ_DEPENDENCIES = MappingProxyType({
+    "SourceSubsystem.voltage_set": ("SourceSubsystem.voltage_query",),
+    "SourceSubsystem.current_set": ("SourceSubsystem.current_query",),
+    "SourceSubsystem.output_power_limit_set": ("SourceSubsystem.output_power_limit_query",),
+    "SourceSubsystem.voltage_limit_set": ("SourceSubsystem.voltage_limit_query",),
+    "SourceSubsystem.current_limit_set": ("SourceSubsystem.current_limit_query",),
+    "SourceSubsystem.programmed_power_limit_set": ("SourceSubsystem.programmed_power_limit_query",),
+    "SourceSubsystem.ovp_delay_set": ("SourceSubsystem.ovp_delay_query",),
+    "SourceSubsystem.ocp_delay_set": ("SourceSubsystem.ocp_delay_query",),
+    "SourceSubsystem.opp_delay_set": ("SourceSubsystem.opp_delay_query",),
+    "SourceSubsystem.uvp_delay_set": ("SourceSubsystem.uvp_delay_query",),
+    "SourceSubsystem.ucp_delay_set": ("SourceSubsystem.ucp_delay_query",),
+    "SourceSubsystem.uvp_warmup_set": ("SourceSubsystem.uvp_warmup_query",),
+    "SourceSubsystem.ucp_warmup_set": ("SourceSubsystem.ucp_warmup_query",),
+    "SourceSubsystem.voltage_rise_time_set": ("SourceSubsystem.voltage_rise_time_query",),
+    "SourceSubsystem.voltage_fall_time_set": ("SourceSubsystem.voltage_fall_time_query",),
+    "SourceSubsystem.voltage_both_time_set": ("SourceSubsystem.voltage_both_time_query",),
+    "SourceSubsystem.current_rise_time_set": ("SourceSubsystem.current_rise_time_query",),
+    "SourceSubsystem.current_fall_time_set": ("SourceSubsystem.current_fall_time_query",),
+    "SourceSubsystem.current_both_time_set": ("SourceSubsystem.current_both_time_query",),
+    "SourceSubsystem.resistance_set": ("SourceSubsystem.resistance_query", "SourceSubsystem.function_query",),
+})
+_RANGE_AWARE_COMMAND_SPECS = MappingProxyType({
+    method: replace(spec, dependencies=_RANGE_READ_DEPENDENCIES[method])
+    if method in _RANGE_READ_DEPENDENCIES else spec
+    for method, spec in _TYPED_COMMAND_SPECS.items()
+})
 COMMAND_SPECS = MappingProxyType({
     method: replace(spec, guide_status="indexed_text_reference", guide_page=_GUIDE_INDEX_PAGES[method])
     if method in _GUIDE_INDEX_PAGES else spec
-    for method, spec in _TYPED_COMMAND_SPECS.items()
+    for method, spec in _RANGE_AWARE_COMMAND_SPECS.items()
 })
 
 

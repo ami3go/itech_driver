@@ -4,6 +4,7 @@ from enum import Enum
 from types import MappingProxyType
 from typing import Mapping
 from .utils.validation import validate_bounds, validate_range
+from .command_specs import command_spec
 from scpi_driver_core import ConfigurationError, IdentityError, ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_float
 
@@ -211,22 +212,25 @@ def effective_ranges(descriptor, live, application=None):
 def discover_capabilities(driver, *, application_limits=None):
     """Explicit read-only probe; retain reported ranges separately from effective limits."""
     with driver.session.operation_lock():
+        methods = ("SourceSubsystem.voltage_query", "SourceSubsystem.current_query",
+                   "SourceSubsystem.voltage_limit_query", "SourceSubsystem.current_limit_query",
+                   "SourceSubsystem.programmed_power_limit_query")
+        driver._require_methods(*methods)
         ident = driver.identity_snapshot(refresh=True)
         descriptor = descriptor_for(ident)
         if descriptor is None:
             raise IdentityError("unknown or unsupported ITECH model: " + ident.model)
-        def probe(header, ceiling):
+        def probe(method, ceiling):
+            header = command_spec(method).header.removesuffix("?")
             lo = parse_float(driver.query_scpi(header + "? MIN"))
             hi = parse_float(driver.query_scpi(header + "? MAX"))
             if not 0 <= lo <= hi or hi <= 0 or lo > ceiling:
                 raise ResponseParseError("invalid instrument capability range", raw=f"{lo},{hi}")
             return Range(lo, hi)
         ratings = descriptor.ratings
-        live = ElectricalRanges(probe("SOUR:VOLT", ratings.voltage_v),
-                                probe("SOUR:CURR", ratings.current_a),
-                                probe("SOUR:VOLT:LIM", ratings.voltage_v),
-                                probe("SOUR:CURR:LIM", ratings.current_a),
-                                probe("SOUR:POW:LIM", ratings.power_w))
+        live = ElectricalRanges(*(probe(method, ceiling) for method, ceiling in zip(
+            methods, (ratings.voltage_v, ratings.current_a, ratings.voltage_v,
+                      ratings.current_a, ratings.power_w))))
         effective = effective_ranges(descriptor, live, application_limits)
         return Capabilities(ident.model, ident.firmware_version, ratings,
                             effective.voltage, effective.current, effective.voltage_limit,

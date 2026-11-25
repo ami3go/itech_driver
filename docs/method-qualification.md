@@ -27,3 +27,6 @@ Guard installation now occurs on subsystem classes rather than attached instance
 
 ## Single capability inventory
 Method qualification keys and restricted dispositions now derive directly from the immutable runtime command registry rather than a second 300-key list. IEEE identity and the offline planner are excluded; ELOG and DLOG retain separate evidence and DLOG raw data remains restricted. Class installation checks actual methods against the derived set. Legacy opt-in behavior is unchanged; external model/firmware evidence remains necessary.
+
+## Live range reads
+All 20 range-validated source setters require matching read-method qualification before identity or MIN/MAX probes. Resistance configuration also preflights the CV-priority query. Explicit capability discovery preflights all five electrical read methods. A qualification reference for these queries must cover the bound selectors when they are used for range discovery; ordinary scalar syntax alone is not evidence of MIN/MAX support. Legacy mode and existing command envelopes remain unchanged.
