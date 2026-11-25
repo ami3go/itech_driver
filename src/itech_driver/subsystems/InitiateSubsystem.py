@@ -1,6 +1,6 @@
 from ..command_specs import execute, execute_parameterized, command_spec
 import math
-from scpi_driver_core import ConfigurationError
+from scpi_driver_core import ConfigurationError, UnsupportedOperationError
 from scpi_driver_core.scpi.parsers import parse_bool
 from ..base import  BaseInstrument, BoolLike, Number
 # -------------------------
@@ -20,8 +20,10 @@ class InitiateSubsystem:
     def continuous_arb_set(self, enable: BoolLike):
         execute_parameterized(self._p, "InitiateSubsystem.continuous_arb_set", enable)
 
-    def continuous_arb_query(self) -> bool:  # Added: Missing query method
-        return execute(self._p, "InitiateSubsystem.continuous_arb_query")
+    def continuous_arb_query(self) -> bool:
+        raise UnsupportedOperationError(
+            "continuous ARB state query is not qualified for this model/firmware and waveform mode"
+        )
 
     def continuous_acq_set(self, enable: BoolLike):
         execute_parameterized(self._p, "InitiateSubsystem.continuous_acq_set", enable)
@@ -51,4 +53,3 @@ class InitiateSubsystem:
 
     def elog(self):
         execute(self._p, "InitiateSubsystem.elog")
-

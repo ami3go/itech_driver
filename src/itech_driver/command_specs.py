@@ -172,7 +172,6 @@ _ADDITIONAL_ROWS = (
     ("BatterySubsystem.mode_set", "SOUR:FUNC:MODE BATT", ResultKind.VOID_WRITE, "BatterySubsystem", "write"),
     ("InitiateSubsystem.acquire", "INITiate:ACQuire", ResultKind.VOID_WRITE, "InitiateSubsystem", "write"),
     ("InitiateSubsystem.arb", "INITiate:ARB", ResultKind.VOID_WRITE, "InitiateSubsystem", "write"),
-    ("InitiateSubsystem.continuous_arb_query", "INITiate:CONTinuous:ARB?", ResultKind.BOOL, "InitiateSubsystem", "read"),
     ("InitiateSubsystem.continuous_acq_query", "INITiate:CONTinuous:ACQuire?", ResultKind.BOOL, "InitiateSubsystem", "read"),
     ("InitiateSubsystem.dlog", "INITiate:DLOG", ResultKind.VOID_WRITE, "InitiateSubsystem", "write"),
     ("InitiateSubsystem.elog", "INITiate:ELOG", ResultKind.VOID_WRITE, "InitiateSubsystem", "write"),
@@ -323,6 +322,7 @@ _PARAMETERIZED_ROWS = (
 )
 # Explicit disposition for all other public inventory entries.
 _FINAL_ROWS = (
+    ("InitiateSubsystem.continuous_arb_query", "", ResultKind.RESTRICTED, "InitiateSubsystem", "unavailable", (), ()),
     ("AbortSubsystem.dlog", "", ResultKind.RESTRICTED, "AbortSubsystem", "unavailable", (), ()),
     ("AbortSubsystem.elog", "", ResultKind.RESTRICTED, "AbortSubsystem", "unavailable", (), ()),
     ("ArbSubsystem.terminate_last_set", "", ResultKind.RESTRICTED, "ArbSubsystem", "unavailable", (), ()),
@@ -381,6 +381,10 @@ _FINAL_ROWS = (
     ("OutputSubsystem.watchdog_set", "", ResultKind.COMPOUND, "OutputSubsystem", "write", ("enable:bool","delay_s:int|None",), ("OutputSubsystem.watchdog_query","OutputSubsystem.watchdog_delay_query",)),
     ("TriggerSubsystem.acquire_source_set", "TRIG:ACQ:SOUR", ResultKind.PARAM_WRITE, "TriggerSubsystem", "write", ("validated_payload",), ()),
     ("TriggerSubsystem.acquire_source_query", "TRIG:ACQ:SOUR?", ResultKind.RAW, "TriggerSubsystem", "read", (), ()),
+    ("TriggerSubsystem.acquire_voltage_level_set", "TRIG:ACQ:VOLT:LEV", ResultKind.PARAM_WRITE, "TriggerSubsystem", "write", ("validated_payload",), ("TriggerSubsystem.acquire_source_query",)),
+    ("TriggerSubsystem.acquire_voltage_level_query", "TRIG:ACQ:VOLT:LEV?", ResultKind.FLOAT, "TriggerSubsystem", "read", (), ("TriggerSubsystem.acquire_source_query",)),
+    ("TriggerSubsystem.acquire_current_level_set", "TRIG:ACQ:CURR:LEV", ResultKind.PARAM_WRITE, "TriggerSubsystem", "write", ("validated_payload",), ("TriggerSubsystem.acquire_source_query",)),
+    ("TriggerSubsystem.acquire_current_level_query", "TRIG:ACQ:CURR:LEV?", ResultKind.FLOAT, "TriggerSubsystem", "read", (), ("TriggerSubsystem.acquire_source_query",)),
     ("TriggerSubsystem.arb_source_set", "TRIG:ARB:SOUR", ResultKind.PARAM_WRITE, "TriggerSubsystem", "write", ("validated_payload",), ()),
     ("TriggerSubsystem.arb_source_query", "TRIG:ARB:SOUR?", ResultKind.RAW, "TriggerSubsystem", "read", (), ()),
     ("TriggerSubsystem.dlog_source_set", "TRIG:DLOG:SOUR", ResultKind.PARAM_WRITE, "TriggerSubsystem", "write", ("validated_payload",), ()),
