@@ -70,6 +70,14 @@ class TriggerSubsystem:
         except ConfigurationError as exc:
             raise ResponseParseError(f"invalid {subsystem} trigger source response", raw=raw) from exc
 
+    def _require_acquire_level_source(self, expected: str):
+        actual = self.acquire_source_query()
+        if actual != expected:
+            raise ConfigurationError(
+                f"acquisition trigger source must be {expected} before querying or setting its level "
+                f"(current source: {actual})"
+            )
+
     def acquire_source_set(self, source: str):
         self._source_set("ACQ", source)
 
@@ -109,16 +117,44 @@ class TriggerSubsystem:
         return value
 
     def acquire_voltage_level_set(self, value: Number):
-        execute_parameterized(self._p, "TriggerSubsystem.acquire_voltage_level_set", self._numeric_arg(value))
+        value = self._numeric_arg(value)
+        with self._p.session.operation_lock():
+            self._p._require_methods(
+                "TriggerSubsystem.acquire_source_query",
+                "TriggerSubsystem.acquire_voltage_level_set",
+            )
+            self._p._assert_write_authorized()
+            self._require_acquire_level_source("VOLT")
+            execute_parameterized(self._p, "TriggerSubsystem.acquire_voltage_level_set", value)
 
     def acquire_voltage_level_query(self) -> float:
-        return execute(self._p, "TriggerSubsystem.acquire_voltage_level_query")
+        with self._p.session.operation_lock():
+            self._p._require_methods(
+                "TriggerSubsystem.acquire_source_query",
+                "TriggerSubsystem.acquire_voltage_level_query",
+            )
+            self._require_acquire_level_source("VOLT")
+            return execute(self._p, "TriggerSubsystem.acquire_voltage_level_query")
 
     def acquire_current_level_set(self, value: Number):
-        execute_parameterized(self._p, "TriggerSubsystem.acquire_current_level_set", self._numeric_arg(value))
+        value = self._numeric_arg(value)
+        with self._p.session.operation_lock():
+            self._p._require_methods(
+                "TriggerSubsystem.acquire_source_query",
+                "TriggerSubsystem.acquire_current_level_set",
+            )
+            self._p._assert_write_authorized()
+            self._require_acquire_level_source("CURR")
+            execute_parameterized(self._p, "TriggerSubsystem.acquire_current_level_set", value)
 
     def acquire_current_level_query(self) -> float:
-        return execute(self._p, "TriggerSubsystem.acquire_current_level_query")
+        with self._p.session.operation_lock():
+            self._p._require_methods(
+                "TriggerSubsystem.acquire_source_query",
+                "TriggerSubsystem.acquire_current_level_query",
+            )
+            self._require_acquire_level_source("CURR")
+            return execute(self._p, "TriggerSubsystem.acquire_current_level_query")
 
     def level_set(self, val: Number):
         raise UnsupportedOperationError("select explicit acquisition voltage or current level")

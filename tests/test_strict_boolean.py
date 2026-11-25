@@ -1,5 +1,5 @@
 import pytest
-from scpi_driver_core import ConfigurationError, ResponseParseError
+from scpi_driver_core import ConfigurationError, ResponseParseError, UnsupportedOperationError
 from scpi_driver_core.simulation import ScriptedScpiTransport
 from itech_driver import ITM3900D
 
@@ -16,13 +16,20 @@ def test_beeper_response(reply, expected):
     ("system","beeper_state_query","SYST:BEEPer:STATe?"),
     ("output","watchdog_query","OUTP:PROT:WDOG:STAT?"),
     ("arb","pause_query","ARB:PAUSe:STATe?"),
-    ("initiate","continuous_arb_query","INITiate:CONTinuous:ARB?"),
     ("initiate","continuous_acq_query","INITiate:CONTinuous:ACQuire?"),
 ])
 def test_invalid_boolean_never_implies_off(subsystem, method, command, reply):
     t = ScriptedScpiTransport().on(command, reply)
     with ITM3900D("sim", transport=t) as d, pytest.raises(ResponseParseError):
         getattr(getattr(d, subsystem), method)()
+
+
+def test_continuous_arb_query_is_unavailable_without_io():
+    t = ScriptedScpiTransport()
+    with ITM3900D("sim", transport=t) as d:
+        with pytest.raises(UnsupportedOperationError, match="continuous ARB state query"):
+            d.initiate.continuous_arb_query()
+        assert t.history == []
 
 
 def test_beeper_invalid_argument_no_io():
