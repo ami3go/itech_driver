@@ -4,9 +4,10 @@ from itech_driver.identity import is_itm3900d
 from itech_driver.capabilities import RATINGS
 
 
-@pytest.mark.parametrize("model",sorted(RATINGS))
-def test_exact_known_model(model):
-    assert is_itm3900d(parse_identity(f"ITECH,{model},S,1.0"))
+@pytest.mark.parametrize("manufacturer", ["ITECH", "ITECH Electronics"])
+@pytest.mark.parametrize("model", sorted(RATINGS))
+def test_exact_known_model(manufacturer, model):
+    assert is_itm3900d(parse_identity(f"{manufacturer},{model},S,1.0"))
 
 
 @pytest.mark.parametrize("manufacturer,model",[

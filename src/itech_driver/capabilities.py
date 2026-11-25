@@ -92,7 +92,7 @@ MODEL_DESCRIPTORS = MappingProxyType({
 
 
 def descriptor_for(identity):
-    if identity.manufacturer.strip().upper() != "ITECH":
+    if identity.manufacturer.strip().upper() not in {"ITECH", "ITECH ELECTRONICS"}:
         return None
     return MODEL_DESCRIPTORS.get(identity.model.strip().upper())
 
