@@ -59,4 +59,5 @@ def set_protection_threshold(driver, protection, value, qualification):
                 or identity.model.strip().upper() != qualification.model
                 or identity.firmware_version != qualification.firmware):
             raise UnsupportedOperationError("protection qualification does not match identified model and firmware")
+        driver._require_methods(method)
         driver.write_scpi(f"{header} {value}")
