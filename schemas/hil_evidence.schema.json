@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ITECH HIL evidence envelope (existing manifest-compatible rows)",
+  "type": "object",
+  "required": [
+    "evidence_type",
+    "driver_commit",
+    "core_commit",
+    "guide_revision",
+    "guide_sha256",
+    "authorization_reference",
+    "rows"
+  ],
+  "properties": {
+    "evidence_type": {
+      "enum": [
+        "physical",
+        "simulated"
+      ]
+    },
+    "driver_commit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "core_commit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "guide_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "guide_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "authorization_reference": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "case_id",
+          "model",
+          "serial",
+          "firmware",
+          "interface",
+          "command",
+          "guide_page",
+          "expected",
+          "actual",
+          "utc",
+          "required",
+          "energized",
+          "result"
+        ],
+        "properties": {
+          "case_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "model": {
+            "type": "string",
+            "minLength": 1
+          },
+          "serial": {
+            "type": "string",
+            "minLength": 1
+          },
+          "firmware": {
+            "type": "string",
+            "minLength": 1
+          },
+          "interface": {
+            "type": "string",
+            "minLength": 1
+          },
+          "command": {
+            "type": "string",
+            "minLength": 1
+          },
+          "guide_page": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected": {
+            "type": "string",
+            "minLength": 1
+          },
+          "actual": {
+            "type": "string",
+            "minLength": 1
+          },
+          "utc": {
+            "type": "string",
+            "minLength": 1
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "energized": {
+            "type": "boolean"
+          },
+          "result": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "NOT_RUN",
+              "UNKNOWN",
+              "BLOCKED",
+              "NOT APPLICABLE",
+              "NOT IMPLEMENTED",
+              "INCONCLUSIVE"
+            ]
+          },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "path",
+                "sha256"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "independent_safe_state_reference": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "result": {
+                  "const": "PASS"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "artifacts"
+              ],
+              "properties": {
+                "artifacts": {
+                  "minItems": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "result": {
+                  "const": "PASS"
+                },
+                "energized": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "independent_safe_state_reference"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

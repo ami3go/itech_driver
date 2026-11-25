@@ -1,0 +1,154 @@
+[
+  {
+    "id": "HIL-COM-ID",
+    "suite": "communication",
+    "priority": "P0",
+    "automated": true,
+    "requirement": "Repeated IDN and exact model/serial/firmware; session cleanup. Existing physical test; operator final independent check.",
+    "status": "NOT RUN"
+  },
+  {
+    "id": "HIL-COM-REMOTE",
+    "suite": "communication",
+    "priority": "P1",
+    "automated": true,
+    "requirement": "Remote/local command sequence; panel observation mandatory; no energized output.",
+    "status": "NOT RUN"
+  },
+  {
+    "id": "HIL-COM-DISC",
+    "suite": "communication",
+    "priority": "P0",
+    "automated": false,
+    "requirement": "Scoped physical discovery, framing, partial response, timeout, interface parity and reconnect; per OS/interface.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-SRC",
+    "suite": "source",
+    "priority": "P0",
+    "automated": false,
+    "requirement": "All supported source controls, setpoint validation, independent output behavior and boundaries.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-SINK",
+    "suite": "load",
+    "priority": "P0",
+    "automated": false,
+    "requirement": "Only if exact model guide establishes sink and regeneration; no assumptions from other families.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-PROT",
+    "suite": "protection",
+    "priority": "P0",
+    "automated": false,
+    "requirement": "Configuration separate from bounded trip/reset; verify no automatic output enable.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-ARB",
+    "suite": "arb",
+    "priority": "P1",
+    "automated": false,
+    "requirement": "Physical waveform, points, count, timing, trigger, abort; exact integer bounds.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-TRIG",
+    "suite": "trigger",
+    "priority": "P1",
+    "automated": false,
+    "requirement": "All implemented trigger paths; external timing reference.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-MEAS",
+    "suite": "measurement",
+    "priority": "P1",
+    "automated": false,
+    "requirement": "Calibrated independent reference, uncertainty and guide limits.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-REC",
+    "suite": "recovery",
+    "priority": "P0",
+    "automated": false,
+    "requirement": "Transport failures, unknown output, operator emergency isolation, no replay.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-PG",
+    "suite": "scpi",
+    "priority": "P0",
+    "automated": false,
+    "requirement": "Per-command guide traceability and independent approval.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-CORE",
+    "suite": "core",
+    "priority": "P0",
+    "automated": false,
+    "requirement": "Pinned core contract, transport cleanup, replay policy.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-PERF",
+    "suite": "performance",
+    "priority": "P1",
+    "automated": false,
+    "requirement": "Compare interfaces, host and physical latency separately.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-SOAK15",
+    "suite": "soak15",
+    "priority": "P1",
+    "automated": false,
+    "requirement": "15-minute smoke profile.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-SOAK1",
+    "suite": "soak1",
+    "priority": "P1",
+    "automated": false,
+    "requirement": "1-hour short profile.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-SOAK4",
+    "suite": "soak4",
+    "priority": "P1",
+    "automated": false,
+    "requirement": "4-hour extended profile.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-SOAK24",
+    "suite": "soak24",
+    "priority": "P1",
+    "automated": false,
+    "requirement": "24-hour standard profile; renew authorization before expiration at safe checkpoint.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-SOAK72",
+    "suite": "soak72",
+    "priority": "P2",
+    "automated": false,
+    "requirement": "72-hour extended reliability; renewal at safe checkpoints.",
+    "status": "BLOCKED"
+  },
+  {
+    "id": "HIL-MODEL",
+    "suite": "models",
+    "priority": "P0",
+    "automated": false,
+    "requirement": "Exact model/firmware/interface and capability guards.",
+    "status": "BLOCKED"
+  }
+]

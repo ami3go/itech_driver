@@ -16,6 +16,8 @@ def selected_driver(request, record_property):
     get = request.config.getoption
     if not get("--run-hil"):
         pytest.skip("physical communication not authorized")
+    from itech_driver.hil_authorization import read_object
+    bench = read_object(get("--hil-config"))
     interface = get("--hil-interface")
     address = get("--hil-address")
     timeout = get("--hil-timeout")
@@ -49,6 +51,8 @@ def selected_driver(request, record_property):
         identity = parse_identity(d.identify())
         assert is_itm3900d(identity), "unexpected model"
         assert identity.serial_number == expected, "unexpected serial"
+        assert identity.model == bench["model"], "unexpected exact model"
+        assert identity.firmware_version == bench["firmware"], "unexpected firmware"
         record_property("idn", identity.raw)
         yield d, identity
     assert not d.session.is_connected
