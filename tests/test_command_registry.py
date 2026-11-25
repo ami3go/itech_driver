@@ -41,7 +41,14 @@ def test_integrated_new_public_methods_and_aliases_have_explicit_registry_entrie
         "LoggingSubsystem.commands",
     ):
         assert name in entries
-        assert entries[name]["guide"]["status"] == "unverified"
+        if name == "SourceSubsystem.voltage_both_time_query":
+            # V1.4 guide indexed text establishes the command on page 60,
+            # but does not establish model/firmware qualification.
+            assert entries[name]["guide"]["status"] == "indexed_text_reference"
+            assert entries[name]["guide"]["page"] == 60
+            assert entries[name]["guide"]["models"] == "IT-M3900D series; actual model/firmware not yet qualified"
+        else:
+            assert entries[name]["guide"]["status"] == "unverified"
         assert entries[name]["retry"] == "no_automatic_replay"
     for name, target in {"SourceSubsystem.transient_mode_set":"SourceSubsystem.function_mode_set","SourceSubsystem.transient_mode_query":"SourceSubsystem.function_mode_query","SourceSubsystem.power_limit_set":"SourceSubsystem.opp_threshold_set","SourceSubsystem.power_limit_query":"SourceSubsystem.opp_threshold_query","SourceSubsystem.power_limit_enable":"SourceSubsystem.opp_enable","SourceSubsystem.power_limit_enable_query":"SourceSubsystem.opp_enable_query"}.items():
         assert entries[name]["alias_of"] == target
